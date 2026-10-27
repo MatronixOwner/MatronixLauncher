@@ -166,3 +166,24 @@ body,.app-shell{background:#050506}
 .catalog-state>p{font-size:10px;color:#777681}
 .instance-info b{font-size:10px;font-weight:500}.instance-info small{font-size:8px}
 .add-instance{border-style:solid;border-color:rgba(255,255,255,.08);background:transparent}
+
+.version-field{position:relative;min-width:104px;z-index:2}
+.version-field>small{display:block;font-size:8px;letter-spacing:1.1px;color:#85838f;margin-bottom:5px}
+.version-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:2px 0;background:none;border:0;color:#eeedf3;font-size:11px;text-align:left}
+.version-trigger span{color:#888493;font-size:13px}
+.launch-panel{overflow:visible;position:relative;z-index:4}
+.version-picker{position:absolute;right:-14px;top:calc(100% + 12px);z-index:30;width:310px;padding:10px;border:1px solid rgba(255,255,255,.12);border-radius:7px;background:#0b0b0e;box-shadow:0 18px 55px rgba(0,0,0,.72)}
+.version-picker>input{width:100%;height:34px;padding:0 10px;border:1px solid rgba(255,255,255,.1);border-radius:4px;background:#08080a;color:#eee;font-size:10px;outline:none}
+.version-picker>input:focus{border-color:rgba(181,164,255,.48)}
+.version-picker>input::placeholder{color:#696874}
+.version-kind-tabs{display:flex;gap:4px;margin:8px 0}
+.version-kind-tabs button{flex:1;padding:6px 3px;border:0;border-radius:4px;background:transparent;color:#8c8996;font-size:8px;white-space:nowrap}
+.version-kind-tabs button:hover{color:#eee;background:#16151a}
+.version-kind-tabs button.selected{background:#1b1923;color:#d3c8ff}
+.version-options{max-height:min(300px,42vh);overflow-y:auto;scrollbar-width:thin;scrollbar-color:#35323e transparent}
+.version-options>button{width:100%;display:flex;justify-content:space-between;align-items:center;padding:8px 8px;border:0;border-bottom:1px solid rgba(255,255,255,.045);background:transparent;color:#d7d5df;text-align:left;font-size:10px}
+.version-options>button:hover,.version-options>button.selected{background:#17151e;color:#e5dbff}
+.version-options>button small{font-size:8px;color:#777482}
+.version-message,.version-error{margin:10px 3px 3px;color:#85828f;font-size:9px;line-height:1.5}
+.version-error{color:#d2aa8b}
+@media(max-width:1200px){.version-picker{right:-30px;width:280px}}

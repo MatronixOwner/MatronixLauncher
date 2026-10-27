@@ -1,5 +1,5 @@
 <script setup>
-import { computed, nextTick, onMounted, ref } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import brandMark from './assets/matronix-mark.png';
 
 const activePage = ref('Главная');
@@ -9,8 +9,19 @@ const loading = ref(false);
 const error = ref('');
 const projects = ref([]);
 const toast = ref('');
-const selectedLoader = ref('Fabric');
-const selectedVersion = ref('1.21.1');
+const selectedLoader = ref(localStorage.getItem('matronix-loader') || 'Fabric');
+const selectedVersion = ref(localStorage.getItem('matronix-version') || '1.21.1');
+const versionList = ref([]);
+const versionLoading = ref(false);
+const versionLoadError = ref('');
+const showVersionPicker = ref(false);
+const versionSearch = ref('');
+const versionTypeFilter = ref('all');
+const fallbackVersions = [
+  { id: '1.21.1', type: 'release' }, { id: '1.20.1', type: 'release' },
+  { id: '1.19.2', type: 'release' }, { id: '1.18.2', type: 'release' },
+  { id: '1.16.5', type: 'release' }
+];
 const curseKey = ref(localStorage.getItem('elyprism-cf-key') || '');
 const keyDraft = ref(curseKey.value);
 const showKeyDialog = ref(false);
@@ -30,11 +41,66 @@ const assistantSuggestions = ['Какой загрузчик выбрать?', '
 const navItems = ['Главная', 'Каталог модов', 'Сборки', 'Библиотека'];
 
 const filteredProjects = computed(() => projects.value);
+const filteredVersions = computed(() => {
+  const query = versionSearch.value.trim().toLowerCase();
+  return versionList.value.filter((version) => {
+    const matchesQuery = !query || version.id.toLowerCase().includes(query);
+    const matchesType = versionTypeFilter.value === 'all'
+      || version.type === versionTypeFilter.value
+      || (versionTypeFilter.value === 'old' && (version.type === 'old_alpha' || version.type === 'old_beta'));
+    return matchesQuery && matchesType;
+  });
+});
+
+watch(selectedVersion, (value) => localStorage.setItem('matronix-version', value));
+watch(selectedLoader, (value) => localStorage.setItem('matronix-loader', value));
 
 function notify(message) {
   toast.value = message;
   window.clearTimeout(notify.timer);
   notify.timer = window.setTimeout(() => (toast.value = ''), 3200);
+}
+
+async function loadMinecraftVersions() {
+  versionLoading.value = true;
+  versionLoadError.value = '';
+  try {
+    let manifest;
+    if (window.elyprism?.desktop && window.elyprism.getMinecraftVersions) {
+      manifest = await window.elyprism.getMinecraftVersions();
+    } else {
+      const response = await fetch('https://piston-meta.mojang.com/mc/game/version_manifest_v2.json');
+      if (!response.ok) throw new Error(`Minecraft manifest request failed: ${response.status}`);
+      manifest = await response.json();
+    }
+    versionList.value = (manifest.versions || []).filter((version) =>
+      ['release', 'snapshot', 'old_beta', 'old_alpha'].includes(version.type)
+    );
+    if (!versionList.value.length) throw new Error('The version manifest is empty.');
+    if (!versionList.value.some((version) => version.id === selectedVersion.value)) {
+      selectedVersion.value = manifest.latest?.release || versionList.value[0].id;
+    }
+  } catch (error) {
+    versionList.value = fallbackVersions;
+    versionLoadError.value = 'Не удалось загрузить полный список версий. Проверь подключение к интернету.';
+  } finally {
+    versionLoading.value = false;
+  }
+}
+
+function toggleVersionPicker() {
+  showVersionPicker.value = !showVersionPicker.value;
+  versionSearch.value = '';
+  versionTypeFilter.value = 'all';
+}
+
+function selectVersion(version) {
+  selectedVersion.value = version.id;
+  showVersionPicker.value = false;
+}
+
+function versionTypeLabel(type) {
+  return ({ release: 'Релиз', snapshot: 'Снапшот', old_beta: 'Бета', old_alpha: 'Альфа' })[type] || type;
 }
 
 async function loadModrinth() {
@@ -152,7 +218,7 @@ function getAssistantReply(question) {
   }
   if (/верси|стар(ая|ые)|все версии|1\.\d/.test(q)) {
     return {
-      text: 'В интерфейсе пока показаны лишь примеры версий. Поддержка всех версий Minecraft потребует менеджера версий и отдельных установщиков загрузчиков; эта часть ещё не реализована.'
+      text: 'Список версий загружается из официального манифеста Minecraft: релизы, снапшоты, бета и альфа. Установка и запуск выбранной версии — следующий шаг.'
     };
   }
   if (/мод|установ/.test(q)) {
@@ -208,7 +274,10 @@ function runAssistantAction(action) {
     setPage('Каталог модов');
   }
 }
-onMounted(() => loadModrinth());
+onMounted(() => {
+  loadModrinth();
+  loadMinecraftVersions();
+});
 </script>
 
 <template>
@@ -221,19 +290,19 @@ onMounted(() => loadModrinth());
       <div class="side-divider"></div>
       <button class="instance-card" @click="activePage = 'Библиотека'">
         <img class="instance-thumb" :src="brandMark" alt="" />
-        <div class="instance-info"><b>Prism Survival</b><small>1.21.1 · Fabric</small></div>
+        <div class="instance-info"><b>Prism Survival</b><small>{{ selectedVersion }} · {{ selectedLoader }}</small></div>
       </button>
       <button class="add-instance" @click="createInstance"><span>＋</span> Новая сборка</button>
       <div class="sidebar-bottom"><button class="settings-shortcut" title="Настройки" aria-label="Настройки" @click="setPage('Настройки')">⚙</button></div>
     </aside>
 
-    <main class="main-area">
+    <main class="main-area" @click="showVersionPicker = false" @keydown.esc="showVersionPicker = false">
       <header class="topbar">
         <div class="top-actions"><button class="assistant-top-button" aria-label="ИИ-помощник" @click="assistantOpen = !assistantOpen">Помощник</button></div>
       </header>
 
       <section v-if="activePage === 'Главная'" class="content home-content">
-        <div class="launch-panel"><div class="launch-instance"><div><b>Prism Survival</b><span>Minecraft {{ selectedVersion }} <i>·</i> {{ selectedLoader }}</span></div></div><div class="launch-meta"><div><small>ВЕРСИЯ</small><select v-model="selectedVersion"><option>1.21.1</option><option>1.20.1</option><option>1.19.2</option><option>1.18.2</option></select></div><div class="meta-divider"></div><div><small>ЗАГРУЗЧИК</small><select v-model="selectedLoader"><option>Fabric</option><option>Forge</option><option>Vanilla</option></select></div><button class="play-button" @click="launchGame"><span>▶</span> Играть</button></div></div>
+        <div class="launch-panel"><div class="launch-instance"><div><b>Prism Survival</b><span>Minecraft {{ selectedVersion }} <i>·</i> {{ selectedLoader }}</span></div></div><div class="launch-meta"><div class="version-field" @click.stop><small>ВЕРСИЯ</small><button class="version-trigger" type="button" :aria-expanded="showVersionPicker" @click="toggleVersionPicker">{{ selectedVersion }} <span>{{ showVersionPicker ? '⌃' : '⌄' }}</span></button><div v-if="showVersionPicker" class="version-picker" @keydown.esc.stop="showVersionPicker = false"><input v-model="versionSearch" autofocus placeholder="Поиск версии" aria-label="Поиск версии"/><div class="version-kind-tabs"><button v-for="kind in [{ id: 'all', label: 'Все' }, { id: 'release', label: 'Релизы' }, { id: 'snapshot', label: 'Снапшоты' }, { id: 'old', label: 'Старые' }]" :key="kind.id" type="button" :class="{ selected: versionTypeFilter === kind.id }" @click="versionTypeFilter = kind.id">{{ kind.label }}</button></div><div v-if="versionLoading" class="version-message">Загрузка версий…</div><div v-else class="version-options"><button v-for="version in filteredVersions" :key="version.id" type="button" :class="{ selected: selectedVersion === version.id }" @click="selectVersion(version)"><span>{{ version.id }}</span><small>{{ versionTypeLabel(version.type) }}</small></button><p v-if="!filteredVersions.length" class="version-message">Версии не найдены</p></div><p v-if="versionLoadError" class="version-error">{{ versionLoadError }}</p></div></div><div class="meta-divider"></div><div><small>ЗАГРУЗЧИК</small><select v-model="selectedLoader"><option>Fabric</option><option>Forge</option><option>Vanilla</option></select></div><button class="play-button" @click="launchGame"><span>▶</span> Играть</button></div></div>
 
         <div class="section-heading"><h2>Загрузчик</h2><button class="text-link" @click="setPage('Библиотека')">Профили</button></div>
         <div class="choice-grid">

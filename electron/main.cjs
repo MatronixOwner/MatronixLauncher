@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell, ipcMain } = require('electron');
+const { app, BrowserWindow, shell, ipcMain, net } = require('electron');
 const path = require('node:path');
 
 function createWindow() {
@@ -23,6 +23,18 @@ function createWindow() {
 
 ipcMain.handle('open-external', (_event, url) => {
   if (typeof url === 'string' && /^https:\/\//i.test(url)) return shell.openExternal(url);
+});
+
+ipcMain.handle('minecraft-version-manifest', async () => {
+  const response = await net.fetch('https://piston-meta.mojang.com/mc/game/version_manifest_v2.json', {
+    headers: { Accept: 'application/json' }
+  });
+  if (!response.ok) throw new Error(`Minecraft manifest request failed: ${response.status}`);
+  const manifest = await response.json();
+  return {
+    latest: manifest.latest,
+    versions: (manifest.versions || []).map(({ id, type, releaseTime }) => ({ id, type, releaseTime }))
+  };
 });
 app.whenReady().then(() => {
   createWindow();
