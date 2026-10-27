@@ -1,0 +1,31 @@
+{
+  "name": "elyprism-launcher",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ElyPrismLauncher — customizable Minecraft launcher",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "desktop": "electron .",
+    "dist:win": "npm run build && electron-builder --win portable --x64",
+    "dist:win:installer": "npm run build && electron-builder --win nsis --x64"
+  },
+  "dependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.0.7",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.elyprism.launcher",
+    "productName": "ElyPrism Launcher",
+    "directories": { "output": "release" },
+    "files": ["dist/**/*", "electron/**/*", "package.json"],
+    "win": { "target": ["portable"], "artifactName": "ElyPrism-Launcher-${version}-win-${arch}.${ext}" },
+    "portable": { "artifactName": "ElyPrism-Launcher-${version}-win-${arch}.${ext}" }
+  }
+}

@@ -1,0 +1,50 @@
+name: Windows installer and GitHub release
+
+on:
+  push:
+    branches:
+      - arena/a2faeba1-matronixlauncher
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Windows installer
+        run: npm run dist:win:installer
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          $tag = "v0.1.0"
+          $files = @(Get-ChildItem release -Filter *.exe | ForEach-Object { $_.FullName })
+          if ($files.Count -eq 0) { throw "No Windows installer .exe was produced." }
+          $notes = @"
+          Первый прототип ElyPrism Launcher для Windows.
+
+          Включает NSIS-установщик. Интерфейс и каталоги модов доступны; игровой движок, авторизация и автоматическая установка Minecraft ещё в разработке.
+          "@
+          $ghArgs = @("release", "create", $tag) + $files + @(
+            "--repo", $env:GITHUB_REPOSITORY,
+            "--title", "ElyPrism Launcher $tag",
+            "--notes", $notes,
+            "--target", $env:GITHUB_SHA
+          )
+          gh @ghArgs
