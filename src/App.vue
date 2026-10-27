@@ -20,6 +20,11 @@ const versionTypeFilter = ref('all');
 const gameBusy = ref(false);
 const gameStatus = ref('');
 const gameProgress = ref(null);
+const storedInstallProfiles = (() => {
+  try { return JSON.parse(localStorage.getItem('matronix-installed-profiles') || '[]'); }
+  catch { return []; }
+})();
+const installedProfiles = ref(Array.isArray(storedInstallProfiles) ? storedInstallProfiles : []);
 const elyProfile = ref(null);
 const launchMode = ref(localStorage.getItem('matronix-profile-mode') || 'ely');
 const offlineProfileName = ref(localStorage.getItem('matronix-offline-name') || '');
@@ -55,6 +60,8 @@ const assistantSuggestions = ['Какой загрузчик выбрать?', '
 const navItems = ['Главная', 'Каталог модов', 'Сборки', 'Библиотека'];
 
 const filteredProjects = computed(() => projects.value);
+const selectedInstallKey = computed(() => `${launchMode.value}:${selectedVersion.value}:${selectedLoader.value}`);
+const selectedVersionReady = computed(() => installedProfiles.value.includes(selectedInstallKey.value));
 const filteredVersions = computed(() => {
   const query = versionSearch.value.trim().toLowerCase();
   return versionList.value.filter((version) => {
@@ -249,9 +256,63 @@ function installProject(project) {
   if (!installed.value.includes(project.project_id)) installed.value.push(project.project_id);
   notify(`«${project.title}» добавлен в очередь установки для ${selectedInstance.value}`);
 }
+function currentLaunchProfile() {
+  return launchMode.value === 'offline'
+    ? { mode: 'offline', name: offlineProfileName.value }
+    : { mode: 'ely' };
+}
+function markVersionInstalled(key) {
+  if (!installedProfiles.value.includes(key)) installedProfiles.value.push(key);
+  localStorage.setItem('matronix-installed-profiles', JSON.stringify(installedProfiles.value));
+}
+async function installSelectedVersion() {
+  if (!window.elyprism?.desktop || !window.elyprism.installMinecraft) {
+    notify('Установка доступна в установленном приложении MatronixLauncher.');
+    return;
+  }
+  if (launchMode.value === 'ely' && !elyProfile.value) {
+    showElyLoginDialog.value = true;
+    return;
+  }
+  if (launchMode.value === 'offline' && !offlineProfileName.value) {
+    showElyLoginDialog.value = true;
+    return;
+  }
+  if (gameBusy.value) return;
+  const version = selectedVersion.value;
+  const loader = selectedLoader.value;
+  const profile = currentLaunchProfile();
+  const profileMode = launchMode.value;
+  const installKey = `${profileMode}:${version}:${loader}`;
+  gameBusy.value = true;
+  gameStatus.value = profileMode === 'offline' ? 'Проверка локальных файлов…' : 'Подготовка установки…';
+  gameProgress.value = null;
+  try {
+    const result = await window.elyprism.installMinecraft(version, loader, profile);
+    if (!result?.ok) throw new Error(result?.error || 'Не удалось подготовить версию Minecraft.');
+    markVersionInstalled(installKey);
+    notify(profileMode === 'offline'
+      ? `Minecraft ${version} проверен и готов к запуску офлайн.`
+      : `Minecraft ${version} установлен. Теперь можно играть.`);
+  } catch (error) {
+    notify(error?.message || 'Не удалось установить Minecraft.');
+    if (/сессия Ely\.by истекла/i.test(error?.message || '')) {
+      elyProfile.value = null;
+      showElyLoginDialog.value = true;
+    }
+  } finally {
+    gameBusy.value = false;
+    gameStatus.value = '';
+    gameProgress.value = null;
+  }
+}
 async function launchGame() {
   if (!window.elyprism?.desktop || !window.elyprism.launchMinecraft) {
     notify('Запуск доступен в установленном приложении MatronixLauncher.');
+    return;
+  }
+  if (!selectedVersionReady.value) {
+    notify('Сначала нажми «Установить» для выбранной версии.');
     return;
   }
   if (launchMode.value === 'ely' && !elyProfile.value) {
@@ -264,16 +325,13 @@ async function launchGame() {
   }
   if (gameBusy.value) return;
   gameBusy.value = true;
-  gameStatus.value = 'Подготовка…';
+  gameStatus.value = 'Запуск…';
   gameProgress.value = null;
   try {
-    const profile = launchMode.value === 'offline'
-      ? { mode: 'offline', name: offlineProfileName.value }
-      : { mode: 'ely' };
-    const result = await window.elyprism.launchMinecraft(selectedVersion.value, selectedLoader.value, profile);
-    if (!result?.ok) throw new Error(result?.error || 'Не удалось установить или запустить Minecraft.');
+    const result = await window.elyprism.launchMinecraft(selectedVersion.value, selectedLoader.value, currentLaunchProfile());
+    if (!result?.ok) throw new Error(result?.error || 'Не удалось запустить Minecraft.');
   } catch (error) {
-    notify(error?.message || 'Не удалось установить или запустить Minecraft.');
+    notify(error?.message || 'Не удалось запустить Minecraft.');
     if (/сессия Ely\.by истекла/i.test(error?.message || '')) {
       elyProfile.value = null;
       showElyLoginDialog.value = true;
@@ -424,7 +482,7 @@ onMounted(() => {
       </header>
 
       <section v-if="activePage === 'Главная'" class="content home-content">
-        <div class="launch-panel"><div class="launch-instance"><div><b>Prism Survival</b><span>Minecraft {{ selectedVersion }} <i>·</i> {{ selectedLoader }}</span></div></div><div class="launch-meta"><div class="version-field" @click.stop><small>ВЕРСИЯ</small><button class="version-trigger" type="button" :aria-expanded="showVersionPicker" @click="toggleVersionPicker">{{ selectedVersion }} <span>{{ showVersionPicker ? '⌃' : '⌄' }}</span></button><div v-if="showVersionPicker" class="version-picker" @keydown.esc.stop="showVersionPicker = false"><input v-model="versionSearch" autofocus placeholder="Поиск версии" aria-label="Поиск версии"/><div class="version-kind-tabs"><button v-for="kind in [{ id: 'all', label: 'Все' }, { id: 'release', label: 'Релизы' }, { id: 'snapshot', label: 'Снапшоты' }, { id: 'old', label: 'Старые' }]" :key="kind.id" type="button" :class="{ selected: versionTypeFilter === kind.id }" @click="versionTypeFilter = kind.id">{{ kind.label }}</button></div><div v-if="versionLoading" class="version-message">Загрузка версий…</div><div v-else class="version-options"><button v-for="version in filteredVersions" :key="version.id" type="button" :class="{ selected: selectedVersion === version.id }" @click="selectVersion(version)"><span>{{ version.id }}</span><small>{{ versionTypeLabel(version.type) }}</small></button><p v-if="!filteredVersions.length" class="version-message">Версии не найдены</p></div><p v-if="versionLoadError" class="version-error">{{ versionLoadError }}</p></div></div><div class="meta-divider"></div><div><small>ЗАГРУЗЧИК</small><select v-model="selectedLoader"><option>Fabric</option><option>Forge</option><option>Vanilla</option></select></div><button class="play-button" :disabled="gameBusy" :title="gameBusy ? gameStatus : ''" @click="launchGame"><span v-if="!gameBusy">▶</span>{{ gameBusy ? `${gameStatus}${gameProgress !== null ? ` ${gameProgress}%` : ''}` : 'Играть' }}</button></div></div>
+        <div class="launch-panel"><div class="launch-instance"><div><b>Prism Survival</b><span>Minecraft {{ selectedVersion }} <i>·</i> {{ selectedLoader }}</span></div></div><div class="launch-meta"><div class="version-field" @click.stop><small>ВЕРСИЯ</small><button class="version-trigger" type="button" :aria-expanded="showVersionPicker" @click="toggleVersionPicker">{{ selectedVersion }} <span>{{ showVersionPicker ? '⌃' : '⌄' }}</span></button><div v-if="showVersionPicker" class="version-picker" @keydown.esc.stop="showVersionPicker = false"><input v-model="versionSearch" autofocus placeholder="Поиск версии" aria-label="Поиск версии"/><div class="version-kind-tabs"><button v-for="kind in [{ id: 'all', label: 'Все' }, { id: 'release', label: 'Релизы' }, { id: 'snapshot', label: 'Снапшоты' }, { id: 'old', label: 'Старые' }]" :key="kind.id" type="button" :class="{ selected: versionTypeFilter === kind.id }" @click="versionTypeFilter = kind.id">{{ kind.label }}</button></div><div v-if="versionLoading" class="version-message">Загрузка версий…</div><div v-else class="version-options"><button v-for="version in filteredVersions" :key="version.id" type="button" :class="{ selected: selectedVersion === version.id }" @click="selectVersion(version)"><span>{{ version.id }}</span><small>{{ versionTypeLabel(version.type) }}</small></button><p v-if="!filteredVersions.length" class="version-message">Версии не найдены</p></div><p v-if="versionLoadError" class="version-error">{{ versionLoadError }}</p></div></div><div class="meta-divider"></div><div><small>ЗАГРУЗЧИК</small><select v-model="selectedLoader"><option>Fabric</option><option>Forge</option><option>Vanilla</option></select></div><button class="play-button" :disabled="gameBusy" :title="gameBusy ? gameStatus : (selectedVersionReady ? 'Запустить установленную версию' : launchMode === 'offline' ? 'Проверить уже установленные локальные файлы; ничего не скачивается' : 'Сначала установить выбранную версию Minecraft и Java')" @click="selectedVersionReady ? launchGame() : installSelectedVersion()"><span v-if="!gameBusy">{{ selectedVersionReady ? '▶' : '↓' }}</span>{{ gameBusy ? `${gameStatus}${gameProgress !== null ? ` ${gameProgress}%` : ''}` : (selectedVersionReady ? 'Играть' : (launchMode === 'offline' ? 'Проверить' : 'Установить')) }}</button></div></div>
 
         <div class="section-heading"><h2>Загрузчик</h2><button class="text-link" @click="setPage('Библиотека')">Профили</button></div>
         <div class="choice-grid">

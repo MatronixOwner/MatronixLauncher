@@ -336,62 +336,108 @@ function offlinePlayerId(name) {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
-async function installAndLaunch(versionId, profile = {}) {
+function validateMinecraftVersionId(versionId) {
   if (typeof versionId !== 'string' || versionId.length > 80 || !/^[\w.-]+$/.test(versionId)) {
     throw new Error('Выбрана некорректная версия Minecraft.');
   }
+}
+
+function getLaunchProfile(profile = {}) {
   const offlineMode = profile?.mode === 'offline';
   const offlineName = typeof profile?.name === 'string' ? profile.name.trim() : '';
   if (offlineMode && !/^[A-Za-z0-9_]{3,16}$/.test(offlineName)) {
     throw new Error('Ник офлайн-профиля должен содержать от 3 до 16 латинских букв, цифр или символов подчёркивания.');
   }
+  return { offlineMode, offlineName };
+}
 
-  let account;
-  if (!offlineMode) account = await getMinecraftAccount();
+async function loadInstalledVersion(versionId, folder, offlineMode) {
+  let resolvedVersion;
+  try {
+    await fs.access(folder.getVersionJson(versionId));
+    resolvedVersion = await Version.parse(folder, versionId);
+  } catch {
+    const advice = offlineMode
+      ? 'Офлайн-профиль не скачивает файлы. Подключись к интернету, выбери Ely.by и нажми «Установить».'
+      : 'Сначала нажми «Установить» для этой версии.';
+    throw new Error(`Minecraft ${versionId} не установлен или установлен не полностью. ${advice}`);
+  }
+
+  const java = resolvedVersion.javaVersion;
+  if (!java?.component) throw new Error('Не удалось определить требуемую версию Java. Переустанови версию Minecraft.');
+  const runtimeRoot = path.join(folder.root, 'runtime', java.component, String(java.majorVersion));
+  const javaPath = path.join(runtimeRoot, 'bin', process.platform === 'win32' ? 'java.exe' : 'java');
+  try {
+    await fs.access(javaPath);
+  } catch {
+    const advice = offlineMode
+      ? 'Офлайн-профиль не скачивает Java. Подключись к интернету, выбери Ely.by и нажми «Установить».'
+      : 'Нажми «Установить», чтобы загрузить нужную Java.';
+    throw new Error(`Java ${java.majorVersion} не найдена локально. ${advice}`);
+  }
+
+  reportGameProgress(`Проверка файлов Minecraft ${versionId}…`, null);
+  const report = await diagnose(versionId, folder);
+  if (report.issues.length) {
+    const examples = report.issues.slice(0, 3).map((issue) => `${issue.role}: ${path.basename(issue.file)}`).join(', ');
+    const extra = report.issues.length > 3 ? ` и ещё ${report.issues.length - 3}` : '';
+    const advice = offlineMode
+      ? 'Офлайн-профиль не загружает файлы — подключись к интернету и нажми «Установить».'
+      : 'Нажми «Установить», чтобы восстановить файлы версии.';
+    throw new Error(`Minecraft ${versionId} не готов к запуску: отсутствуют или повреждены файлы (${examples}${extra}). ${advice}`);
+  }
+  return { resolvedVersion, javaPath };
+}
+
+async function getVerifiedAuthlibInjector(folder) {
+  const destination = path.join(folder.root, 'libraries', 'authlib-injector', `authlib-injector-${AUTHLIB_INJECTOR.version}.jar`);
+  try {
+    const content = await fs.readFile(destination);
+    const digest = createHash('sha256').update(content).digest('hex');
+    if (digest === AUTHLIB_INJECTOR.sha256) return destination;
+  } catch {
+    // Report a clear install-first message below.
+  }
+  throw new Error('Компонент авторизации Ely.by не установлен или повреждён. Нажми «Установить», чтобы подготовить версию.');
+}
+
+async function installMinecraftVersion(versionId, profile = {}) {
+  validateMinecraftVersionId(versionId);
+  const { offlineMode, offlineName } = getLaunchProfile(profile);
+  if (offlineMode) {
+    const folder = MinecraftFolder.from(minecraftRoot());
+    const { resolvedVersion } = await loadInstalledVersion(versionId, folder, true);
+    reportGameProgress(`Локальная версия Minecraft ${versionId} проверена`, null, 'installed');
+    return { version: versionId, account: offlineName, profileMode: 'offline', javaMajorVersion: resolvedVersion.javaVersion.majorVersion };
+  }
+
+  const account = await getMinecraftAccount();
+  reportGameProgress('Получение каталога Minecraft…', null);
+  const manifest = await getVersionList();
+  const metadata = manifest.versions.find((version) => version.id === versionId);
+  if (!metadata) throw new Error(`Версия Minecraft ${versionId} отсутствует в официальном каталоге.`);
 
   const folder = MinecraftFolder.from(minecraftRoot());
   await fs.mkdir(folder.root, { recursive: true });
-  let resolvedVersion;
-  let javaPath;
+  reportGameProgress(`Установка Minecraft ${versionId}…`, null);
+  const resolvedVersion = await installMinecraftWithRetry(metadata, folder, versionId);
+  await installJava(resolvedVersion, folder);
+  await ensureAuthlibInjector(folder);
+  reportGameProgress(`Minecraft ${versionId} установлен`, null, 'installed');
+  return { version: versionId, account: account.profile.name, profileMode: 'ely', javaMajorVersion: resolvedVersion.javaVersion?.majorVersion };
+}
 
-  if (offlineMode) {
-    const versionJson = folder.getVersionJson(versionId);
-    try {
-      await fs.access(versionJson);
-      resolvedVersion = await Version.parse(folder, versionId);
-    } catch {
-      throw new Error(`Minecraft ${versionId} не найден или установлен не полностью. Офлайн-профиль не загружает файлы: подключись к интернету, выбери Ely.by и дождись завершения установки.`);
-    }
-    const java = resolvedVersion.javaVersion;
-    if (!java?.component) throw new Error('Не удалось определить Java для этой версии Minecraft. Подключись к интернету и установи игру через профиль Ely.by.');
-    const runtimeRoot = path.join(folder.root, 'runtime', java.component, String(java.majorVersion));
-    javaPath = path.join(runtimeRoot, 'bin', process.platform === 'win32' ? 'java.exe' : 'java');
-    try {
-      await fs.access(javaPath);
-    } catch {
-      throw new Error(`Java ${java.majorVersion} не установлена локально. Офлайн-профиль не скачивает Java; сначала заверши онлайн-установку через Ely.by.`);
-    }
-    reportGameProgress(`Проверка локальных файлов Minecraft ${versionId}…`, null);
-    const report = await diagnose(versionId, folder);
-    if (report.issues.length) {
-      const examples = report.issues.slice(0, 3).map((issue) => `${issue.role}: ${path.basename(issue.file)}`).join(', ');
-      const extra = report.issues.length > 3 ? ` и ещё ${report.issues.length - 3}` : '';
-      throw new Error(`Офлайн-запуск невозможен: отсутствуют или повреждены файлы игры (${examples}${extra}). Офлайн-профиль не загружает их — установи Minecraft через Ely.by при подключённом интернете.`);
-    }
-  } else {
-    reportGameProgress('Получение каталога Minecraft…', null);
-    const manifest = await getVersionList();
-    const metadata = manifest.versions.find((version) => version.id === versionId);
-    if (!metadata) throw new Error(`Версия Minecraft ${versionId} отсутствует в официальном каталоге.`);
-    reportGameProgress(`Установка Minecraft ${versionId}…`, null);
-    resolvedVersion = await installMinecraftWithRetry(metadata, folder, versionId);
-    javaPath = await installJava(resolvedVersion, folder);
-  }
-
-  const authlibInjector = offlineMode ? undefined : await ensureAuthlibInjector(folder);
+async function launchInstalledMinecraft(versionId, profile = {}) {
+  validateMinecraftVersionId(versionId);
+  const { offlineMode, offlineName } = getLaunchProfile(profile);
+  const account = offlineMode ? undefined : await getMinecraftAccount();
+  const folder = MinecraftFolder.from(minecraftRoot());
+  const { resolvedVersion, javaPath } = await loadInstalledVersion(versionId, folder, offlineMode);
+  const authlibInjector = offlineMode ? undefined : await getVerifiedAuthlibInjector(folder);
   const gameProfile = offlineMode
     ? { id: offlinePlayerId(offlineName), name: offlineName }
     : { id: account.profile.id, name: account.profile.name };
+
   reportGameProgress(`Запуск Minecraft ${versionId}…`, null, 'progress');
   const child = await launch({
     version: resolvedVersion,
@@ -416,22 +462,27 @@ async function installAndLaunch(versionId, profile = {}) {
   return { version: versionId, account: offlineMode ? offlineName : account.profile.name };
 }
 
-ipcMain.handle('minecraft-launch', async (_event, { version, loader, profile }) => {
+async function handleMinecraftOperation(operation, version, loader, profile) {
   if (gameOperation) return { ok: false, error: 'Установка или запуск Minecraft уже выполняется.' };
   if (loader !== 'Vanilla') {
     return { ok: false, error: `${loader} пока не подключён к установщику. Выбери Vanilla для установки и запуска.` };
   }
-  gameOperation = installAndLaunch(version, profile);
+  gameOperation = operation(version, profile);
   try {
     return { ok: true, ...(await gameOperation) };
   } catch (error) {
     const message = explainLaunchFailure(error);
-    console.error('[minecraft-launch]', message);
+    console.error('[minecraft-operation]', message);
     return { ok: false, error: message };
   } finally {
     gameOperation = undefined;
   }
-});
+}
+
+ipcMain.handle('minecraft-install', async (_event, { version, loader, profile }) =>
+  handleMinecraftOperation(installMinecraftVersion, version, loader, profile));
+ipcMain.handle('minecraft-launch', async (_event, { version, loader, profile }) =>
+  handleMinecraftOperation(launchInstalledMinecraft, version, loader, profile));
 
 app.whenReady().then(() => {
   createWindow();
