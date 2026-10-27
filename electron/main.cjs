@@ -2,6 +2,7 @@ const { app, BrowserWindow, shell, ipcMain, net, safeStorage } = require('electr
 const path = require('node:path');
 const fs = require('node:fs/promises');
 const { randomUUID, createHash } = require('node:crypto');
+const { Agent } = require('undici');
 const { MinecraftFolder, launch } = require('@xmcl/core');
 const {
   getVersionList,
@@ -15,6 +16,14 @@ let activeWindow;
 let activeElyAccount;
 
 const ELY_AUTH_URL = 'https://authserver.ely.by';
+const minecraftDownloadDispatcher = new Agent({
+  connections: 6,
+  autoSelectFamily: true,
+  autoSelectFamilyAttemptTimeout: 250,
+  connect: { timeout: 30_000 },
+  headersTimeout: 60_000,
+  bodyTimeout: 120_000
+});
 const AUTHLIB_INJECTOR = {
   version: '1.2.8',
   url: 'https://github.com/yushijinhun/authlib-injector/releases/download/v1.2.8/authlib-injector-1.2.8.jar',
@@ -34,6 +43,26 @@ function explainError(error, depth = 0) {
   if (error.cause) nested.push(error.cause);
   const details = nested.map((item) => explainError(item, depth + 1)).filter(Boolean);
   return [...new Set([label, ...details])].join(' → ').slice(0, 1800);
+}
+
+function isRetryableDownloadError(error, depth = 0) {
+  if (!error || depth > 5) return false;
+  const details = `${error.name || ''} ${error.code || ''} ${error.message || ''}`;
+  if (/ConnectTimeoutError|HeadersTimeoutError|BodyTimeoutError|UND_ERR_CONNECT_TIMEOUT|ETIMEDOUT|ECONNRESET|EAI_AGAIN|ENETUNREACH|EHOSTUNREACH|ChecksumNotMatchError|sha1 checksum not match/i.test(details)) return true;
+  if (Array.isArray(error.errors) && error.errors.some((item) => isRetryableDownloadError(item, depth + 1))) return true;
+  return error.cause ? isRetryableDownloadError(error.cause, depth + 1) : false;
+}
+
+function explainLaunchFailure(error) {
+  const details = explainError(error);
+  if (/ConnectTimeoutError|UND_ERR_CONNECT_TIMEOUT|ETIMEDOUT/i.test(details)) {
+    const host = details.match(/https?:\/\/([^/\s)]+)/i)?.[1] || 'серверу ресурсов Minecraft';
+    return `Не удалось подключиться к ${host}: истёк таймаут соединения. Неполные файлы не прошли SHA-1-проверку и не будут запущены. Проверь, открывается ли адрес в браузере, а также DNS, прокси и настройки брандмауэра; затем повтори попытку. Автоповторы загрузки включены.`;
+  }
+  if (/ChecksumNotMatchError|sha1 checksum not match/i.test(details)) {
+    return 'Скачанный игровой файл не прошёл проверку SHA-1. Повтори попытку; если ошибка повторяется, проверь соединение или доступность сервера загрузки Minecraft.';
+  }
+  return details || 'Не удалось установить или запустить Minecraft.';
 }
 
 function createWindow() {
@@ -213,10 +242,25 @@ async function installJava(version, folder) {
   }
 
   reportGameProgress(`Установка Java ${java.majorVersion}…`, null);
-  const manifest = await fetchJavaRuntimeManifest({ target: java.component });
-  await installJavaRuntimeTask({ manifest, destination: runtimeRoot }).startAndWait(taskContext('Java'));
+  const manifest = await fetchJavaRuntimeManifest({ target: java.component, dispatcher: minecraftDownloadDispatcher });
+  await installJavaRuntimeTask({ manifest, destination: runtimeRoot, dispatcher: minecraftDownloadDispatcher }).startAndWait(taskContext('Java'));
   await fs.access(javaExecutable);
   return javaExecutable;
+}
+
+async function installMinecraftWithRetry(metadata, folder, versionId) {
+  const maxAttempts = 4;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      return await installTask(metadata, folder, { dispatcher: minecraftDownloadDispatcher })
+        .startAndWait(taskContext(`Minecraft ${versionId}`));
+    } catch (error) {
+      if (attempt === maxAttempts || !isRetryableDownloadError(error)) throw error;
+      reportGameProgress(`Сеть прервала загрузку. Повтор ${attempt}/${maxAttempts - 1}…`, null);
+      await new Promise((resolve) => setTimeout(resolve, 1200 * attempt));
+    }
+  }
+  throw new Error('Не удалось завершить загрузку Minecraft после повторных попыток.');
 }
 
 async function ensureAuthlibInjector(folder) {
@@ -258,7 +302,7 @@ async function installAndLaunch(versionId) {
   const folder = MinecraftFolder.from(minecraftRoot());
   await fs.mkdir(folder.root, { recursive: true });
   reportGameProgress(`Установка Minecraft ${versionId}…`, null);
-  const resolvedVersion = await installTask(metadata, folder).startAndWait(taskContext('Minecraft'));
+  const resolvedVersion = await installMinecraftWithRetry(metadata, folder, versionId);
   const javaPath = await installJava(resolvedVersion, folder);
 
   const authlibInjector = await ensureAuthlibInjector(folder);
@@ -294,7 +338,7 @@ ipcMain.handle('minecraft-launch', async (_event, { version, loader }) => {
   try {
     return { ok: true, ...(await gameOperation) };
   } catch (error) {
-    const message = explainError(error) || 'Не удалось установить или запустить Minecraft.';
+    const message = explainLaunchFailure(error);
     console.error('[minecraft-launch]', message);
     return { ok: false, error: message };
   } finally {
