@@ -1,6 +1,6 @@
 # MatronixLauncher
 
-Прототип лаунчера Minecraft с тёмным интерфейсом, выбором Vanilla / Fabric / Forge, поиском в Modrinth и CurseForge и сборкой Windows-приложения на Electron.
+Прототип лаунчера Minecraft с чёрным анимированным неоновым интерфейсом, выбором Vanilla / Fabric / Forge, поиском в Modrinth и CurseForge, локальным ИИ-помощником и сборкой Windows-приложения на Electron. Помощник отвечает по встроенным подсказкам и не отправляет вопросы в облако.
 
 ## Установка и запуск из исходников
 

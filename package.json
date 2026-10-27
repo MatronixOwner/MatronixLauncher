@@ -1,6 +1,6 @@
 {
   "name": "matronix-launcher",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "description": "MatronixLauncher — customizable Minecraft launcher",
   "main": "electron/main.cjs",
@@ -23,11 +23,20 @@
   "build": {
     "appId": "com.matronix.launcher",
     "productName": "MatronixLauncher",
-    "directories": { "output": "release", "buildResources": "build" },
-    "files": ["dist/**/*", "electron/**/*", "package.json"],
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
     "win": {
       "icon": "build/icon.ico",
-      "target": ["portable"],
+      "target": [
+        "portable"
+      ],
       "artifactName": "MatronixLauncher-${version}-win-${arch}.${ext}"
     },
     "nsis": {
@@ -37,12 +46,17 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "MatronixLauncher",
-      "installerLanguages": ["ru_RU", "en_US"],
+      "installerLanguages": [
+        "ru_RU",
+        "en_US"
+      ],
       "displayLanguageSelector": true,
       "runAfterFinish": true,
       "deleteAppDataOnUninstall": false,
       "artifactName": "MatronixLauncher-Setup-${version}-win-${arch}.${ext}"
     },
-    "portable": { "artifactName": "MatronixLauncher-${version}-win-${arch}.${ext}" }
+    "portable": {
+      "artifactName": "MatronixLauncher-${version}-win-${arch}.${ext}"
+    }
   }
 }

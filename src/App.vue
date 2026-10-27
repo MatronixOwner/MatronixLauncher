@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, nextTick, onMounted, ref } from 'vue';
 import brandMark from './assets/matronix-mark.png';
 
 const activePage = ref('Главная');
@@ -16,6 +16,17 @@ const keyDraft = ref(curseKey.value);
 const showKeyDialog = ref(false);
 const installed = ref([]);
 const selectedInstance = ref('Prism Survival');
+const assistantOpen = ref(false);
+const assistantInput = ref('');
+const assistantTyping = ref(false);
+const assistantMessages = ref([
+  {
+    id: 1,
+    role: 'assistant',
+    text: 'Привет! Я помощник MatronixLauncher. Подскажу по версиям, загрузчикам, модам и ошибкам. Сейчас ответы работают локально, без отправки сообщений в облако.'
+  }
+]);
+const assistantSuggestions = ['Какой загрузчик выбрать?', 'Не запускается Minecraft', 'Как подключить CurseForge?'];
 const navItems = [
   { label: 'Главная', icon: '⌂' },
   { label: 'Каталог модов', icon: '◈' },
@@ -119,6 +130,96 @@ function prettyDownloads(n = 0) {
   if (n >= 1000) return `${(n / 1000).toFixed(0)} тыс.`;
   return String(n);
 }
+
+function getAssistantReply(question) {
+  const q = question.toLowerCase();
+  if (/curseforge|curse forge|курс.?фордж|курсов|ключ/.test(q)) {
+    return {
+      text: 'Для CurseForge нужен API-ключ: открой настройки лаунчера и сохрани ключ в поле CurseForge API. Пока каталог недоступен без ключа; проверь также, открывается ли сам CurseForge в твоей сети.',
+      action: 'curseforge',
+      actionLabel: 'Открыть настройки'
+    };
+  }
+  if (/modrinth|модринт|найти мод|каталог|поиск мод/.test(q)) {
+    return {
+      text: 'Открой «Каталог модов» и выбери Modrinth. Можно искать по названию. Карточки открывают страницу проекта на исходном сайте; фактическая установка модов в этой версии ещё не подключена.',
+      action: 'catalog',
+      actionLabel: 'Открыть каталог'
+    };
+  }
+  if (/чёрн|черн|black screen|пуст(ой|ое) экран|не вид|завис/.test(q)) {
+    return {
+      text: 'В версии 0.1.1 исправлены относительные пути к файлам интерфейса, которые могли вызывать чёрный экран. Полностью закрой лаунчер и запусти снова. Если экран останется, пришли версию Windows и текст ошибки — я помогу разобраться.'
+    };
+  }
+  if (/не запуска|ошибк|вылет|краш|не работает/.test(q)) {
+    return {
+      text: 'Пока игровой движок ещё не подключён, поэтому кнопка «Играть» не запускает Minecraft. Если проблема с интерфейсом: перезапусти лаунчер и проверь подключение. Напиши, что именно нажал и какой текст ошибки увидел.'
+    };
+  }
+  if (/forge|fabric|загрузчик|loader/.test(q)) {
+    return {
+      text: 'Fabric обычно выбирают для лёгких модов и оптимизации; Forge — для модов и сборок, которым нужен Forge. Мод должен совпадать с версией Minecraft и загрузчиком. Сейчас выбор в интерфейсе демонстрационный — установка загрузчика ещё впереди.'
+    };
+  }
+  if (/верси|стар(ая|ые)|все версии|1\.\d/.test(q)) {
+    return {
+      text: 'В интерфейсе пока показаны лишь примеры версий. Поддержка всех версий Minecraft потребует менеджера версий и отдельных установщиков загрузчиков; эта часть ещё не реализована.'
+    };
+  }
+  if (/мод|установ/.test(q)) {
+    return {
+      text: 'Сейчас каталог показывает проекты, а кнопка «+» только демонстрирует очередь — она ещё не скачивает файлы. Для реальной установки нужно будет проверить совместимость мода с версией игры и Fabric/Forge.'
+    };
+  }
+  if (/java|джава|памят|рам|лаг|фпс|fps|тормоз/.test(q)) {
+    return {
+      text: 'Для модов сначала подбирай версию Java и объём памяти под выбранную версию Minecraft и сборку. Слишком мало памяти вызывает вылеты, а слишком много не всегда повышает FPS. Настройки Java и тестирование производительности пока не добавлены.'
+    };
+  }
+  if (/аккаунт|вход|майкрософт|microsoft/.test(q)) {
+    return {
+      text: 'Авторизация Microsoft ещё не подключена. Для будущего релиза нужно будет добавить официальный OAuth-вход; не вводи пароль от Microsoft в сторонние формы.'
+    };
+  }
+  if (/интернет|страна|росси|доступ/.test(q)) {
+    return {
+      text: 'Сам интерфейс работает локально. Каталоги обращаются к официальным сервисам Modrinth и CurseForge напрямую, поэтому доступность зависит от региона, сети и правил самих платформ.'
+    };
+  }
+  return {
+    text: 'Я подскажу по каталогу модов, CurseForge, Modrinth, версиям, Fabric и Forge, а также объясню текущие ограничения лаунчера. Попробуй задать вопрос конкретнее — например: «как настроить CurseForge?»'
+  };
+}
+
+async function submitAssistant(text = assistantInput.value) {
+  const question = text.trim();
+  if (!question || assistantTyping.value) return;
+  assistantMessages.value.push({ id: Date.now(), role: 'user', text: question });
+  assistantInput.value = '';
+  assistantTyping.value = true;
+  await nextTick();
+  const chat = document.querySelector('.assistant-messages');
+  if (chat) chat.scrollTop = chat.scrollHeight;
+  window.setTimeout(async () => {
+    assistantMessages.value.push({ id: Date.now() + 1, role: 'assistant', ...getAssistantReply(question) });
+    assistantTyping.value = false;
+    await nextTick();
+    const updatedChat = document.querySelector('.assistant-messages');
+    if (updatedChat) updatedChat.scrollTop = updatedChat.scrollHeight;
+  }, 350);
+}
+
+function runAssistantAction(action) {
+  assistantOpen.value = false;
+  if (action === 'curseforge') {
+    activePage.value = 'Настройки';
+    keyDraft.value = curseKey.value;
+    showKeyDialog.value = true;
+  } else if (action === 'catalog') {
+    setPage('Каталог модов');
+  }
+}
 onMounted(() => loadModrinth());
 </script>
 
@@ -145,7 +246,7 @@ onMounted(() => loadModrinth());
     <main class="main-area">
       <header class="topbar">
         <div class="breadcrumbs"><span>MATRONIX</span><i>/</i><b>{{ routeTitle }}</b></div>
-        <div class="top-actions"><button class="icon-button" title="Уведомления" @click="notify('Новых уведомлений нет')">♧<span class="notification-dot"></span></button><div class="top-separator"></div><button class="account-button"><span class="tiny-avatar">M</span><span>Мой профиль</span><span class="chevron">⌄</span></button></div>
+        <div class="top-actions"><button class="assistant-top-button" @click="assistantOpen = !assistantOpen"><span>✦</span> ИИ помощник</button><button class="icon-button" title="Уведомления" @click="notify('Новых уведомлений нет')">♧<span class="notification-dot"></span></button><div class="top-separator"></div><button class="account-button"><span class="tiny-avatar">M</span><span>Мой профиль</span><span class="chevron">⌄</span></button></div>
       </header>
 
       <section v-if="activePage === 'Главная'" class="content home-content">
@@ -183,6 +284,30 @@ onMounted(() => loadModrinth());
     </main>
 
     <div v-if="showKeyDialog" class="modal-backdrop" @click.self="showKeyDialog = false"><div class="key-modal"><button class="modal-close" @click="showKeyDialog = false">×</button><div class="modal-icon">✺</div><div class="eyebrow muted">ИНТЕГРАЦИЯ КАТАЛОГА</div><h2>Подключи CurseForge</h2><p>Вставь свой CurseForge API-ключ. Он сохраняется локально в этом профиле приложения и не отправляется MatronixLauncher.</p><label for="cf-key">API-ключ</label><input id="cf-key" v-model="keyDraft" type="password" placeholder="Вставь ключ CurseForge"/><div class="modal-actions"><button class="cancel-button" @click="showKeyDialog = false">Отмена</button><button class="primary-small" @click="saveKey">Сохранить ключ</button></div><small class="modal-note">Получение ключа и правила использования регулируются CurseForge.</small></div></div>
+    <section v-if="assistantOpen" class="assistant-panel" aria-label="ИИ-помощник MatronixLauncher">
+      <header class="assistant-panel-head">
+        <div class="assistant-avatar">✦<i></i></div>
+        <div class="assistant-head-copy"><b>ИИ-помощник Matronix</b><small><span></span> На связи · локальный режим</small></div>
+        <button class="assistant-close" aria-label="Закрыть помощника" @click="assistantOpen = false">×</button>
+      </header>
+      <div class="assistant-messages" aria-live="polite">
+        <div v-for="message in assistantMessages" :key="message.id" :class="['assistant-message', message.role === 'user' ? 'user-message' : 'bot-message']">
+          <p>{{ message.text }}</p>
+          <button v-if="message.action" class="assistant-action" @click="runAssistantAction(message.action)">{{ message.actionLabel }} <span>↗</span></button>
+        </div>
+        <div v-if="assistantTyping" class="assistant-message bot-message typing-message"><span></span><span></span><span></span></div>
+      </div>
+      <div v-if="assistantMessages.length === 1" class="assistant-suggestions">
+        <span>БЫСТРЫЕ ВОПРОСЫ</span>
+        <button v-for="suggestion in assistantSuggestions" :key="suggestion" @click="submitAssistant(suggestion)">{{ suggestion }} <span>↗</span></button>
+      </div>
+      <form class="assistant-input-row" @submit.prevent="submitAssistant()">
+        <input v-model="assistantInput" aria-label="Сообщение помощнику" placeholder="Спроси о лаунчере…" maxlength="400" />
+        <button type="submit" :disabled="!assistantInput.trim() || assistantTyping" aria-label="Отправить вопрос">↑</button>
+      </form>
+      <div class="assistant-footnote">ОТВЕТЫ ФОРМИРУЮТСЯ ЛОКАЛЬНО · БЕЗ ОБЛАЧНОГО ИИ</div>
+    </section>
+    <button v-if="!assistantOpen" class="assistant-fab" aria-label="Открыть ИИ-помощника" @click="assistantOpen = true"><span>✦</span><i></i></button>
     <div v-if="toast" class="toast"><span>✦</span>{{ toast }}</div>
   </div>
 </template>
