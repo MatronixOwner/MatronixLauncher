@@ -26,6 +26,16 @@ function reportGameProgress(message, percent = null, state = 'progress') {
   activeWindow.webContents.send('minecraft-progress', { message, percent, state });
 }
 
+function explainError(error, depth = 0) {
+  if (!error || depth > 4) return '';
+  const label = [error.name, error.message].filter(Boolean).join(': ') || String(error);
+  const nested = [];
+  if (Array.isArray(error.errors)) nested.push(...error.errors);
+  if (error.cause) nested.push(error.cause);
+  const details = nested.map((item) => explainError(item, depth + 1)).filter(Boolean);
+  return [...new Set([label, ...details])].join(' → ').slice(0, 1800);
+}
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 1440,
@@ -131,6 +141,7 @@ async function authenticateEly({ username, password, totp } = {}) {
 }
 
 async function getMinecraftAccount() {
+  reportGameProgress('Подключение к Ely.by…', null);
   const saved = await readSavedElyAccount();
   if (!saved) throw new Error('Сначала войди через Ely.by.');
   try {
@@ -160,8 +171,12 @@ async function getMinecraftAccount() {
 
 ipcMain.handle('ely-account', async () => (await readSavedElyAccount())?.profile || null);
 ipcMain.handle('ely-login', async (_event, credentials) => {
-  const account = await authenticateEly(credentials);
-  return account.profile;
+  try {
+    const account = await authenticateEly(credentials);
+    return { ok: true, profile: account.profile };
+  } catch (error) {
+    return { ok: false, error: explainError(error) || 'Не удалось войти в Ely.by.' };
+  }
 });
 ipcMain.handle('ely-logout', async () => {
   const account = await readSavedElyAccount();
@@ -235,6 +250,7 @@ async function installAndLaunch(versionId) {
     throw new Error('Выбрана некорректная версия Minecraft.');
   }
   const account = await getMinecraftAccount();
+  reportGameProgress('Получение каталога Minecraft…', null);
   const manifest = await getVersionList();
   const metadata = manifest.versions.find((version) => version.id === versionId);
   if (!metadata) throw new Error(`Версия Minecraft ${versionId} отсутствует в официальном каталоге.`);
@@ -270,16 +286,17 @@ async function installAndLaunch(versionId) {
 }
 
 ipcMain.handle('minecraft-launch', async (_event, { version, loader }) => {
-  if (gameOperation) throw new Error('Установка или запуск Minecraft уже выполняется.');
+  if (gameOperation) return { ok: false, error: 'Установка или запуск Minecraft уже выполняется.' };
   if (loader !== 'Vanilla') {
-    throw new Error(`${loader} пока не подключён к установщику. Выбери Vanilla для установки и запуска.`);
+    return { ok: false, error: `${loader} пока не подключён к установщику. Выбери Vanilla для установки и запуска.` };
   }
   gameOperation = installAndLaunch(version);
   try {
-    return await gameOperation;
+    return { ok: true, ...(await gameOperation) };
   } catch (error) {
-    reportGameProgress(error?.message || 'Не удалось запустить Minecraft.', null, 'error');
-    throw error;
+    const message = explainError(error) || 'Не удалось установить или запустить Minecraft.';
+    console.error('[minecraft-launch]', message);
+    return { ok: false, error: message };
   } finally {
     gameOperation = undefined;
   }

@@ -181,11 +181,13 @@ async function submitElyLogin() {
   elyLoginBusy.value = true;
   elyLoginError.value = '';
   try {
-    elyProfile.value = await window.elyprism.loginEly({
+    const result = await window.elyprism.loginEly({
       username: elyUsername.value.trim(),
       password: elyPassword.value,
       totp: elyTotp.value.trim()
     });
+    if (!result?.ok) throw new Error(result?.error || 'Не удалось войти в Ely.by.');
+    elyProfile.value = result.profile;
     elyPassword.value = '';
     elyTotp.value = '';
     showElyLoginDialog.value = false;
@@ -238,7 +240,8 @@ async function launchGame() {
   gameStatus.value = 'Подготовка…';
   gameProgress.value = null;
   try {
-    await window.elyprism.launchMinecraft(selectedVersion.value, selectedLoader.value);
+    const result = await window.elyprism.launchMinecraft(selectedVersion.value, selectedLoader.value);
+    if (!result?.ok) throw new Error(result?.error || 'Не удалось установить или запустить Minecraft.');
   } catch (error) {
     notify(error?.message || 'Не удалось установить или запустить Minecraft.');
     if (/сессия Ely\.by истекла/i.test(error?.message || '')) {
