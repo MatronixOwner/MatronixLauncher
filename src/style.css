@@ -145,3 +145,24 @@ body,.app-shell{background:#050506}
 .toast{border-radius:6px;background:#111116;border-color:rgba(255,255,255,.12);box-shadow:0 10px 35px #0009}
 @media(max-width:1200px){.content{width:calc(100% - 60px)}.topbar{padding-inline:30px}.app-footer{padding-inline:30px}}
 @media(prefers-reduced-motion:reduce){.app-shell::before{animation:none}}
+
+/* Strip the last decorative controls and retain only navigation labels. */
+.nav-item{width:100%;padding-inline:12px;gap:0}
+.sidebar-bottom{justify-content:flex-end}
+.settings-shortcut{width:32px;height:32px;border:1px solid rgba(255,255,255,.09);border-radius:5px;background:transparent;color:#93919c;font-size:15px}
+.settings-shortcut:hover{color:#e7e1ff;border-color:rgba(190,170,255,.28)}
+.instance-thumb{object-fit:cover}
+.launch-instance{gap:0}
+.launch-instance>div:last-child{display:grid;gap:5px}
+.choice-card{height:62px;align-items:center;padding:0 14px;background:#09090c;border-color:rgba(255,255,255,.08)}
+.choice-card h3{font-size:11px;font-weight:500;margin:0;color:#b7b5c0}
+.choice-card.selected{border-color:rgba(181,164,255,.34);background:#111017}
+.choice-card.selected h3{color:#eeeaff}
+.choice-card:hover{transform:none;background:#101014}
+.search-box button{min-width:32px;color:#b7a9ef;font-size:15px}
+.search-box input{padding-left:12px}
+.catalog-page-heading{padding:34px 0 10px}
+.catalog-page-heading h1{font-size:22px;letter-spacing:-.6px;margin:0;color:#f3f1f7}
+.catalog-state>p{font-size:10px;color:#777681}
+.instance-info b{font-size:10px;font-weight:500}.instance-info small{font-size:8px}
+.add-instance{border-style:solid;border-color:rgba(255,255,255,.08);background:transparent}
