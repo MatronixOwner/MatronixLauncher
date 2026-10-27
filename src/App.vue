@@ -21,6 +21,10 @@ const gameBusy = ref(false);
 const gameStatus = ref('');
 const gameProgress = ref(null);
 const elyProfile = ref(null);
+const launchMode = ref(localStorage.getItem('matronix-profile-mode') || 'ely');
+const offlineProfileName = ref(localStorage.getItem('matronix-offline-name') || '');
+const offlineNameDraft = ref(offlineProfileName.value);
+const offlineProfileError = ref('');
 const showElyLoginDialog = ref(false);
 const elyUsername = ref('');
 const elyPassword = ref('');
@@ -176,6 +180,24 @@ function saveKey() {
   if (activeTab.value === 'CurseForge') loadCurseForge();
   notify('Настройки CurseForge сохранены');
 }
+function setLaunchMode(mode) {
+  launchMode.value = mode;
+  localStorage.setItem('matronix-profile-mode', mode);
+  if (mode === 'offline') offlineNameDraft.value = offlineProfileName.value;
+}
+function saveOfflineProfile() {
+  const name = offlineNameDraft.value.trim();
+  if (!/^[A-Za-z0-9_]{3,16}$/.test(name)) {
+    offlineProfileError.value = 'Ник: 3–16 латинских букв, цифр или символов подчёркивания.';
+    return;
+  }
+  offlineProfileName.value = name;
+  localStorage.setItem('matronix-offline-name', name);
+  setLaunchMode('offline');
+  offlineProfileError.value = '';
+  showElyLoginDialog.value = false;
+  notify(`Выбран офлайн-профиль: ${name}`);
+}
 async function submitElyLogin() {
   if (elyLoginBusy.value) return;
   elyLoginBusy.value = true;
@@ -188,6 +210,7 @@ async function submitElyLogin() {
     });
     if (!result?.ok) throw new Error(result?.error || 'Не удалось войти в Ely.by.');
     elyProfile.value = result.profile;
+    setLaunchMode('ely');
     elyPassword.value = '';
     elyTotp.value = '';
     showElyLoginDialog.value = false;
@@ -231,7 +254,11 @@ async function launchGame() {
     notify('Запуск доступен в установленном приложении MatronixLauncher.');
     return;
   }
-  if (!elyProfile.value) {
+  if (launchMode.value === 'ely' && !elyProfile.value) {
+    showElyLoginDialog.value = true;
+    return;
+  }
+  if (launchMode.value === 'offline' && !offlineProfileName.value) {
     showElyLoginDialog.value = true;
     return;
   }
@@ -240,7 +267,10 @@ async function launchGame() {
   gameStatus.value = 'Подготовка…';
   gameProgress.value = null;
   try {
-    const result = await window.elyprism.launchMinecraft(selectedVersion.value, selectedLoader.value);
+    const profile = launchMode.value === 'offline'
+      ? { mode: 'offline', name: offlineProfileName.value }
+      : { mode: 'ely' };
+    const result = await window.elyprism.launchMinecraft(selectedVersion.value, selectedLoader.value, profile);
     if (!result?.ok) throw new Error(result?.error || 'Не удалось установить или запустить Minecraft.');
   } catch (error) {
     notify(error?.message || 'Не удалось установить или запустить Minecraft.');
@@ -390,7 +420,7 @@ onMounted(() => {
 
     <main class="main-area" @click="showVersionPicker = false" @keydown.esc="showVersionPicker = false">
       <header class="topbar">
-        <div class="top-actions"><button class="ely-account-button" @click="showElyLoginDialog = true">{{ elyProfile?.name || 'Войти через Ely.by' }}</button><button class="assistant-top-button" aria-label="ИИ-помощник" @click="assistantOpen = !assistantOpen">Помощник</button></div>
+        <div class="top-actions"><button class="ely-account-button" @click="showElyLoginDialog = true">{{ launchMode === 'offline' ? `Офлайн: ${offlineProfileName || 'профиль'}` : (elyProfile?.name || 'Войти через Ely.by') }}</button><button class="assistant-top-button" aria-label="ИИ-помощник" @click="assistantOpen = !assistantOpen">Помощник</button></div>
       </header>
 
       <section v-if="activePage === 'Главная'" class="content home-content">
@@ -424,7 +454,38 @@ onMounted(() => {
     </main>
 
     <div v-if="showKeyDialog" class="modal-backdrop" @click.self="showKeyDialog = false"><div class="key-modal"><button class="modal-close" @click="showKeyDialog = false">×</button><h2>CurseForge</h2><p>API-ключ хранится локально.</p><label for="cf-key">API-ключ</label><input id="cf-key" v-model="keyDraft" type="password" placeholder="Вставь ключ CurseForge"/><div class="modal-actions"><button class="cancel-button" @click="showKeyDialog = false">Отмена</button><button class="primary-small" @click="saveKey">Сохранить ключ</button></div></div></div>
-    <div v-if="showElyLoginDialog" class="modal-backdrop" @click.self="showElyLoginDialog = false"><div class="key-modal ely-login-modal"><button class="modal-close" aria-label="Закрыть" @click="showElyLoginDialog = false">×</button><h2>{{ elyProfile ? 'Аккаунт Ely.by' : 'Вход через Ely.by' }}</h2><template v-if="elyProfile"><p>Подключён аккаунт <b>{{ elyProfile.name }}</b>.</p><div class="modal-actions"><button class="cancel-button" @click="showElyLoginDialog = false">Закрыть</button><button class="primary-small" @click="logoutEly">Выйти</button></div></template><form v-else @submit.prevent="submitElyLogin"><p>Войди в свой аккаунт Ely.by. Пароль отправляется напрямую на authserver.ely.by по HTTPS и не сохраняется лаунчером.</p><label for="ely-username">Логин или e-mail</label><input id="ely-username" v-model="elyUsername" autocomplete="username" required maxlength="254"/><label for="ely-password">Пароль</label><input id="ely-password" v-model="elyPassword" type="password" autocomplete="current-password" required maxlength="256"/><label for="ely-totp">Код двухфакторной защиты (если включён)</label><input id="ely-totp" v-model="elyTotp" inputmode="numeric" autocomplete="one-time-code" maxlength="12" placeholder="Необязательно"/><p v-if="elyLoginError" class="ely-login-error">{{ elyLoginError }}</p><div class="modal-actions"><button type="button" class="cancel-button" :disabled="elyLoginBusy" @click="showElyLoginDialog = false">Отмена</button><button type="submit" class="primary-small" :disabled="elyLoginBusy">{{ elyLoginBusy ? 'Вход…' : 'Войти' }}</button></div><button type="button" class="ely-register-link" @click="openElyRegister">Создать аккаунт Ely.by</button></form></div></div>
+    <div v-if="showElyLoginDialog" class="modal-backdrop" @click.self="showElyLoginDialog = false">
+      <div class="key-modal ely-login-modal">
+        <button class="modal-close" aria-label="Закрыть" @click="showElyLoginDialog = false">×</button>
+        <h2>Профиль запуска</h2>
+        <div class="version-kind-tabs profile-mode-tabs">
+          <button type="button" :class="{ selected: launchMode === 'ely' }" @click="setLaunchMode('ely')">Ely.by</button>
+          <button type="button" :class="{ selected: launchMode === 'offline' }" @click="setLaunchMode('offline')">Офлайн</button>
+        </div>
+        <template v-if="launchMode === 'offline'">
+          <form @submit.prevent="saveOfflineProfile">
+            <p>Локальный профиль не входит в Ely.by и подходит только для игры без онлайн-проверки аккаунта. Для запуска уже должны быть установлены выбранная версия Minecraft, все её файлы и Java. Офлайн-режим ничего не скачивает и не исправит прерванную установку.</p>
+            <label for="offline-name">Игровой ник</label>
+            <input id="offline-name" v-model="offlineNameDraft" autocomplete="nickname" required minlength="3" maxlength="16" pattern="[A-Za-z0-9_]{3,16}" placeholder="Например, Alex_1" @input="offlineProfileError = ''"/>
+            <p v-if="offlineProfileError" class="ely-login-error">{{ offlineProfileError }}</p>
+            <div class="modal-actions"><button type="button" class="cancel-button" @click="showElyLoginDialog = false">Отмена</button><button type="submit" class="primary-small">Использовать офлайн</button></div>
+          </form>
+        </template>
+        <template v-else-if="elyProfile">
+          <p>Подключён аккаунт <b>{{ elyProfile.name }}</b>.</p>
+          <div class="modal-actions"><button class="cancel-button" @click="showElyLoginDialog = false">Закрыть</button><button class="primary-small" @click="logoutEly">Выйти</button></div>
+        </template>
+        <form v-else @submit.prevent="submitElyLogin">
+          <p>Войди в свой аккаунт Ely.by. Пароль отправляется напрямую на authserver.ely.by по HTTPS и не сохраняется лаунчером.</p>
+          <label for="ely-username">Логин или e-mail</label><input id="ely-username" v-model="elyUsername" autocomplete="username" required maxlength="254"/>
+          <label for="ely-password">Пароль</label><input id="ely-password" v-model="elyPassword" type="password" autocomplete="current-password" required maxlength="256"/>
+          <label for="ely-totp">Код двухфакторной защиты (если включён)</label><input id="ely-totp" v-model="elyTotp" inputmode="numeric" autocomplete="one-time-code" maxlength="12" placeholder="Необязательно"/>
+          <p v-if="elyLoginError" class="ely-login-error">{{ elyLoginError }}</p>
+          <div class="modal-actions"><button type="button" class="cancel-button" :disabled="elyLoginBusy" @click="showElyLoginDialog = false">Отмена</button><button type="submit" class="primary-small" :disabled="elyLoginBusy">{{ elyLoginBusy ? 'Вход…' : 'Войти' }}</button></div>
+          <button type="button" class="ely-register-link" @click="openElyRegister">Создать аккаунт Ely.by</button>
+        </form>
+      </div>
+    </div>
     <section v-if="assistantOpen" class="assistant-panel" aria-label="ИИ-помощник MatronixLauncher">
       <header class="assistant-panel-head">
         <div class="assistant-avatar">M</div>
