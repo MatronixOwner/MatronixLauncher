@@ -261,6 +261,21 @@ function taskContext(label) {
   };
 }
 
+function metadataMirrorUrls(url) {
+  try {
+    const parsed = new URL(url);
+    const pathname = `${parsed.pathname}${parsed.search}`;
+    const mirrors = [url];
+    for (const host of ['bmclapi2.bangbang93.com', 'launchermeta.mojang.com']) {
+      const mirror = `https://${host}${pathname}`;
+      if (!mirrors.includes(mirror)) mirrors.push(mirror);
+    }
+    return mirrors;
+  } catch {
+    return [url];
+  }
+}
+
 async function installJava(version, folder) {
   const java = version.javaVersion;
   if (!java?.component) throw new Error('Не удалось определить требуемую версию Java.');
@@ -286,6 +301,8 @@ async function installMinecraftWithRetry(metadata, folder, versionId) {
     try {
       return await installTask(metadata, folder, {
         dispatcher: minecraftDownloadDispatcher,
+        json: (version) => metadataMirrorUrls(version.url),
+        assetsIndexUrl: (version) => metadataMirrorUrls(version.assetIndex.url),
         assetsHost: [
           'https://resources.download.minecraft.net',
           'https://bmclapi2.bangbang93.com/assets'
