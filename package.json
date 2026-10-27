@@ -1,6 +1,6 @@
 {
   "name": "matronix-launcher",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "private": true,
   "description": "MatronixLauncher — customizable Minecraft launcher",
   "main": "electron/main.cjs",
@@ -13,12 +13,15 @@
   },
   "dependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
+    "@xmcl/core": "^2.15.1",
+    "@xmcl/installer": "^6.1.2",
+    "msmc": "^5.0.5",
     "vite": "^6.0.7",
     "vue": "^3.5.13"
   },
   "devDependencies": {
-    "electron": "^33.2.1",
-    "electron-builder": "^25.1.8"
+    "electron": "^45.0.0",
+    "electron-builder": "^26.18.0"
   },
   "build": {
     "appId": "com.matronix.launcher",
@@ -58,5 +61,8 @@
     "portable": {
       "artifactName": "MatronixLauncher-${version}-win-${arch}.${ext}"
     }
+  },
+  "overrides": {
+    "undici": "^7.30.1"
   }
 }

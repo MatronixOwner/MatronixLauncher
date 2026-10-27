@@ -1,6 +1,6 @@
 <script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
-import brandMark from './assets/matronix-mark.png';
+import brandMark from './assets/matronix-mined-mark.png';
 
 const activePage = ref('Главная');
 const activeTab = ref('Modrinth');
@@ -9,7 +9,7 @@ const loading = ref(false);
 const error = ref('');
 const projects = ref([]);
 const toast = ref('');
-const selectedLoader = ref(localStorage.getItem('matronix-loader') || 'Fabric');
+const selectedLoader = ref(localStorage.getItem('matronix-loader') || 'Vanilla');
 const selectedVersion = ref(localStorage.getItem('matronix-version') || '1.21.1');
 const versionList = ref([]);
 const versionLoading = ref(false);
@@ -17,6 +17,9 @@ const versionLoadError = ref('');
 const showVersionPicker = ref(false);
 const versionSearch = ref('');
 const versionTypeFilter = ref('all');
+const gameBusy = ref(false);
+const gameStatus = ref('');
+const gameProgress = ref(null);
 const fallbackVersions = [
   { id: '1.21.1', type: 'release' }, { id: '1.20.1', type: 'release' },
   { id: '1.19.2', type: 'release' }, { id: '1.18.2', type: 'release' },
@@ -177,8 +180,23 @@ function installProject(project) {
   if (!installed.value.includes(project.project_id)) installed.value.push(project.project_id);
   notify(`«${project.title}» добавлен в очередь установки для ${selectedInstance.value}`);
 }
-function launchGame() {
-  notify('Игровой движок ещё не подключён. Сейчас готовится интерфейс лаунчера.');
+async function launchGame() {
+  if (!window.elyprism?.desktop || !window.elyprism.launchMinecraft) {
+    notify('Запуск доступен в установленном приложении MatronixLauncher.');
+    return;
+  }
+  if (gameBusy.value) return;
+  gameBusy.value = true;
+  gameStatus.value = 'Подготовка…';
+  gameProgress.value = null;
+  try {
+    await window.elyprism.launchMinecraft(selectedVersion.value, selectedLoader.value);
+  } catch (error) {
+    notify(error?.message || 'Не удалось установить или запустить Minecraft.');
+    gameBusy.value = false;
+    gameStatus.value = '';
+    gameProgress.value = null;
+  }
 }
 function createInstance() { notify('Создание профилей появится в следующем этапе разработки'); }
 function setPage(page) {
@@ -208,17 +226,17 @@ function getAssistantReply(question) {
   }
   if (/не запуска|ошибк|вылет|краш|не работает/.test(q)) {
     return {
-      text: 'Пока игровой движок ещё не подключён, поэтому кнопка «Играть» не запускает Minecraft. Если проблема с интерфейсом: перезапусти лаунчер и проверь подключение. Напиши, что именно нажал и какой текст ошибки увидел.'
+      text: 'Кнопка «Играть» устанавливает выбранную Vanilla-версию с официальных серверов и запускает её после входа в Microsoft-аккаунт с лицензией Minecraft Java Edition. Первый запуск может занять время из-за загрузки игры и Java. Fabric и Forge пока не подключены.'
     };
   }
   if (/forge|fabric|загрузчик|loader/.test(q)) {
     return {
-      text: 'Fabric обычно выбирают для лёгких модов и оптимизации; Forge — для модов и сборок, которым нужен Forge. Мод должен совпадать с версией Minecraft и загрузчиком. Сейчас выбор в интерфейсе демонстрационный — установка загрузчика ещё впереди.'
+      text: 'Fabric обычно выбирают для лёгких модов и оптимизации; Forge — для модов и сборок, которым нужен Forge. Сейчас реальная установка и запуск подключены для Vanilla. Для Fabric и Forge интеграция установщиков ещё в разработке.'
     };
   }
   if (/верси|стар(ая|ые)|все версии|1\.\d/.test(q)) {
     return {
-      text: 'Список версий загружается из официального манифеста Minecraft: релизы, снапшоты, бета и альфа. Установка и запуск выбранной версии — следующий шаг.'
+      text: 'Список версий загружается из официального манифеста Minecraft. Кнопка «Играть» устанавливает выбранную Vanilla-версию, нужные файлы и Java, затем запускает игру после входа в Microsoft-аккаунт с лицензией.'
     };
   }
   if (/мод|установ/.test(q)) {
@@ -233,7 +251,7 @@ function getAssistantReply(question) {
   }
   if (/аккаунт|вход|майкрософт|microsoft/.test(q)) {
     return {
-      text: 'Авторизация Microsoft ещё не подключена. Для будущего релиза нужно будет добавить официальный OAuth-вход; не вводи пароль от Microsoft в сторонние формы.'
+      text: 'Вход выполняется в окне Microsoft через OAuth. Пароль вводится только на странице Microsoft; лаунчер его не запрашивает. Для запуска нужна лицензия Minecraft Java Edition.'
     };
   }
   if (/интернет|страна|росси|доступ/.test(q)) {
@@ -277,6 +295,24 @@ function runAssistantAction(action) {
 onMounted(() => {
   loadModrinth();
   loadMinecraftVersions();
+  window.elyprism?.onMinecraftProgress?.((progress) => {
+    gameStatus.value = progress.message || '';
+    gameProgress.value = progress.percent;
+    if (progress.state === 'running') {
+      gameBusy.value = false;
+      notify(progress.message || 'Minecraft запущен');
+    } else if (progress.state === 'finished') {
+      gameBusy.value = false;
+      gameStatus.value = '';
+      gameProgress.value = null;
+      notify(progress.message || 'Minecraft закрыт');
+    } else if (progress.state === 'error') {
+      gameBusy.value = false;
+      notify(progress.message || 'Ошибка запуска Minecraft');
+      gameStatus.value = '';
+      gameProgress.value = null;
+    }
+  });
 });
 </script>
 
@@ -302,7 +338,7 @@ onMounted(() => {
       </header>
 
       <section v-if="activePage === 'Главная'" class="content home-content">
-        <div class="launch-panel"><div class="launch-instance"><div><b>Prism Survival</b><span>Minecraft {{ selectedVersion }} <i>·</i> {{ selectedLoader }}</span></div></div><div class="launch-meta"><div class="version-field" @click.stop><small>ВЕРСИЯ</small><button class="version-trigger" type="button" :aria-expanded="showVersionPicker" @click="toggleVersionPicker">{{ selectedVersion }} <span>{{ showVersionPicker ? '⌃' : '⌄' }}</span></button><div v-if="showVersionPicker" class="version-picker" @keydown.esc.stop="showVersionPicker = false"><input v-model="versionSearch" autofocus placeholder="Поиск версии" aria-label="Поиск версии"/><div class="version-kind-tabs"><button v-for="kind in [{ id: 'all', label: 'Все' }, { id: 'release', label: 'Релизы' }, { id: 'snapshot', label: 'Снапшоты' }, { id: 'old', label: 'Старые' }]" :key="kind.id" type="button" :class="{ selected: versionTypeFilter === kind.id }" @click="versionTypeFilter = kind.id">{{ kind.label }}</button></div><div v-if="versionLoading" class="version-message">Загрузка версий…</div><div v-else class="version-options"><button v-for="version in filteredVersions" :key="version.id" type="button" :class="{ selected: selectedVersion === version.id }" @click="selectVersion(version)"><span>{{ version.id }}</span><small>{{ versionTypeLabel(version.type) }}</small></button><p v-if="!filteredVersions.length" class="version-message">Версии не найдены</p></div><p v-if="versionLoadError" class="version-error">{{ versionLoadError }}</p></div></div><div class="meta-divider"></div><div><small>ЗАГРУЗЧИК</small><select v-model="selectedLoader"><option>Fabric</option><option>Forge</option><option>Vanilla</option></select></div><button class="play-button" @click="launchGame"><span>▶</span> Играть</button></div></div>
+        <div class="launch-panel"><div class="launch-instance"><div><b>Prism Survival</b><span>Minecraft {{ selectedVersion }} <i>·</i> {{ selectedLoader }}</span></div></div><div class="launch-meta"><div class="version-field" @click.stop><small>ВЕРСИЯ</small><button class="version-trigger" type="button" :aria-expanded="showVersionPicker" @click="toggleVersionPicker">{{ selectedVersion }} <span>{{ showVersionPicker ? '⌃' : '⌄' }}</span></button><div v-if="showVersionPicker" class="version-picker" @keydown.esc.stop="showVersionPicker = false"><input v-model="versionSearch" autofocus placeholder="Поиск версии" aria-label="Поиск версии"/><div class="version-kind-tabs"><button v-for="kind in [{ id: 'all', label: 'Все' }, { id: 'release', label: 'Релизы' }, { id: 'snapshot', label: 'Снапшоты' }, { id: 'old', label: 'Старые' }]" :key="kind.id" type="button" :class="{ selected: versionTypeFilter === kind.id }" @click="versionTypeFilter = kind.id">{{ kind.label }}</button></div><div v-if="versionLoading" class="version-message">Загрузка версий…</div><div v-else class="version-options"><button v-for="version in filteredVersions" :key="version.id" type="button" :class="{ selected: selectedVersion === version.id }" @click="selectVersion(version)"><span>{{ version.id }}</span><small>{{ versionTypeLabel(version.type) }}</small></button><p v-if="!filteredVersions.length" class="version-message">Версии не найдены</p></div><p v-if="versionLoadError" class="version-error">{{ versionLoadError }}</p></div></div><div class="meta-divider"></div><div><small>ЗАГРУЗЧИК</small><select v-model="selectedLoader"><option>Fabric</option><option>Forge</option><option>Vanilla</option></select></div><button class="play-button" :disabled="gameBusy" :title="gameBusy ? gameStatus : ''" @click="launchGame"><span v-if="!gameBusy">▶</span>{{ gameBusy ? `${gameStatus}${gameProgress !== null ? ` ${gameProgress}%` : ''}` : 'Играть' }}</button></div></div>
 
         <div class="section-heading"><h2>Загрузчик</h2><button class="text-link" @click="setPage('Библиотека')">Профили</button></div>
         <div class="choice-grid">
