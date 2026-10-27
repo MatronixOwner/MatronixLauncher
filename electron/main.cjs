@@ -1,7 +1,7 @@
 const { app, BrowserWindow, shell, ipcMain, net, safeStorage } = require('electron');
 const path = require('node:path');
 const fs = require('node:fs/promises');
-const { Auth } = require('msmc');
+const { randomUUID, createHash } = require('node:crypto');
 const { MinecraftFolder, launch } = require('@xmcl/core');
 const {
   getVersionList,
@@ -12,7 +12,14 @@ const {
 
 let gameOperation;
 let activeWindow;
-let activeXbox;
+let activeElyAccount;
+
+const ELY_AUTH_URL = 'https://authserver.ely.by';
+const AUTHLIB_INJECTOR = {
+  version: '1.2.8',
+  url: 'https://github.com/yushijinhun/authlib-injector/releases/download/v1.2.8/authlib-injector-1.2.8.jar',
+  sha256: '9c7f4343e6c82034958ffb48c14a2cb0c85928be7283103ce17da00c6d5a7b10'
+};
 
 function reportGameProgress(message, percent = null, state = 'progress') {
   if (!activeWindow || activeWindow.isDestroyed()) return;
@@ -57,46 +64,115 @@ ipcMain.handle('minecraft-version-manifest', async () => {
 });
 
 const minecraftRoot = () => path.join(app.getPath('userData'), 'minecraft');
-const accountTokenPath = () => path.join(app.getPath('userData'), 'microsoft-account.bin');
+const accountTokenPath = () => path.join(app.getPath('userData'), 'elyby-account.bin');
 
-async function getMinecraftAccount() {
-  if (activeXbox?.validate()) {
-    const cached = await activeXbox.getMinecraft();
-    if (cached.profile && !cached.isDemo()) return cached;
+async function postElyAuth(endpoint, payload) {
+  const response = await fetch(`${ELY_AUTH_URL}/auth/${endpoint}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  let result = {};
+  try { result = await response.json(); } catch { /* The auth server may return an empty success response. */ }
+  if (!response.ok) {
+    const reason = result.errorMessage || result.error || `HTTP ${response.status}`;
+    const error = new Error(`Ely.by: ${reason}`);
+    error.status = response.status;
+    throw error;
   }
+  return result;
+}
 
-  const tokenFile = accountTokenPath();
+async function persistElyAccount(account) {
+  activeElyAccount = account;
+  if (!safeStorage.isEncryptionAvailable()) return;
+  const encrypted = safeStorage.encryptString(JSON.stringify(account));
+  await fs.writeFile(accountTokenPath(), encrypted, { mode: 0o600 });
+}
+
+async function readSavedElyAccount() {
+  if (activeElyAccount) return activeElyAccount;
+  if (!safeStorage.isEncryptionAvailable()) return undefined;
   try {
-    if (safeStorage.isEncryptionAvailable()) {
-      const encrypted = await fs.readFile(tokenFile);
-      const refreshToken = safeStorage.decryptString(encrypted);
-      const auth = new Auth('select_account');
-      activeXbox = await auth.refresh(refreshToken);
-      const account = await activeXbox.getMinecraft();
-      if (!account.profile) throw new Error('Для этого Microsoft-аккаунта не найден профиль Minecraft.');
-      if (account.isDemo()) throw new Error('Для игры требуется аккаунт с лицензией Minecraft Java Edition.');
-      return account;
+    const encrypted = await fs.readFile(accountTokenPath());
+    const saved = JSON.parse(safeStorage.decryptString(encrypted));
+    if (saved?.accessToken && saved?.clientToken && saved?.profile?.id && saved?.profile?.name) {
+      activeElyAccount = saved;
+      return saved;
     }
   } catch (error) {
-    if (error?.code !== 'ENOENT') {
-      activeXbox = undefined;
-      if (error?.message?.includes('профиль Minecraft') || error?.message?.includes('лицензией Minecraft')) throw error;
-    }
+    if (error?.code !== 'ENOENT') await fs.rm(accountTokenPath(), { force: true }).catch(() => {});
   }
+  return undefined;
+}
 
-  reportGameProgress('Ожидание входа Microsoft…', null, 'progress');
-  const auth = new Auth('select_account');
-  activeXbox = await auth.launch('electron', { width: 620, height: 760, resizable: true });
-  const account = await activeXbox.getMinecraft();
-  if (!account.profile) throw new Error('Для этого Microsoft-аккаунта не найден профиль Minecraft.');
-  if (account.isDemo()) throw new Error('Для игры требуется аккаунт с лицензией Minecraft Java Edition.');
-
-  if (safeStorage.isEncryptionAvailable()) {
-    const encrypted = safeStorage.encryptString(activeXbox.save());
-    await fs.writeFile(tokenFile, encrypted, { mode: 0o600 });
+async function authenticateEly({ username, password, totp } = {}) {
+  if (typeof username !== 'string' || !username.trim() || typeof password !== 'string' || !password) {
+    throw new Error('Укажи логин и пароль Ely.by.');
   }
+  const clientToken = randomUUID();
+  const combinedPassword = totp?.trim() ? `${password}:${totp.trim()}` : password;
+  const result = await postElyAuth('authenticate', {
+    username: username.trim(),
+    password: combinedPassword,
+    clientToken,
+    requestUser: true
+  });
+  if (!result.accessToken || !result.selectedProfile?.id || !result.selectedProfile?.name) {
+    throw new Error('Ely.by не вернул игровой профиль. Проверь аккаунт и наличие профиля Minecraft.');
+  }
+  const account = {
+    accessToken: result.accessToken,
+    clientToken: result.clientToken || clientToken,
+    profile: { id: result.selectedProfile.id, name: result.selectedProfile.name }
+  };
+  await persistElyAccount(account);
   return account;
 }
+
+async function getMinecraftAccount() {
+  const saved = await readSavedElyAccount();
+  if (!saved) throw new Error('Сначала войди через Ely.by.');
+  try {
+    const result = await postElyAuth('refresh', {
+      accessToken: saved.accessToken,
+      clientToken: saved.clientToken,
+      requestUser: true
+    });
+    const account = {
+      accessToken: result.accessToken || saved.accessToken,
+      clientToken: result.clientToken || saved.clientToken,
+      profile: result.selectedProfile?.id && result.selectedProfile?.name
+        ? { id: result.selectedProfile.id, name: result.selectedProfile.name }
+        : saved.profile
+    };
+    await persistElyAccount(account);
+    return account;
+  } catch (error) {
+    if (error?.status === 400 || error?.status === 401) {
+      activeElyAccount = undefined;
+      await fs.rm(accountTokenPath(), { force: true }).catch(() => {});
+      throw new Error('Сессия Ely.by истекла. Войди в аккаунт снова.');
+    }
+    throw error;
+  }
+}
+
+ipcMain.handle('ely-account', async () => (await readSavedElyAccount())?.profile || null);
+ipcMain.handle('ely-login', async (_event, credentials) => {
+  const account = await authenticateEly(credentials);
+  return account.profile;
+});
+ipcMain.handle('ely-logout', async () => {
+  const account = await readSavedElyAccount();
+  activeElyAccount = undefined;
+  if (account) {
+    await postElyAuth('invalidate', { accessToken: account.accessToken, clientToken: account.clientToken }).catch(() => {});
+  }
+  await fs.rm(accountTokenPath(), { force: true }).catch(() => {});
+  return true;
+});
+
 
 function taskContext(label) {
   return {
@@ -128,6 +204,32 @@ async function installJava(version, folder) {
   return javaExecutable;
 }
 
+async function ensureAuthlibInjector(folder) {
+  const directory = path.join(folder.root, 'libraries', 'authlib-injector');
+  const destination = path.join(directory, `authlib-injector-${AUTHLIB_INJECTOR.version}.jar`);
+  const matchesChecksum = async (file) => {
+    try {
+      const content = await fs.readFile(file);
+      return createHash('sha256').update(content).digest('hex') === AUTHLIB_INJECTOR.sha256;
+    } catch {
+      return false;
+    }
+  };
+  if (await matchesChecksum(destination)) return destination;
+
+  reportGameProgress('Загрузка компонента авторизации Ely.by…', null);
+  const response = await fetch(AUTHLIB_INJECTOR.url);
+  if (!response.ok) throw new Error(`Не удалось получить authlib-injector: HTTP ${response.status}`);
+  const content = Buffer.from(await response.arrayBuffer());
+  const digest = createHash('sha256').update(content).digest('hex');
+  if (digest !== AUTHLIB_INJECTOR.sha256) throw new Error('Контрольная сумма authlib-injector не совпала. Файл не установлен.');
+  await fs.mkdir(directory, { recursive: true });
+  const temporary = `${destination}.${process.pid}.tmp`;
+  await fs.writeFile(temporary, content, { mode: 0o600 });
+  await fs.rename(temporary, destination);
+  return destination;
+}
+
 async function installAndLaunch(versionId) {
   if (typeof versionId !== 'string' || versionId.length > 80 || !/^[\w.-]+$/.test(versionId)) {
     throw new Error('Выбрана некорректная версия Minecraft.');
@@ -143,6 +245,7 @@ async function installAndLaunch(versionId) {
   const resolvedVersion = await installTask(metadata, folder).startAndWait(taskContext('Minecraft'));
   const javaPath = await installJava(resolvedVersion, folder);
 
+  const authlibInjector = await ensureAuthlibInjector(folder);
   reportGameProgress(`Запуск Minecraft ${versionId}…`, null, 'progress');
   const child = await launch({
     version: resolvedVersion,
@@ -150,10 +253,11 @@ async function installAndLaunch(versionId) {
     resourcePath: folder.root,
     javaPath,
     gameProfile: { id: account.profile.id, name: account.profile.name },
-    accessToken: account.mcToken,
+    accessToken: account.accessToken,
     launcherName: 'MatronixLauncher',
     launcherBrand: 'MatronixLauncher',
     maxMemory: 4096,
+    extraJVMArgs: [`-javaagent:${authlibInjector}=ely.by`],
     extraExecOption: { windowsHide: true }
   });
   reportGameProgress(`Minecraft ${versionId} запущен`, null, 'running');

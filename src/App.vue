@@ -20,6 +20,13 @@ const versionTypeFilter = ref('all');
 const gameBusy = ref(false);
 const gameStatus = ref('');
 const gameProgress = ref(null);
+const elyProfile = ref(null);
+const showElyLoginDialog = ref(false);
+const elyUsername = ref('');
+const elyPassword = ref('');
+const elyTotp = ref('');
+const elyLoginBusy = ref(false);
+const elyLoginError = ref('');
 const fallbackVersions = [
   { id: '1.21.1', type: 'release' }, { id: '1.20.1', type: 'release' },
   { id: '1.19.2', type: 'release' }, { id: '1.18.2', type: 'release' },
@@ -169,6 +176,43 @@ function saveKey() {
   if (activeTab.value === 'CurseForge') loadCurseForge();
   notify('Настройки CurseForge сохранены');
 }
+async function submitElyLogin() {
+  if (elyLoginBusy.value) return;
+  elyLoginBusy.value = true;
+  elyLoginError.value = '';
+  try {
+    elyProfile.value = await window.elyprism.loginEly({
+      username: elyUsername.value.trim(),
+      password: elyPassword.value,
+      totp: elyTotp.value.trim()
+    });
+    elyPassword.value = '';
+    elyTotp.value = '';
+    showElyLoginDialog.value = false;
+    notify(`Вход выполнен: ${elyProfile.value.name}`);
+  } catch (error) {
+    const message = error?.message || 'Не удалось войти в Ely.by.';
+    elyLoginError.value = /two factor|2fa|totp/i.test(message)
+      ? 'Для этого аккаунта требуется код двухфакторной защиты. Введи одноразовый код и попробуй снова.'
+      : message;
+  } finally {
+    elyLoginBusy.value = false;
+    elyPassword.value = '';
+    elyTotp.value = '';
+  }
+}
+async function logoutEly() {
+  await window.elyprism?.logoutEly?.();
+  elyProfile.value = null;
+  elyPassword.value = '';
+  elyTotp.value = '';
+  showElyLoginDialog.value = false;
+  notify('Выход из Ely.by выполнен');
+}
+function openElyRegister() {
+  if (window.elyprism?.desktop) window.elyprism.openExternal('https://account.ely.by/register');
+  else window.open('https://account.ely.by/register', '_blank', 'noopener');
+}
 function openProject(project) {
   const url = project.source === 'curseforge'
     ? `https://www.curseforge.com/minecraft/mc-mods/${project.slug}`
@@ -185,6 +229,10 @@ async function launchGame() {
     notify('Запуск доступен в установленном приложении MatronixLauncher.');
     return;
   }
+  if (!elyProfile.value) {
+    showElyLoginDialog.value = true;
+    return;
+  }
   if (gameBusy.value) return;
   gameBusy.value = true;
   gameStatus.value = 'Подготовка…';
@@ -193,6 +241,10 @@ async function launchGame() {
     await window.elyprism.launchMinecraft(selectedVersion.value, selectedLoader.value);
   } catch (error) {
     notify(error?.message || 'Не удалось установить или запустить Minecraft.');
+    if (/сессия Ely\.by истекла/i.test(error?.message || '')) {
+      elyProfile.value = null;
+      showElyLoginDialog.value = true;
+    }
     gameBusy.value = false;
     gameStatus.value = '';
     gameProgress.value = null;
@@ -226,7 +278,7 @@ function getAssistantReply(question) {
   }
   if (/не запуска|ошибк|вылет|краш|не работает/.test(q)) {
     return {
-      text: 'Кнопка «Играть» устанавливает выбранную Vanilla-версию с официальных серверов и запускает её после входа в Microsoft-аккаунт с лицензией Minecraft Java Edition. Первый запуск может занять время из-за загрузки игры и Java. Fabric и Forge пока не подключены.'
+      text: 'Кнопка «Играть» устанавливает выбранную Vanilla-версию с официальных серверов и запускает её после входа в аккаунт Ely.by. Первый запуск может занять время из-за загрузки игры, Java и компонента авторизации Ely.by. Fabric и Forge пока не подключены.'
     };
   }
   if (/forge|fabric|загрузчик|loader/.test(q)) {
@@ -236,7 +288,7 @@ function getAssistantReply(question) {
   }
   if (/верси|стар(ая|ые)|все версии|1\.\d/.test(q)) {
     return {
-      text: 'Список версий загружается из официального манифеста Minecraft. Кнопка «Играть» устанавливает выбранную Vanilla-версию, нужные файлы и Java, затем запускает игру после входа в Microsoft-аккаунт с лицензией.'
+      text: 'Список версий загружается из официального манифеста Minecraft. Кнопка «Играть» устанавливает выбранную Vanilla-версию, нужные файлы и Java, затем запускает игру после входа через Ely.by.'
     };
   }
   if (/мод|установ/.test(q)) {
@@ -251,7 +303,7 @@ function getAssistantReply(question) {
   }
   if (/аккаунт|вход|майкрософт|microsoft/.test(q)) {
     return {
-      text: 'Вход выполняется в окне Microsoft через OAuth. Пароль вводится только на странице Microsoft; лаунчер его не запрашивает. Для запуска нужна лицензия Minecraft Java Edition.'
+      text: 'Войди через Ely.by в верхней панели лаунчера. Пароль отправляется напрямую на официальный сервер авторизации Ely.by по HTTPS и не сохраняется; сохраняется только зашифрованный токен сессии.'
     };
   }
   if (/интернет|страна|росси|доступ/.test(q)) {
@@ -295,6 +347,7 @@ function runAssistantAction(action) {
 onMounted(() => {
   loadModrinth();
   loadMinecraftVersions();
+  window.elyprism?.getElyAccount?.().then((profile) => { elyProfile.value = profile; }).catch(() => {});
   window.elyprism?.onMinecraftProgress?.((progress) => {
     gameStatus.value = progress.message || '';
     gameProgress.value = progress.percent;
@@ -334,7 +387,7 @@ onMounted(() => {
 
     <main class="main-area" @click="showVersionPicker = false" @keydown.esc="showVersionPicker = false">
       <header class="topbar">
-        <div class="top-actions"><button class="assistant-top-button" aria-label="ИИ-помощник" @click="assistantOpen = !assistantOpen">Помощник</button></div>
+        <div class="top-actions"><button class="ely-account-button" @click="showElyLoginDialog = true">{{ elyProfile?.name || 'Войти через Ely.by' }}</button><button class="assistant-top-button" aria-label="ИИ-помощник" @click="assistantOpen = !assistantOpen">Помощник</button></div>
       </header>
 
       <section v-if="activePage === 'Главная'" class="content home-content">
@@ -368,6 +421,7 @@ onMounted(() => {
     </main>
 
     <div v-if="showKeyDialog" class="modal-backdrop" @click.self="showKeyDialog = false"><div class="key-modal"><button class="modal-close" @click="showKeyDialog = false">×</button><h2>CurseForge</h2><p>API-ключ хранится локально.</p><label for="cf-key">API-ключ</label><input id="cf-key" v-model="keyDraft" type="password" placeholder="Вставь ключ CurseForge"/><div class="modal-actions"><button class="cancel-button" @click="showKeyDialog = false">Отмена</button><button class="primary-small" @click="saveKey">Сохранить ключ</button></div></div></div>
+    <div v-if="showElyLoginDialog" class="modal-backdrop" @click.self="showElyLoginDialog = false"><div class="key-modal ely-login-modal"><button class="modal-close" aria-label="Закрыть" @click="showElyLoginDialog = false">×</button><h2>{{ elyProfile ? 'Аккаунт Ely.by' : 'Вход через Ely.by' }}</h2><template v-if="elyProfile"><p>Подключён аккаунт <b>{{ elyProfile.name }}</b>.</p><div class="modal-actions"><button class="cancel-button" @click="showElyLoginDialog = false">Закрыть</button><button class="primary-small" @click="logoutEly">Выйти</button></div></template><form v-else @submit.prevent="submitElyLogin"><p>Войди в свой аккаунт Ely.by. Пароль отправляется напрямую на authserver.ely.by по HTTPS и не сохраняется лаунчером.</p><label for="ely-username">Логин или e-mail</label><input id="ely-username" v-model="elyUsername" autocomplete="username" required maxlength="254"/><label for="ely-password">Пароль</label><input id="ely-password" v-model="elyPassword" type="password" autocomplete="current-password" required maxlength="256"/><label for="ely-totp">Код двухфакторной защиты (если включён)</label><input id="ely-totp" v-model="elyTotp" inputmode="numeric" autocomplete="one-time-code" maxlength="12" placeholder="Необязательно"/><p v-if="elyLoginError" class="ely-login-error">{{ elyLoginError }}</p><div class="modal-actions"><button type="button" class="cancel-button" :disabled="elyLoginBusy" @click="showElyLoginDialog = false">Отмена</button><button type="submit" class="primary-small" :disabled="elyLoginBusy">{{ elyLoginBusy ? 'Вход…' : 'Войти' }}</button></div><button type="button" class="ely-register-link" @click="openElyRegister">Создать аккаунт Ely.by</button></form></div></div>
     <section v-if="assistantOpen" class="assistant-panel" aria-label="ИИ-помощник MatronixLauncher">
       <header class="assistant-panel-head">
         <div class="assistant-avatar">M</div>

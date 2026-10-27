@@ -1,6 +1,6 @@
 {
   "name": "matronix-launcher",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "private": true,
   "description": "MatronixLauncher — customizable Minecraft launcher",
   "main": "electron/main.cjs",
@@ -15,7 +15,6 @@
     "@vitejs/plugin-vue": "^5.2.1",
     "@xmcl/core": "^2.15.1",
     "@xmcl/installer": "^6.1.2",
-    "msmc": "^5.0.5",
     "vite": "^6.0.7",
     "vue": "^3.5.13"
   },
