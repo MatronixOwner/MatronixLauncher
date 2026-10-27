@@ -53,6 +53,34 @@ function isRetryableDownloadError(error, depth = 0) {
   return error.cause ? isRetryableDownloadError(error.cause, depth + 1) : false;
 }
 
+function collectChecksumFailureFiles(error, files = new Set(), depth = 0) {
+  if (!error || depth > 5) return files;
+  if (/ChecksumNotMatchError/i.test(error.name || '') && typeof error.file === 'string') files.add(error.file);
+  if (Array.isArray(error.errors)) error.errors.forEach((item) => collectChecksumFailureFiles(item, files, depth + 1));
+  if (error.cause) collectChecksumFailureFiles(error.cause, files, depth + 1);
+  return files;
+}
+
+function findChecksumFailure(error, depth = 0) {
+  if (!error || depth > 5) return undefined;
+  if (/ChecksumNotMatchError/i.test(error.name || '')) return error;
+  if (Array.isArray(error.errors)) {
+    for (const item of error.errors) {
+      const found = findChecksumFailure(item, depth + 1);
+      if (found) return found;
+    }
+  }
+  return error.cause ? findChecksumFailure(error.cause, depth + 1) : undefined;
+}
+
+async function removeCorruptDownloads(error, root) {
+  const rootPath = path.resolve(root) + path.sep;
+  for (const file of collectChecksumFailureFiles(error)) {
+    const target = path.resolve(file);
+    if (target.startsWith(rootPath)) await fs.rm(target, { force: true }).catch(() => {});
+  }
+}
+
 function explainLaunchFailure(error) {
   const details = explainError(error);
   if (/ConnectTimeoutError|UND_ERR_CONNECT_TIMEOUT|ETIMEDOUT/i.test(details)) {
@@ -60,7 +88,11 @@ function explainLaunchFailure(error) {
     return `Не удалось подключиться к ${host}: истёк таймаут соединения. Неполные файлы не прошли SHA-1-проверку и не будут запущены. Проверь, открывается ли адрес в браузере, а также DNS, прокси и настройки брандмауэра; затем повтори попытку. Автоповторы загрузки включены.`;
   }
   if (/ChecksumNotMatchError|sha1 checksum not match/i.test(details)) {
-    return 'Скачанный игровой файл не прошёл проверку SHA-1. Повтори попытку; если ошибка повторяется, проверь соединение или доступность сервера загрузки Minecraft.';
+    const checksum = findChecksumFailure(error);
+    const host = checksum?.source ? (() => { try { return new URL(checksum.source).hostname; } catch { return ''; } })() : '';
+    const hashes = checksum?.expect && checksum?.actual ? ` Ожидалось SHA-1 ${checksum.expect}, получено ${checksum.actual}.` : '';
+    const source = host ? ` Источник: ${host}.` : '';
+    return `Файл ресурсов не прошёл SHA-1-проверку.${hashes}${source} Повреждённая локальная копия удалена; включены официальный источник, резервное зеркало с проверкой хеша и повторные попытки. Если ошибка повторяется, проверь соединение, прокси или антивирус.`;
   }
   return details || 'Не удалось установить или запустить Minecraft.';
 }
@@ -252,10 +284,17 @@ async function installMinecraftWithRetry(metadata, folder, versionId) {
   const maxAttempts = 4;
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
-      return await installTask(metadata, folder, { dispatcher: minecraftDownloadDispatcher })
-        .startAndWait(taskContext(`Minecraft ${versionId}`));
+      return await installTask(metadata, folder, {
+        dispatcher: minecraftDownloadDispatcher,
+        assetsHost: [
+          'https://resources.download.minecraft.net',
+          'https://bmclapi2.bangbang93.com/assets'
+        ]
+      }).startAndWait(taskContext(`Minecraft ${versionId}`));
     } catch (error) {
-      if (attempt === maxAttempts || !isRetryableDownloadError(error)) throw error;
+      const retryable = isRetryableDownloadError(error);
+      if (retryable) await removeCorruptDownloads(error, folder.root);
+      if (attempt === maxAttempts || !retryable) throw error;
       reportGameProgress(`Сеть прервала загрузку. Повтор ${attempt}/${maxAttempts - 1}…`, null);
       await new Promise((resolve) => setTimeout(resolve, 1200 * attempt));
     }
