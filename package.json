@@ -1,14 +1,14 @@
 {
-  "name": "elyprism-launcher",
-  "version": "0.1.0",
+  "name": "matronix-launcher",
+  "version": "0.1.1",
   "private": true,
-  "description": "ElyPrismLauncher — customizable Minecraft launcher",
+  "description": "MatronixLauncher — customizable Minecraft launcher",
   "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "desktop": "electron .",
-    "dist:win": "npm run build && electron-builder --win portable --x64",
+    "dist:win": "npm run build && electron-builder --win portable --x64 --publish never",
     "dist:win:installer": "npm run build && electron-builder --win nsis --x64 --publish never"
   },
   "dependencies": {
@@ -21,11 +21,28 @@
     "electron-builder": "^25.1.8"
   },
   "build": {
-    "appId": "com.elyprism.launcher",
-    "productName": "ElyPrism Launcher",
-    "directories": { "output": "release" },
+    "appId": "com.matronix.launcher",
+    "productName": "MatronixLauncher",
+    "directories": { "output": "release", "buildResources": "build" },
     "files": ["dist/**/*", "electron/**/*", "package.json"],
-    "win": { "target": ["portable"], "artifactName": "ElyPrism-Launcher-${version}-win-${arch}.${ext}" },
-    "portable": { "artifactName": "ElyPrism-Launcher-${version}-win-${arch}.${ext}" }
+    "win": {
+      "icon": "build/icon.ico",
+      "target": ["portable"],
+      "artifactName": "MatronixLauncher-${version}-win-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "MatronixLauncher",
+      "installerLanguages": ["ru_RU", "en_US"],
+      "displayLanguageSelector": true,
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false,
+      "artifactName": "MatronixLauncher-Setup-${version}-win-${arch}.${ext}"
+    },
+    "portable": { "artifactName": "MatronixLauncher-${version}-win-${arch}.${ext}" }
   }
 }

@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue';
+import brandMark from './assets/matronix-mark.png';
 
 const activePage = ref('Главная');
 const activeTab = ref('Modrinth');
@@ -124,7 +125,7 @@ onMounted(() => loadModrinth());
 <template>
   <div class="app-shell">
     <aside class="sidebar">
-      <div class="brand"><div class="brand-mark"><span></span><span></span><span></span></div><div><b>ELYPRISM</b><small>LAUNCHER</small></div></div>
+      <div class="brand"><img class="brand-image" :src="brandMark" alt="MatronixLauncher"/><div><b>MATRONIX</b><small>LAUNCHER</small></div></div>
       <div class="side-label">МЕНЮ</div>
       <nav class="main-nav">
         <button v-for="item in navItems" :key="item.label" :class="['nav-item', { active: activePage === item.label }]" @click="setPage(item.label)">
@@ -138,13 +139,13 @@ onMounted(() => loadModrinth());
         <div class="instance-info"><b>Prism Survival</b><small>1.21.1 · Fabric</small></div><span class="online-dot"></span>
       </button>
       <button class="add-instance" @click="createInstance"><span>＋</span> Новая сборка</button>
-      <div class="sidebar-bottom"><div class="avatar">E</div><div class="user-meta"><b>Исследователь</b><small>Локальный профиль</small></div><button class="more-btn" title="Настройки" @click="setPage('Настройки')">•••</button></div>
+      <div class="sidebar-bottom"><div class="avatar">M</div><div class="user-meta"><b>Игрок</b><small>Локальный профиль</small></div><button class="more-btn" title="Настройки" @click="setPage('Настройки')">•••</button></div>
     </aside>
 
     <main class="main-area">
       <header class="topbar">
-        <div class="breadcrumbs"><span>ELYPRISM</span><i>/</i><b>{{ routeTitle }}</b></div>
-        <div class="top-actions"><button class="icon-button" title="Уведомления" @click="notify('Новых уведомлений нет')">♧<span class="notification-dot"></span></button><div class="top-separator"></div><button class="account-button"><span class="tiny-avatar">E</span><span>Мой профиль</span><span class="chevron">⌄</span></button></div>
+        <div class="breadcrumbs"><span>MATRONIX</span><i>/</i><b>{{ routeTitle }}</b></div>
+        <div class="top-actions"><button class="icon-button" title="Уведомления" @click="notify('Новых уведомлений нет')">♧<span class="notification-dot"></span></button><div class="top-separator"></div><button class="account-button"><span class="tiny-avatar">M</span><span>Мой профиль</span><span class="chevron">⌄</span></button></div>
       </header>
 
       <section v-if="activePage === 'Главная'" class="content home-content">
@@ -172,16 +173,16 @@ onMounted(() => loadModrinth());
         <div v-else-if="error" class="catalog-state error-state"><div class="state-symbol">!</div><h3>Каталог пока недоступен</h3><p>{{ error }}</p><button class="retry-button" @click="loadCatalog">Попробовать снова</button></div>
         <div v-else-if="projects.length" class="project-grid"><article v-for="project in filteredProjects" :key="project.project_id" class="project-card"><div class="project-cover"><img v-if="project.icon_url" :src="project.icon_url" @error="$event.target.style.display='none'"/><span v-else class="project-fallback">✧</span><span class="project-loader">{{ activeTab }} · мод</span><button class="card-menu" @click="openProject(project)">↗</button></div><div class="project-info"><div class="project-title-row"><h3>{{ project.title }}</h3><button class="install-button" :class="{ installed: installed.includes(project.project_id) }" @click="installProject(project)">{{ installed.includes(project.project_id) ? '✓' : '+' }}</button></div><p>{{ project.description || 'Мод для Minecraft от сообщества.' }}</p><div class="project-stats"><span>↓ {{ prettyDownloads(project.downloads) }}</span><span class="compat-tag">{{ selectedLoader }}</span></div></div></article></div>
         <div v-else class="catalog-state"><div class="state-symbol">⌕</div><h3>Найди свой следующий мод</h3><p>Поиск работает по каталогу {{ activeTab }}.</p></div>
-        <div class="catalog-footnote"><span>✦</span> ElyPrism не размещает моды — файлы загружаются с исходных платформ.</div>
+        <div class="catalog-footnote"><span>✦</span> MatronixLauncher не размещает моды — файлы загружаются с исходных платформ.</div>
       </section>
 
       <section v-else-if="activePage === 'Сборки' || activePage === 'Библиотека'" class="content empty-page"><div class="eyebrow muted">ТВОЯ КОЛЛЕКЦИЯ</div><h1>{{ activePage === 'Библиотека' ? 'Твоя библиотека.' : 'Сборки сообщества.' }}</h1><p>{{ activePage === 'Библиотека' ? 'Здесь будут жить твои игровые профили.' : 'Готовые сборки появятся здесь.' }}</p><div class="empty-card"><span>✦</span><h3>Место для новых миров</h3><p>Установка Minecraft и управление профилями будут добавлены в следующих версиях.</p><button class="primary-small" @click="createInstance">＋ Создать сборку</button></div></section>
-      <section v-else class="content empty-page"><div class="eyebrow muted">ELYPRISM</div><h1>Настройки лаунчера.</h1><p>Подключи каталог CurseForge или настрой интерфейс под себя.</p><div class="empty-card settings-card"><div><div class="settings-icon">⚙</div><h3>CurseForge API</h3><p>Для поиска CurseForge нужен API-ключ. Он хранится только в этом приложении.</p></div><button class="primary-small" @click="showKeyDialog = true">Настроить ключ</button></div></section>
+      <section v-else class="content empty-page"><div class="eyebrow muted">MATRONIX</div><h1>Настройки лаунчера.</h1><p>Подключи каталог CurseForge или настрой интерфейс под себя.</p><div class="empty-card settings-card"><div><div class="settings-icon">⚙</div><h3>CurseForge API</h3><p>Для поиска CurseForge нужен API-ключ. Он хранится только в этом приложении.</p></div><button class="primary-small" @click="showKeyDialog = true">Настроить ключ</button></div></section>
 
-      <footer class="app-footer"><span>ELYPRISM LAUNCHER <i>·</i> РАННЯЯ ВЕРСИЯ</span><span>СДЕЛАНО ДЛЯ ИССЛЕДОВАТЕЛЕЙ <b>✦</b></span></footer>
+      <footer class="app-footer"><span>MATRONIX LAUNCHER <i>·</i> РАННЯЯ ВЕРСИЯ</span><span>СДЕЛАНО ДЛЯ ИССЛЕДОВАТЕЛЕЙ <b>✦</b></span></footer>
     </main>
 
-    <div v-if="showKeyDialog" class="modal-backdrop" @click.self="showKeyDialog = false"><div class="key-modal"><button class="modal-close" @click="showKeyDialog = false">×</button><div class="modal-icon">✺</div><div class="eyebrow muted">ИНТЕГРАЦИЯ КАТАЛОГА</div><h2>Подключи CurseForge</h2><p>Вставь свой CurseForge API-ключ. Он сохраняется локально в этом профиле приложения и не отправляется ElyPrism.</p><label for="cf-key">API-ключ</label><input id="cf-key" v-model="keyDraft" type="password" placeholder="Вставь ключ CurseForge"/><div class="modal-actions"><button class="cancel-button" @click="showKeyDialog = false">Отмена</button><button class="primary-small" @click="saveKey">Сохранить ключ</button></div><small class="modal-note">Получение ключа и правила использования регулируются CurseForge.</small></div></div>
+    <div v-if="showKeyDialog" class="modal-backdrop" @click.self="showKeyDialog = false"><div class="key-modal"><button class="modal-close" @click="showKeyDialog = false">×</button><div class="modal-icon">✺</div><div class="eyebrow muted">ИНТЕГРАЦИЯ КАТАЛОГА</div><h2>Подключи CurseForge</h2><p>Вставь свой CurseForge API-ключ. Он сохраняется локально в этом профиле приложения и не отправляется MatronixLauncher.</p><label for="cf-key">API-ключ</label><input id="cf-key" v-model="keyDraft" type="password" placeholder="Вставь ключ CurseForge"/><div class="modal-actions"><button class="cancel-button" @click="showKeyDialog = false">Отмена</button><button class="primary-small" @click="saveKey">Сохранить ключ</button></div><small class="modal-note">Получение ключа и правила использования регулируются CurseForge.</small></div></div>
     <div v-if="toast" class="toast"><span>✦</span>{{ toast }}</div>
   </div>
 </template>

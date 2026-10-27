@@ -8,7 +8,7 @@ function createWindow() {
     minWidth: 1060,
     minHeight: 700,
     backgroundColor: '#111019',
-    title: 'ElyPrism Launcher',
+    title: 'MatronixLauncher',
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
