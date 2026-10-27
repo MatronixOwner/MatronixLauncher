@@ -4,7 +4,20 @@ on:
   push:
     branches:
       - arena/a2faeba1-matronixlauncher
+    tags:
+      - 'v*'
   workflow_dispatch:
+    inputs:
+      create_release:
+        description: Publish a GitHub release after building
+        type: boolean
+        required: true
+        default: false
+      release_tag:
+        description: Release tag, for example v0.1.1
+        type: string
+        required: false
+        default: v0.1.1
 
 permissions:
   contents: write
@@ -36,18 +49,30 @@ jobs:
             exit $LASTEXITCODE
           }
 
+      - name: Upload installer for this build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ElyPrism-Installer-${{ github.sha }}
+          path: release/*.exe
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Publish GitHub release
+        if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && inputs.create_release)
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
         shell: pwsh
         run: |
-          $tag = "v0.1.0"
+          if ($env:GITHUB_REF -like "refs/tags/*") { $tag = $env:GITHUB_REF_NAME }
+          else { $tag = $env:RELEASE_TAG }
+          if (-not $tag) { throw "Choose a release tag, such as v0.1.1." }
           $files = @(Get-ChildItem release -Filter *.exe | ForEach-Object { $_.FullName })
           if ($files.Count -eq 0) { throw "No Windows installer .exe was produced." }
           $notes = @"
-          Первый прототип ElyPrism Launcher для Windows.
+          ElyPrism Launcher for Windows.
 
-          Включает NSIS-установщик. Интерфейс и каталоги модов доступны; игровой движок, авторизация и автоматическая установка Minecraft ещё в разработке.
+          Includes the NSIS installer. The launcher interface and mod catalogs are available; Minecraft installation, authentication, and launching are still under development.
           "@
           $ghArgs = @("release", "create", $tag) + $files + @(
             "--repo", $env:GITHUB_REPOSITORY,
