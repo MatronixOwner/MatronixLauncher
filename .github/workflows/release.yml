@@ -1,0 +1,126 @@
+name: Build Application and Make Release
+
+on:
+  push:
+    tags:
+      - "*"
+
+permissions: {}
+
+jobs:
+  build_release:
+    name: Build Release
+    uses: ./.github/workflows/build.yml
+    permissions:
+      contents: read
+      # Required for Azure Trusted Signing
+      id-token: write
+      # Required for vcpkg binary cache
+      packages: write
+    with:
+      build-type: Release
+      environment: Release
+    secrets: inherit
+
+  create_release:
+    needs: build_release
+    permissions:
+      contents: write
+    runs-on: ubuntu-slim
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: "true"
+          path: "MatronixLauncher-source"
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+      - name: Grab and store version
+        run: |
+          tag_name=$(echo ${{ github.ref }} | grep -oE "[^/]+$")
+          echo "VERSION=$tag_name" >> $GITHUB_ENV
+      - name: Package artifacts properly
+        run: |
+          mv ${{ github.workspace }}/MatronixLauncher-source MatronixLauncher-${{ env.VERSION }}
+          mv MatronixLauncher-Linux-Qt6-Portable*/MatronixLauncher-portable.tar.gz MatronixLauncher-Linux-Qt6-Portable-${{ env.VERSION }}.tar.gz
+          mv MatronixLauncher-Linux-aarch64-Qt6-Portable*/MatronixLauncher-portable.tar.gz MatronixLauncher-Linux-aarch64-Qt6-Portable-${{ env.VERSION }}.tar.gz
+          mv MatronixLauncher-*.AppImage/MatronixLauncher-*-x86_64.AppImage MatronixLauncher-Linux-x86_64.AppImage
+          mv MatronixLauncher-*.AppImage.zsync/MatronixLauncher-*-x86_64.AppImage.zsync MatronixLauncher-Linux-x86_64.AppImage.zsync
+          mv MatronixLauncher-*.AppImage/MatronixLauncher-*-aarch64.AppImage MatronixLauncher-Linux-aarch64.AppImage
+          mv MatronixLauncher-*.AppImage.zsync/MatronixLauncher-*-aarch64.AppImage.zsync MatronixLauncher-Linux-aarch64.AppImage.zsync
+          mv MatronixLauncher-macOS*/MatronixLauncher.zip MatronixLauncher-macOS-${{ env.VERSION }}.zip
+          mv MatronixLauncher-macOS*/MatronixLauncher.dmg MatronixLauncher-macOS-${{ env.VERSION }}.dmg
+
+          tar --exclude='.git' -czf MatronixLauncher-${{ env.VERSION }}.tar.gz MatronixLauncher-${{ env.VERSION }}
+
+          for d in MatronixLauncher-Windows-MSVC*; do
+            cd "${d}" || continue
+            LEGACY="$(echo -n ${d} | grep -o Legacy || true)"
+            ARM64="$(echo -n ${d} | grep -o arm64 || true)"
+            INST="$(echo -n ${d} | grep -o Setup || true)"
+            PORT="$(echo -n ${d} | grep -o Portable || true)"
+            NAME="MatronixLauncher-Windows-MSVC"
+            test -z "${LEGACY}" || NAME="${NAME}-Legacy"
+            test -z "${ARM64}" || NAME="${NAME}-arm64"
+            test -z "${PORT}" || NAME="${NAME}-Portable"
+            test -z "${INST}" || mv MatronixLauncher-*.exe ../${NAME}-Setup-${{ env.VERSION }}.exe
+            test -n "${INST}" || zip -r -9 "../${NAME}-${{ env.VERSION }}.zip" *
+            cd ..
+          done
+
+          for d in MatronixLauncher-Windows-MinGW-w64*; do
+            cd "${d}" || continue
+            INST="$(echo -n ${d} | grep -o Setup || true)"
+            PORT="$(echo -n ${d} | grep -o Portable || true)"
+            NAME="MatronixLauncher-Windows-MinGW-w64"
+            test -z "${PORT}" || NAME="${NAME}-Portable"
+            test -z "${INST}" || mv MatronixLauncher-*.exe ../${NAME}-Setup-${{ env.VERSION }}.exe
+            test -n "${INST}" || zip -r -9 "../${NAME}-${{ env.VERSION }}.zip" *
+            cd ..
+          done
+
+          for d in MatronixLauncher-Windows-MinGW-arm64*; do
+            cd "${d}" || continue
+            INST="$(echo -n ${d} | grep -o Setup || true)"
+            PORT="$(echo -n ${d} | grep -o Portable || true)"
+            NAME="MatronixLauncher-Windows-MinGW-arm64"
+            test -z "${PORT}" || NAME="${NAME}-Portable"
+            test -z "${INST}" || mv MatronixLauncher-*.exe ../${NAME}-Setup-${{ env.VERSION }}.exe
+            test -n "${INST}" || zip -r -9 "../${NAME}-${{ env.VERSION }}.zip" *
+            cd ..
+          done
+
+      - name: Create release
+        id: create_release
+        uses: softprops/action-gh-release@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ github.ref }}
+          name: MatronixLauncher ${{ env.VERSION }}
+          draft: true
+          prerelease: false
+          fail_on_unmatched_files: true
+          files: |
+            MatronixLauncher-Linux-x86_64.AppImage
+            MatronixLauncher-Linux-x86_64.AppImage.zsync
+            MatronixLauncher-Linux-aarch64.AppImage
+            MatronixLauncher-Linux-aarch64.AppImage.zsync
+            MatronixLauncher-Linux-Qt6-Portable-${{ env.VERSION }}.tar.gz
+            MatronixLauncher-Linux-aarch64-Qt6-Portable-${{ env.VERSION }}.tar.gz
+            MatronixLauncher-Windows-MinGW-w64-${{ env.VERSION }}.zip
+            MatronixLauncher-Windows-MinGW-w64-Portable-${{ env.VERSION }}.zip
+            MatronixLauncher-Windows-MinGW-w64-Setup-${{ env.VERSION }}.exe
+            MatronixLauncher-Windows-MinGW-arm64-${{ env.VERSION }}.zip
+            MatronixLauncher-Windows-MinGW-arm64-Portable-${{ env.VERSION }}.zip
+            MatronixLauncher-Windows-MinGW-arm64-Setup-${{ env.VERSION }}.exe
+            MatronixLauncher-Windows-MSVC-arm64-${{ env.VERSION }}.zip
+            MatronixLauncher-Windows-MSVC-arm64-Portable-${{ env.VERSION }}.zip
+            MatronixLauncher-Windows-MSVC-arm64-Setup-${{ env.VERSION }}.exe
+            MatronixLauncher-Windows-MSVC-${{ env.VERSION }}.zip
+            MatronixLauncher-Windows-MSVC-Portable-${{ env.VERSION }}.zip
+            MatronixLauncher-Windows-MSVC-Setup-${{ env.VERSION }}.exe
+            MatronixLauncher-macOS-${{ env.VERSION }}.zip
+            MatronixLauncher-macOS-${{ env.VERSION }}.dmg
+            MatronixLauncher-${{ env.VERSION }}.tar.gz
