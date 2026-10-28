@@ -17,21 +17,38 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
+          npx electron --version
 
-      - name: Build EXE (electron-builder)
-        run: npm run dist
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Debug environment
+        shell: pwsh
+        run: |
+          Write-Host "Node: $(node --version)"
+          Write-Host "NPM: $(npm --version)"
+          Get-ChildItem node_modules/.bin | Select-Object Name
 
-      - name: Release
+      - name: Build EXE
+        shell: pwsh
+        run: |
+          $env:ELECTRON_GET_UPSTREAM_MIRROR = "https://github.com/electron/electron/releases/download"
+          npx electron-builder --win --x64 --publish never
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MatronixLauncher-EXE
+          path: dist/*
+          if-no-files-found: warn
+
+      - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            dist/MatronixLauncher Setup 1.0.0.exe
-            dist/*-x64.exe
+            dist/*
           tag_name: ${{ github.ref }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
