@@ -13,9 +13,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Qt 6 via choco
+      - name: Install Qt 6 via winget
+        shell: pwsh
         run: |
-          choco install qt6 -y || choco install qt -y
+          $ProgressPreference = 'SilentlyContinue'
+          try {
+            winget install QtProject.Qt.670 --accept-source-agreements --accept-package-agreements --silent
+          } catch {
+            Write-Host "winget QtProject.Qt.670 failed, trying QtProject.Qt..."
+            winget install QtProject.Qt --accept-source-agreements --accept-package-agreements --silent
+          }
 
       - name: Install CMake and NSIS
         run: |
