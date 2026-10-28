@@ -13,19 +13,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Qt 6 via vcpkg
-        shell: pwsh
-        run: |
-          if (-not (Test-Path "C:\vcpkg\vcpkg.exe")) {
-            Write-Host "Cloning vcpkg..."
-            git clone https://github.com/microsoft/vcpkg.git C:\vcpkg
-            C:\vcpkg\bootstrap-vcpkg.bat
-          }
-          Write-Host "Installing Qt via vcpkg (может занять 30+ мин)..."
-          C:\vcpkg\vcpkg install qtbase:x64-windows
-          C:\vcpkg\vcpkg install qttools:x64-windows
-          echo "C:\vcpkg\installed\x64-windows" >> $env:GITHUB_PATH
-          echo "VCPKG_ROOT=C:\vcpkg" >> $env:GITHUB_ENV
+      - name: Install Qt 6
+        uses: jurplel/install-qt-action@v2
+        with:
+          version: '6.7'
+          target: 'desktop'
+          arch: 'win64'
 
       - name: Install CMake and NSIS
         run: |
@@ -35,7 +28,7 @@ jobs:
       - name: Configure CMake
         shell: pwsh
         run: |
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$env:Qt6_DIR
 
       - name: Build
         shell: pwsh
