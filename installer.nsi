@@ -2,7 +2,7 @@
 !define MATRONIX_VERSION "1.0.0"
 !define MATRONIX_PUBLISHER "MatronixLauncher"
 !define MATRONIX_ICON "assets/icon.ico"
-!define MATRONIX_EXE "MatronixLauncher.exe"
+!define MATRONIX_EXE "build\MatronixLauncher.exe"
 !define MATRONIX_SETUP "MatronixLauncher-Setup.exe"
 
 Name "${MATRONIX_NAME} ${MATRONIX_VERSION}"
