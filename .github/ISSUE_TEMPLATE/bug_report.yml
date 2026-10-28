@@ -6,10 +6,10 @@ body:
   attributes:
     value: |
       Before submitting a bug report, please make sure you have read this *entire* form, and that:
-      * You have read the [project README](https://github.com/d50130483-ship-it/MatronixLauncher#readme) and it has not answered your question.
+      * You have read the [project README](https://github.com/d50130483-ship-it/MatronixPrismLauncher#readme) and it has not answered your question.
       * You have read the [Prism Launcher wiki](https://prismlauncher.org/wiki/) and it has not answered your question.
       * Your bug is not caused by Minecraft or any mods you have installed.
-      * Your issue has not been reported before, [make sure to use the search function!](https://github.com/d50130483-ship-it/MatronixLauncher/issues)
+      * Your issue has not been reported before, [make sure to use the search function!](https://github.com/d50130483-ship-it/MatronixPrismLauncher/issues)
 
       **Do not forget to give your issue a descriptive title.** "Bug in the instance screen" makes it hard to distinguish issues at a glance.
 - type: dropdown
@@ -24,15 +24,15 @@ body:
     - Other
 - type: input
   attributes:
-    label: Version of MatronixLauncher
-    description: The version of MatronixLauncher used in the bug report.
-    placeholder: MatronixLauncher 10.0.6
+    label: Version of MatronixPrismLauncher
+    description: The version of MatronixPrismLauncher used in the bug report.
+    placeholder: MatronixPrismLauncher 10.0.6
   validations:
     required: true
 - type: input
   attributes:
     label: Version of Qt
-    description: The version of Qt used in the bug report. You can find it in Help -> About MatronixLauncher -> About Qt.
+    description: The version of Qt used in the bug report. You can find it in Help -> About MatronixPrismLauncher -> About Qt.
     placeholder: Qt 6.3.0
   validations:
     required: true

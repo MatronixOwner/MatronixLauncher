@@ -342,7 +342,7 @@ auto V1::getIndexForMod(const QDir& index_dir, QString slug) -> Mod
 
         toml::table* mod_provider_table = nullptr;
         if ((mod_provider_table = update_table[ModPlatform::ProviderCapabilities::name(Provider::FLAME)].as_table())) {
-            qCritical() << "Packwiz metadata points to CurseForge, which is disabled in MatronixLauncher.";
+            qCritical() << "Packwiz metadata points to CurseForge, which is disabled in MatronixPrismLauncher.";
             return {};
         } else if ((mod_provider_table = update_table[ModPlatform::ProviderCapabilities::name(Provider::MODRINTH)].as_table())) {
             mod.provider = Provider::MODRINTH;

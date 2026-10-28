@@ -1,5 +1,5 @@
 name: Setup Dependencies
-description: Install and setup dependencies for building MatronixLauncher
+description: Install and setup dependencies for building MatronixPrismLauncher
 
 inputs:
   build-type:

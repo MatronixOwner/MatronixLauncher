@@ -35,6 +35,7 @@
 
 #include "ui/themes/CatPack.h"
 #include <QDate>
+#include <QFile>
 #include <QDir>
 #include <QDirIterator>
 #include <QFileInfo>
@@ -45,20 +46,23 @@
 
 QString BasicCatPack::path() const
 {
+    const QString basePath = QString(":/backgrounds/%1").arg(m_id);
     const auto now = QDate::currentDate();
     const auto birthday = QDate(now.year(), 11, 1);
     const auto xmas = QDate(now.year(), 12, 25);
     const auto halloween = QDate(now.year(), 10, 31);
 
-    QString cat = QString(":/backgrounds/%1").arg(m_id);
+    QString seasonalPath = basePath;
     if (std::abs(now.daysTo(xmas)) <= 4) {
-        cat += "-xmas";
+        seasonalPath += "-xmas";
     } else if (std::abs(now.daysTo(halloween)) <= 4) {
-        cat += "-spooky";
+        seasonalPath += "-spooky";
     } else if (std::abs(now.daysTo(birthday)) <= 12) {
-        cat += "-bday";
+        seasonalPath += "-bday";
     }
-    return cat;
+
+    // Custom and new built-in cat packs may not have seasonal variants.
+    return QFile::exists(seasonalPath) ? seasonalPath : basePath;
 }
 
 JsonCatPack::PartialDate partialDate(QJsonObject date)

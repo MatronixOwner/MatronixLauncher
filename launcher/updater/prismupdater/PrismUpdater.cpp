@@ -971,7 +971,7 @@ void PrismUpdaterApp::backupAppDir()
     if (file_list.isEmpty()) {
         // best guess
         if (BuildConfig.BUILD_ARTIFACT.toLower().contains("linux")) {
-            file_list.append({ "MatronixLauncher", "bin", "share", "lib" });
+            file_list.append({ "MatronixPrismLauncher", "bin", "share", "lib" });
         } else {  // windows by process of elimination
             file_list.append({
                 "jars",

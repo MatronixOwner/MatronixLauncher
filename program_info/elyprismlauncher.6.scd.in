@@ -13,10 +13,10 @@
 
 # DESCRIPTION
 
-MatronixLauncher is an independent Minecraft launcher based on open-source Prism Launcher code. It lets
+MatronixPrismLauncher is an independent Minecraft launcher based on open-source Prism Launcher code. It lets
 you manage multiple Minecraft installations and includes support for mod loaders and Minecraft accounts.
 
-MatronixLauncher is not endorsed by Prism Launcher, Ely.by, Mojang, or Microsoft.
+MatronixPrismLauncher is not endorsed by Prism Launcher, Ely.by, Mojang, or Microsoft.
 
 # OPTIONS
 

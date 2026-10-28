@@ -306,10 +306,13 @@ QString ThemeManager::addCatPack(std::unique_ptr<CatPack> catPack)
 
 void ThemeManager::initializeCatPacks()
 {
-    QList<std::pair<QString, QString>> defaultCats{ { "kitteh", QObject::tr("Background Cat (from MultiMC)") },
-                                                    { "rory", QObject::tr("Rory ID 11 (drawn by Ashtaka)") },
-                                                    { "rory-flat", QObject::tr("Rory ID 11 (flat edition, drawn by Ashtaka)") },
-                                                    { "teawie", QObject::tr("Teawie (drawn by SympathyTea)") } };
+    QList<std::pair<QString, QString>> defaultCats{
+        { "matronix-dark-kitten", QObject::tr("Тёмный котёнок") },
+        { "matronix-minecraft-boat-cat", QObject::tr("Кот в лодке Minecraft") },
+        { "matronix-computer-cat", QObject::tr("Кот за компьютером") },
+        { "matronix-moon-cat", QObject::tr("Кот под луной") },
+        { "matronix-bat-cat", QObject::tr("Кот-летучая мышь") },
+    };
     for (auto [id, name] : defaultCats) {
         addCatPack(std::unique_ptr<CatPack>(new BasicCatPack(id, name)));
     }
@@ -349,6 +352,12 @@ void ThemeManager::initializeCatPacks()
         } else {
             loadFiles(dir);
         }
+    }
+
+    // Retire the previous built-in cat selections without breaking custom packs.
+    const QString currentCat = APPLICATION->settings()->get("BackgroundCat").toString();
+    if (m_catPacks.find(currentCat) == m_catPacks.end()) {
+        APPLICATION->settings()->set("BackgroundCat", QStringLiteral("matronix-dark-kitten"));
     }
 }
 

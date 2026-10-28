@@ -649,7 +649,7 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
         m_settings->registerSetting("IconTheme", QString());
         m_settings->registerSetting("ApplicationTheme", QString());
         m_settings->registerSetting("MatronixBlackThemeMigrationComplete", false);
-        m_settings->registerSetting("BackgroundCat", QString("kitteh"));
+        m_settings->registerSetting("BackgroundCat", QStringLiteral("matronix-dark-kitten"));
         m_settings->registerSetting("CatButtonVisible", true);
 
         // Remembered state
@@ -1852,7 +1852,7 @@ void Application::updateCapabilities()
     m_capabilities = None;
     if (!getMSAClientID().isEmpty())
         m_capabilities |= SupportsMSA;
-    // CurseForge downloads are intentionally disabled in MatronixLauncher.
+    // CurseForge downloads are intentionally disabled in MatronixPrismLauncher.
     // Mod and resource downloads are provided by Modrinth only.
 
 #ifdef Q_OS_LINUX

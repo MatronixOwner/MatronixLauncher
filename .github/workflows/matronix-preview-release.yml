@@ -1,4 +1,4 @@
-name: Publish MatronixLauncher preview installer
+name: Publish MatronixPrismLauncher preview installer
 
 on:
   push:
@@ -36,7 +36,7 @@ jobs:
       - name: Download Windows installer artifact
         uses: actions/download-artifact@v8
         with:
-          pattern: MatronixLauncher-Windows-MSVC-Setup-*
+          pattern: MatronixPrismLauncher-Windows-MSVC-Setup-*
           merge-multiple: true
 
       - name: Publish public preview release
@@ -45,13 +45,15 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.VERSION }}
           target_commitish: ${{ github.sha }}
-          name: MatronixLauncher ${{ env.VERSION }}
+          name: MatronixPrismLauncher ${{ env.VERSION }}
           body: |
-            Preview build of MatronixLauncher.
+            Preview build of MatronixPrismLauncher.
 
+            - Five selectable cat backgrounds were added to the launcher home screen.
+            - The installer welcome page now includes MatronixPrismLauncher artwork.
             - Managed mod discovery and downloads use Modrinth only.
             - The installer is unsigned and may trigger a Windows SmartScreen warning.
             - Ely.by sign-in requires the project's own OAuth Client ID and is not enabled in this preview build.
           draft: false
           prerelease: true
-          files: MatronixLauncher-Setup.exe
+          files: MatronixPrismLauncher-Setup.exe

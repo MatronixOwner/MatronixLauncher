@@ -41,7 +41,7 @@
        <item>
         <widget class="QGroupBox" name="groupBox_matronix">
          <property name="title">
-          <string>MatronixLauncher</string>
+          <string>MatronixPrismLauncher</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_9">
           <item>
@@ -477,7 +477,7 @@
           <item>
            <widget class="QLabel" name="label_8">
             <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Note: you only need to set this to access private data. Read the &lt;a href=&quot;https://docs.modrinth.com/api/#authentication&quot;&gt;documentation&lt;/a&gt; for more information.&lt;/p&gt;&lt;p&gt;Managed mod downloads in MatronixLauncher use Modrinth only.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Note: you only need to set this to access private data. Read the &lt;a href=&quot;https://docs.modrinth.com/api/#authentication&quot;&gt;documentation&lt;/a&gt; for more information.&lt;/p&gt;&lt;p&gt;Managed mod downloads in MatronixPrismLauncher use Modrinth only.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>

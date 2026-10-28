@@ -24,6 +24,13 @@
         <file alias="teawie-bday">teawie-bday.png</file>
         <!-- https://commons.wikimedia.org/wiki/File:Teawie_Party.png -->
         <file alias="teawie-spooky">teawie-spooky.png</file>
+
+        <!-- MatronixPrismLauncher home-screen cat backgrounds, provided by the project owner. -->
+        <file alias="matronix-dark-kitten">matronix-dark-kitten.png</file>
+        <file alias="matronix-minecraft-boat-cat">matronix-minecraft-boat-cat.png</file>
+        <file alias="matronix-computer-cat">matronix-computer-cat.png</file>
+        <file alias="matronix-moon-cat">matronix-moon-cat.png</file>
+        <file alias="matronix-bat-cat">matronix-bat-cat.png</file>
         <!-- https://commons.wikimedia.org/wiki/File:Teawie_Halloween.png -->
     </qresource>
 </RCC>
