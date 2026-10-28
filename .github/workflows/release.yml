@@ -1,9 +1,13 @@
 name: Windows installer and GitHub release
 
 on:
-  push:
-    tags:
-      - "*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release tag (for example v0.1.0-alpha.1)
+        required: true
+        type: string
+        default: v0.1.0-alpha.1
 
 permissions: {}
 
@@ -29,17 +33,19 @@ jobs:
           pattern: MatronixLauncher-Windows-MSVC-Setup-*
           merge-multiple: true
 
-      - name: Name installer
-        shell: bash
-        run: |
-          mv MatronixLauncher-Setup.exe "MatronixLauncher-Setup-${GITHUB_REF_NAME}.exe"
-
-      - name: Create draft GitHub release
+      - name: Create public preview release
         uses: softprops/action-gh-release@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: ${{ github.ref_name }}
-          name: MatronixLauncher ${{ github.ref_name }}
-          draft: true
-          prerelease: false
-          files: MatronixLauncher-Setup-${{ github.ref_name }}.exe
+          tag_name: ${{ inputs.version }}
+          target_commitish: ${{ github.sha }}
+          name: MatronixLauncher ${{ inputs.version }}
+          body: |
+            Preview build of MatronixLauncher.
+
+            - Managed mod discovery and downloads use Modrinth only.
+            - The installer is unsigned and may trigger a Windows SmartScreen warning.
+            - Ely.by login requires the project's own OAuth Client ID and is not enabled in this preview build.
+          draft: false
+          prerelease: true
+          files: MatronixLauncher-Setup.exe

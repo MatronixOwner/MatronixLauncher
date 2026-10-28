@@ -12,7 +12,7 @@ MatronixLauncher is a Minecraft launcher project. Its initial implementation is 
 
 ## Build and release status
 
-The Windows packaging workflow is configured in `.github/workflows/build.yml`; it is intended to produce an unsigned installer until project-owned code-signing is configured. A GitHub Actions build must pass before an installer can be called tested or published. This repository does not yet contain a verified release installer.
+The Windows packaging workflow is configured in `.github/workflows/build.yml`; it produces an unsigned installer until project-owned code-signing is configured. The release workflow is `.github/workflows/release.yml`. Ely.by sign-in requires the project's own OAuth Client ID. A GitHub Actions build must pass before an installer can be called tested or published.
 
 CurseForge browsing, downloads, and automatic updates are disabled in MatronixLauncher; Modrinth is the sole managed mod source. The upstream CurseForge key is not reused. Ely.by sign-in still needs a MatronixLauncher-owned OAuth Client ID (`MATRONIX_ELY_CLIENT_ID` in GitHub Actions variables); do not paste credentials into chat.
 
