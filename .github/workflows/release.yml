@@ -34,7 +34,6 @@ jobs:
       - name: Build EXE
         shell: pwsh
         run: |
-          $env:ELECTRON_GET_UPSTREAM_MIRROR = "https://github.com/electron/electron/releases/download"
           npx electron-builder --win --x64 --publish never
 
       - name: Upload artifact

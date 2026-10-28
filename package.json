@@ -13,38 +13,17 @@
   },
   "build": {
     "appId": "org.matronixlauncher",
+    "productName": "MatronixLauncher",
     "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        }
-      ],
-      "icon": "assets/icon.ico",
-      "publisherName": "MatronixLauncher"
-    },
-    "nsis": {
-      "oneClick": false,
-      "perMachine": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "shortcutName": "MatronixLauncher",
-      "license": "LICENSE"
+      "target": "nsis",
+      "arch": "x64",
+      "icon": "assets/icon.ico"
     },
     "files": [
       "electron/**/*",
       "src/**/*",
       "assets/**/*",
       "node_modules/**/*"
-    ],
-    "extraResources": [
-      {
-        "from": "assets/icon.ico",
-        "to": "assets/icon.ico"
-      }
     ]
   },
   "dependencies": {
