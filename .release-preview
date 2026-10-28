@@ -1,2 +1,2 @@
 v0.1.0-alpha.7
-# Retry with explicit NSIS bitmap staging
+# Use native Windows path for the installer bitmap
