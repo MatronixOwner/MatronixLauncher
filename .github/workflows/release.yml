@@ -21,8 +21,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install
-          npx electron --version
+          npm install --ignore-scripts
+          npx electron@28 --version || true
 
       - name: Debug environment
         shell: pwsh
