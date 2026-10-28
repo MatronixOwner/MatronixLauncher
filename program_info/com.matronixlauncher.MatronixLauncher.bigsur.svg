@@ -163,11 +163,11 @@
          id="stop55" />
       <stop
          offset="0.489516"
-         stop-color="#EFEFEF"
+         stop-color="#efefef"
          id="stop57" />
       <stop
          offset="1"
-         stop-color="#C0C0C0"
+         stop-color="#c0c0c0"
          id="stop59" />
     </linearGradient>
     <linearGradient
@@ -178,7 +178,7 @@
        y2="134.072"
        gradientUnits="userSpaceOnUse">
       <stop
-         stop-color="#F6F3F3"
+         stop-color="#f4f4f4"
          id="stop62" />
       <stop
          offset="1"
@@ -193,15 +193,15 @@
        y2="542.528"
        gradientUnits="userSpaceOnUse">
       <stop
-         stop-color="#88B858"
+         stop-color="#a7a7a7"
          id="stop67" />
       <stop
          offset="0.5"
-         stop-color="#72B147"
+         stop-color="#9c9c9c"
          id="stop69" />
       <stop
          offset="1"
-         stop-color="#5A9A30"
+         stop-color="#858585"
          id="stop71" />
     </linearGradient>
   </defs>
@@ -210,7 +210,7 @@
      transform="matrix(0.81938386,0,0,0.81938386,-746.9626,25.220302)"
      style="display:inline">
     <path
-       style="fill:#99cd61;fill-opacity:1;stroke-width:17.3878"
+       style="fill:#bababa;fill-opacity:1;stroke-width:17.3878"
        d="M 1536.4629,591.62417 Z"
        id="path7899" />
     <path

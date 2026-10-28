@@ -62,11 +62,11 @@
        fill="#dfdfdf"
        stroke-width="0.26458"
        id="path30"
-       style="display:inline;fill:#dfe9df;fill-opacity:1" />
+       style="display:inline;fill:#e6e6e6;fill-opacity:1" />
   </g>
   <path
      d="m 3.8299,4.8948 c -0.14551,0.25205 -0.14553,2.6584 0,2.9104 0.14553,0.25204 2.2292,1.4552 2.5203,1.4552 V 6.35 Z"
-     fill="#d6d2d2"
+     fill="#d3d3d3"
      stroke-width="0.26458"
      id="path34"
      style="display:inline" />

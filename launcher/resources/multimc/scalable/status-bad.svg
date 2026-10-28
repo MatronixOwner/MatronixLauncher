@@ -46,11 +46,11 @@
       <stop
          id="stop3829"
          offset="0"
-         style="stop-color:#b80000;stop-opacity:1;" />
+         style="stop-color:#272727;stop-opacity:1;" />
       <stop
          id="stop3831"
          offset="1"
-         style="stop-color:#600000;stop-opacity:1;" />
+         style="stop-color:#141414;stop-opacity:1;" />
     </linearGradient>
     <radialGradient
        r="2.5"
@@ -121,7 +121,7 @@
        sodipodi:cy="16"
        sodipodi:cx="16"
        id="path3813"
-       style="color:#000000;fill:#df0000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       style="color:#000000;fill:#2f2f2f;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
        sodipodi:type="arc" />
     <path
        inkscape:connector-curvature="0"

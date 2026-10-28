@@ -23,10 +23,10 @@
        y2="7"
        gradientUnits="userSpaceOnUse" /><linearGradient
        id="linearGradient11855"><stop
-         style="stop-color:#57965f;stop-opacity:1;"
+         style="stop-color:#858585;stop-opacity:1;"
          offset="0"
          id="stop11851" /><stop
-         style="stop-color:#78bf6e;stop-opacity:1;"
+         style="stop-color:#aaaaaa;stop-opacity:1;"
          offset="1"
          id="stop11853" /></linearGradient><radialGradient
        xlink:href="#linearGradient10455"
@@ -39,10 +39,10 @@
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(1.1666668,-6.8921104e-7,5.6666669e-7,1.1666667,-18.666684,-2.8332561)" /><linearGradient
        id="linearGradient10455"><stop
-         style="stop-color:#1b2719;stop-opacity:1;"
+         style="stop-color:#232323;stop-opacity:1;"
          offset="0"
          id="stop10451" /><stop
-         style="stop-color:#0f150e;stop-opacity:1;"
+         style="stop-color:#131313;stop-opacity:1;"
          offset="1"
          id="stop10453" /></linearGradient></defs><title
      id="title132">Prism Launcher Logo</title><metadata

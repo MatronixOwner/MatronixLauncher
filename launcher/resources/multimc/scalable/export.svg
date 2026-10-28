@@ -62,23 +62,23 @@
       <stop
          id="stop2939"
          offset="0"
-         style="stop-color:#72b4f4;stop-opacity:1" />
+         style="stop-color:#ababab;stop-opacity:1" />
       <stop
          id="stop2941"
          offset="0.13053299"
-         style="stop-color:#b3d9ff;stop-opacity:1" />
+         style="stop-color:#d4d4d4;stop-opacity:1" />
       <stop
          id="stop2943"
          offset="0.34621301"
-         style="stop-color:#b3d9ff;stop-opacity:1" />
+         style="stop-color:#d4d4d4;stop-opacity:1" />
       <stop
          id="stop2945"
          offset="0.72006166"
-         style="stop-color:#71a8f5;stop-opacity:1" />
+         style="stop-color:#a2a2a2;stop-opacity:1" />
       <stop
          id="stop2947"
          offset="1"
-         style="stop-color:#508ed9;stop-opacity:1" />
+         style="stop-color:#868686;stop-opacity:1" />
     </linearGradient>
     <linearGradient
        gradientTransform="translate(242.00093,332.5)"
@@ -91,15 +91,15 @@
       <stop
          id="stop2929"
          offset="0"
-         style="stop-color:#cfe7ff;stop-opacity:1" />
+         style="stop-color:#e4e4e4;stop-opacity:1" />
       <stop
          id="stop2931"
          offset="0.1"
-         style="stop-color:#71a8f5;stop-opacity:1" />
+         style="stop-color:#a2a2a2;stop-opacity:1" />
       <stop
          id="stop2933"
          offset="1"
-         style="stop-color:#2c72c7;stop-opacity:1" />
+         style="stop-color:#696969;stop-opacity:1" />
     </linearGradient>
     <linearGradient
        id="linearGradient2822">
@@ -123,11 +123,11 @@
       <stop
          id="stop46"
          offset="0.25"
-         style="stop-color:#71a8f5;stop-opacity:0" />
+         style="stop-color:#a2a2a2;stop-opacity:0" />
       <stop
          id="stop48"
          offset="1"
-         style="stop-color:#0057ae;stop-opacity:1" />
+         style="stop-color:#4b4b4b;stop-opacity:1" />
     </linearGradient>
     <filter
        height="1.768"
@@ -150,19 +150,19 @@
       <stop
          id="stop7"
          offset="0"
-         style="stop-color:#00479e;stop-opacity:1" />
+         style="stop-color:#3e3e3e;stop-opacity:1" />
       <stop
          id="stop9"
          offset="0.0769"
-         style="stop-color:#2c72c7;stop-opacity:1" />
+         style="stop-color:#696969;stop-opacity:1" />
       <stop
          id="stop11"
          offset="0.58579999"
-         style="stop-color:#6ea1df;stop-opacity:1" />
+         style="stop-color:#9b9b9b;stop-opacity:1" />
       <stop
          id="stop13"
          offset="0.96450001"
-         style="stop-color:#adcbee;stop-opacity:1" />
+         style="stop-color:#c7c7c7;stop-opacity:1" />
     </linearGradient>
     <linearGradient
        gradientTransform="matrix(1.0033808,0,0,1,-8.2378,8)"
@@ -271,31 +271,31 @@
       <stop
          id="stop41"
          offset="0"
-         style="stop-color:#b7b8b9;stop-opacity:1;" />
+         style="stop-color:#b8b8b8;stop-opacity:1;" />
       <stop
          id="stop47"
          offset="0.18851049"
-         style="stop-color:#ECECEC" />
+         style="stop-color:#ececec" />
       <stop
          id="stop49"
          offset="0.25718147"
-         style="stop-color:#FAFAFA" />
+         style="stop-color:#fafafa" />
       <stop
          id="stop51"
          offset="0.30111277"
-         style="stop-color:#FFFFFF" />
+         style="stop-color:#ffffff" />
       <stop
          id="stop53"
          offset="0.5313"
-         style="stop-color:#FAFAFA" />
+         style="stop-color:#fafafa" />
       <stop
          id="stop55"
          offset="0.8449"
-         style="stop-color:#EBECEC" />
+         style="stop-color:#ececec" />
       <stop
          id="stop57"
          offset="1"
-         style="stop-color:#E1E2E3" />
+         style="stop-color:#e2e2e2" />
     </radialGradient>
     <linearGradient
        gradientUnits="userSpaceOnUse"
@@ -307,39 +307,39 @@
       <stop
          id="stop83"
          offset="0"
-         style="stop-color:#888A85" />
+         style="stop-color:#898989" />
       <stop
          id="stop85"
          offset="0.0072"
-         style="stop-color:#8C8E89" />
+         style="stop-color:#8d8d8d" />
       <stop
          id="stop87"
          offset="0.0673"
-         style="stop-color:#ABACA9" />
+         style="stop-color:#acacac" />
       <stop
          id="stop89"
          offset="0.1347"
-         style="stop-color:#C5C6C4" />
+         style="stop-color:#c6c6c6" />
       <stop
          id="stop91"
          offset="0.2652576"
-         style="stop-color:#DBDBDA" />
+         style="stop-color:#dbdbdb" />
       <stop
          id="stop93"
          offset="0.37646064"
-         style="stop-color:#EBEBEB" />
+         style="stop-color:#ebebeb" />
       <stop
          id="stop95"
          offset="0.48740286"
-         style="stop-color:#F7F7F6" />
+         style="stop-color:#f7f7f7" />
       <stop
          id="stop97"
          offset="0.6324091"
-         style="stop-color:#FDFDFD" />
+         style="stop-color:#fdfdfd" />
       <stop
          id="stop99"
          offset="1"
-         style="stop-color:#FFFFFF" />
+         style="stop-color:#ffffff" />
     </linearGradient>
     <linearGradient
        id="linearGradient10207">
@@ -416,7 +416,7 @@
       <stop
          id="stop3323"
          offset="0.86000001"
-         style="stop-color:#999;stop-opacity:0.58762884;" />
+         style="stop-color:#999999;stop-opacity:0.58762884;" />
       <stop
          style="stop-color:white;stop-opacity:0;"
          offset="1"
@@ -442,7 +442,7 @@
   <path
      d="M 119.99722,31 C 120.00622,29.35 118.66422,28 117.01422,28 L 42.975222,28 L 36.389222,21.414 C 35.611222,20.636 34.075222,20 32.975222,20 L 12.014222,20 C 9.8142222,20 8.0142222,21.8 8.0142222,24 C 8.0142222,24 7.9822222,54.499299 8.0142222,60.031299 L 12.014222,60.031299 C 12.014222,53.222299 12.014222,24 12.014222,24 L 32.901222,23.997 C 33.083222,24.019 33.470222,24.179 33.560222,24.243 L 41.318222,32 C 41.318222,32 114.02722,32 115.99922,32 C 115.99922,32.435 116.00022,56.400299 116.00222,60.031299 L 120.01422,60.031299 C 120.04522,54.499299 119.99722,31 119.99722,31 z "
      id="path2896"
-     style="fill:#5e95e3;fill-opacity:1" />
+     style="fill:#8f8f8f;fill-opacity:1" />
   <path
      d="M 124.36598,113.79242 C 124.27969,115.00674 122.85389,116 121.19831,116 L 6.812906,116 C 5.157329,116 3.731522,115.00674 3.644228,113.79242 L 0.007982,62.204632 C -0.112423,60.992526 1.143808,60 2.799384,60 L 125.21183,60 C 126.86741,60 128.11762,60.991789 127.9912,62.203895 L 124.36598,113.79242 z "
      id="path30"

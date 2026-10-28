@@ -59,15 +59,15 @@
        id="linearGradient3030">
       <stop
          id="stop3032"
-         style="stop-color:#36c536;stop-opacity:1"
+         style="stop-color:#9c9c9c;stop-opacity:1"
          offset="0" />
       <stop
          id="stop3038"
-         style="stop-color:#1f721f;stop-opacity:1"
+         style="stop-color:#5a5a5a;stop-opacity:1"
          offset="0.75714284" />
       <stop
          id="stop3034"
-         style="stop-color:#134513;stop-opacity:1"
+         style="stop-color:#373737;stop-opacity:1"
          offset="1" />
     </linearGradient>
     <radialGradient
@@ -188,18 +188,18 @@
        x="23"
        y="1003.3622"
        id="rect3001"
-       style="color:#000000;fill:#112b00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.75;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+       style="color:#000000;fill:#222222;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.75;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
     <rect
        width="6"
        height="6"
        x="35"
        y="1003.3622"
        id="rect3003"
-       style="color:#000000;fill:#112b00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.75;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+       style="color:#000000;fill:#222222;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.75;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
     <path
        d="m 29,1009.3622 0,3 -3,0 0,9 3,0 0,-3 6,0 0,3 3,0 0,-9 -3,0 0,-3 -6,0 z"
        id="rect3005"
-       style="color:#000000;fill:#112b00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.75;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+       style="color:#000000;fill:#222222;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.75;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
     <rect
        width="6"
        height="2.9999955"

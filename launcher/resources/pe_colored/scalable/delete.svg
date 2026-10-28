@@ -23,13 +23,13 @@
      y="7.1611009" /><path
      d="M 18.455476,4.1064849 V 2.071966 c 0,-0.8979555 0.387777,-0.8011866 -2.488293,-0.8011866 h -1.397072 c -2.876069,0 -2.488293,-0.1289149 -2.488293,0.8011866 v 2.0345189"
      id="path10"
-     style="fill:#39b54a;fill-opacity:1;stroke:#39b54a;stroke-width:2;stroke-dasharray:none;stroke-opacity:1" /><g
+     style="fill:#939393;fill-opacity:1;stroke:#939393;stroke-width:2;stroke-dasharray:none;stroke-opacity:1" /><g
      id="g2238"
      transform="translate(-0.9858234)"><path
-       fill="#8c6239"
+       fill="#686868"
        d="m 22.885931,26.821028 c -0.0782,1.097217 -0.9,1.178972 -2,1.178972 H 11.62312 c -1.1,0 -2.0000002,-0.07897 -2.0000002,-1.178972 L 8.2218981,7.1611009 H 4.2241361 L 5.6231198,26.821028 C 5.8573527,30.112705 8.3231198,32 11.62312,32 h 9.262811 c 3.3,0 5.765767,-1.887295 6,-5.178972 L 28.284915,7.1611009 h -3.997763 z"
        id="path12" /></g><rect
-     style="fill:#39b54a;fill-opacity:1;stroke:none;stroke-width:8.79999e-07;stroke-linecap:round;stroke-linejoin:round"
+     style="fill:#939393;fill-opacity:1;stroke:none;stroke-width:8.79999e-07;stroke-linecap:round;stroke-linejoin:round"
      id="rect587"
      width="29.264914"
      height="3.9999995"
@@ -47,7 +47,7 @@
            id="g24025"
            transform="matrix(1,0,0,1.4771202,-0.16968376,-9.6959051)"
            style="stroke-width:0.872052"><rect
-             style="fill:#8c6239;fill-opacity:1;stroke:none;stroke-width:3.49043;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill"
+             style="fill:#686868;fill-opacity:1;stroke:none;stroke-width:3.49043;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill"
              id="rect24019"
              width="2.1505656"
              height="10.38496"
@@ -59,7 +59,7 @@
            id="g72180"
            transform="matrix(-1,0,0,1.4771202,32.603298,-9.6959051)"
            style="stroke-width:0.872052"><rect
-             style="fill:#8c6239;fill-opacity:1;stroke:none;stroke-width:3.49043;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill"
+             style="fill:#686868;fill-opacity:1;stroke:none;stroke-width:3.49043;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill"
              id="rect72178"
              width="2.1505656"
              height="10.38496"

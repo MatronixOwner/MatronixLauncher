@@ -1,6 +1,6 @@
 [Icon Theme]
-Name=Simple (Colored)
-Comment=Icons by pexner (colored)
+Name=Simple Monochrome
+Comment=Grayscale adaptation of icons by pexner
 Inherits=multimc
 Directories=scalable
 

@@ -42,20 +42,20 @@
      style="stop-color:#000000;stop-opacity:1;"
      offset="0"
      id="stop3247" /></linearGradient>
-	
-	
-	
 
-		
+
+
+
+
 	</defs><g
      id="g6"><path
        id="path2"
        d="M26,0H6C2.7,0,0,2.7,0,6v3h32V6C32,2.7,29.3,0,26,0z"
-       fill="#39B54A" /><path
+       fill="#939393" /><path
        id="path4"
        d="M0,26c0,3.3,2.7,6,6,6h20c3.3,0,6-2.7,6-6V9H0V26z"
-       fill="#8C6239" /></g><path
-     fill="#F2F2F2"
+       fill="#686868" /></g><path
+     fill="#f2f2f2"
      fill-rule="evenodd"
      clip-rule="evenodd"
      id="path8"
@@ -70,14 +70,14 @@
      id="rect838"
      style="stroke-width:1.98049" /><path
      id="polygon840"
-     style="clip-rule:evenodd;fill:#294eab;fill-rule:evenodd;stroke-width:3.19043"
+     style="clip-rule:evenodd;fill:#4d4d4d;fill-rule:evenodd;stroke-width:3.19043"
      transform="matrix(0.62075979,0,0,0.62075979,293.47962,-158.4335)"
      d="m -433,272.1 v 17.8 l -14,7.1 v -17.8 z" /><path
      id="polygon842"
-     style="clip-rule:evenodd;fill:#39b54a;fill-rule:evenodd;stroke-width:3.19043"
+     style="clip-rule:evenodd;fill:#939393;fill-rule:evenodd;stroke-width:3.19043"
      transform="matrix(0.62075979,0,0,0.62075979,293.47962,-158.4335)"
      d="m -461,272.1 v 17.8 l 14,7.1 v -17.8 z" /><path
      id="polygon844"
-     style="clip-rule:evenodd;fill:#ed4c31;fill-rule:evenodd;stroke-width:3.19043"
+     style="clip-rule:evenodd;fill:#6c6c6c;fill-rule:evenodd;stroke-width:3.19043"
      transform="matrix(0.62075979,0,0,0.62075979,293.47962,-158.4335)"
      d="m -447,265 -14,7.1 14,7.1 14,-7.1 z" /></svg>

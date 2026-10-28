@@ -23,10 +23,10 @@
        y2="21"
        gradientUnits="userSpaceOnUse" /><linearGradient
        id="linearGradient19391"><stop
-         style="stop-color:#cfaf6b;stop-opacity:1;"
+         style="stop-color:#b1b1b1;stop-opacity:1;"
          offset="0"
          id="stop19387" /><stop
-         style="stop-color:#ddc694;stop-opacity:1;"
+         style="stop-color:#c7c7c7;stop-opacity:1;"
          offset="1"
          id="stop19389" /></linearGradient><linearGradient
        xlink:href="#linearGradient19391"
@@ -58,7 +58,7 @@
          rdf:about=""><dc:title>Prism Launcher Logo</dc:title><dc:date>19/10/2022</dc:date><dc:creator><cc:Agent><dc:title>Prism Launcher</dc:title></cc:Agent></dc:creator><dc:contributor><cc:Agent><dc:title>AutiOne, Boba, ely, Fulmine, gon sawa, Pankakes, tobimori, Zeke</dc:title></cc:Agent></dc:contributor><dc:source>https://github.com/PrismLauncher/PrismLauncher</dc:source><dc:rights><cc:Agent><dc:title>CC BY-SA 4.0</dc:title></cc:Agent></dc:rights><dc:publisher><cc:Agent><dc:title>Prism Launcher</dc:title></cc:Agent></dc:publisher></cc:Work></rdf:RDF></metadata><g
      id="i_planks"
      transform="translate(-676,-4)"><rect
-       style="fill:#a88a4a;fill-opacity:1;stroke-width:0.277182;paint-order:stroke markers fill;stop-color:#000000"
+       style="fill:#8c8c8c;fill-opacity:1;stroke-width:0.277182;paint-order:stroke markers fill;stop-color:#000000"
        id="rect56542-7-5-0"
        width="20"
        height="20"

@@ -25,11 +25,11 @@
     <linearGradient
        id="linearGradient3801">
       <stop
-         style="stop-color:#00b81a;stop-opacity:1;"
+         style="stop-color:#858585;stop-opacity:1;"
          offset="0"
          id="stop3803" />
       <stop
-         style="stop-color:#00600d;stop-opacity:1;"
+         style="stop-color:#464646;stop-opacity:1;"
          offset="1"
          id="stop3805" />
     </linearGradient>
@@ -56,11 +56,11 @@
     <linearGradient
        id="linearGradient15792">
       <stop
-         style="stop-color:#00b81a;stop-opacity:1;"
+         style="stop-color:#858585;stop-opacity:1;"
          offset="0"
          id="stop15788" />
       <stop
-         style="stop-color:#008311;stop-opacity:1;"
+         style="stop-color:#5f5f5f;stop-opacity:1;"
          offset="1"
          id="stop15790" />
     </linearGradient>
@@ -81,13 +81,13 @@
     <g
        transform="matrix(0.26458333,0,0,0.26458333,107.69465,-145.83977)"
        id="layer1-3"
-       style="fill:#00c900;fill-opacity:1;stroke:url(#radialGradient11398)">
+       style="fill:#909090;fill-opacity:1;stroke:url(#radialGradient11398)">
       <g
          id="g4187"
          transform="matrix(1.6112635,0,0,1.6112635,-11.986846,-633.49032)"
-         style="fill:#00c900;fill-opacity:1;stroke:url(#radialGradient20379);stroke-width:0.620631">
+         style="fill:#909090;fill-opacity:1;stroke:url(#radialGradient20379);stroke-width:0.620631">
         <path
-           style="opacity:1;fill:#0ebb0e;fill-opacity:1;stroke:url(#radialGradient12126);stroke-width:1.24126;stroke-dasharray:none;stroke-opacity:1"
+           style="opacity:1;fill:#8a8a8a;fill-opacity:1;stroke:url(#radialGradient12126);stroke-width:1.24126;stroke-dasharray:none;stroke-opacity:1"
            id="path3809-3"
            d="m 10.5,1044.3622 v -16 l 13.5,8 z" />
       </g>

@@ -23,13 +23,13 @@
        y2="16"
        gradientUnits="userSpaceOnUse" /><linearGradient
        id="linearGradient18899"><stop
-         style="stop-color:#bf454c;stop-opacity:1;"
+         style="stop-color:#5f5f5f;stop-opacity:1;"
          offset="0"
          id="stop18895" /><stop
-         style="stop-color:#df6277;stop-opacity:1;"
+         style="stop-color:#7e7e7e;stop-opacity:1;"
          offset="0.5"
          id="stop18972" /><stop
-         style="stop-color:#bf454c;stop-opacity:1;"
+         style="stop-color:#5f5f5f;stop-opacity:1;"
          offset="1"
          id="stop18897" /></linearGradient><linearGradient
        xlink:href="#linearGradient18899"
@@ -55,10 +55,10 @@
        x2="816"
        y2="20" /><linearGradient
        id="linearGradient19917"><stop
-         style="stop-color:#a02722;stop-opacity:1;"
+         style="stop-color:#404040;stop-opacity:1;"
          offset="0"
          id="stop19913" /><stop
-         style="stop-color:#a02722;stop-opacity:0;"
+         style="stop-color:#404040;stop-opacity:0;"
          offset="1"
          id="stop19915" /></linearGradient><radialGradient
        xlink:href="#linearGradient19935"
@@ -74,7 +74,7 @@
          style="stop-color:#ffffff;stop-opacity:1;"
          offset="0"
          id="stop19933" /><stop
-         style="stop-color:#f6cff4;stop-opacity:1;"
+         style="stop-color:#dadada;stop-opacity:1;"
          offset="1"
          id="stop19931" /></linearGradient></defs><title
      id="title132">Prism Launcher Logo</title><metadata
@@ -82,7 +82,7 @@
          rdf:about=""><dc:title>Prism Launcher Logo</dc:title><dc:date>19/10/2022</dc:date><dc:creator><cc:Agent><dc:title>Prism Launcher</dc:title></cc:Agent></dc:creator><dc:contributor><cc:Agent><dc:title>AutiOne, Boba, ely, Fulmine, gon sawa, Pankakes, tobimori, Zeke</dc:title></cc:Agent></dc:contributor><dc:source>https://github.com/PrismLauncher/PrismLauncher</dc:source><dc:rights><cc:Agent><dc:title>CC BY-SA 4.0</dc:title></cc:Agent></dc:rights><dc:publisher><cc:Agent><dc:title>Prism Launcher</dc:title></cc:Agent></dc:publisher></cc:Work></rdf:RDF></metadata><g
      id="i_tnt"
      transform="translate(-804,-4)"><rect
-       style="fill:#a02722;fill-opacity:1;stroke-width:0.277182;paint-order:stroke markers fill;stop-color:#000000"
+       style="fill:#404040;fill-opacity:1;stroke-width:0.277182;paint-order:stroke markers fill;stop-color:#000000"
        id="rect13011-7"
        width="20"
        height="20"
@@ -116,7 +116,7 @@
        x="806"
        y="11" /><path
        id="rect122467"
-       style="opacity:1;fill:#4d3f33;fill-opacity:1;stroke:none;stroke-width:0.374177;paint-order:stroke markers fill;stop-color:#000000"
+       style="opacity:1;fill:#414141;fill-opacity:1;stroke:none;stroke-width:0.374177;paint-order:stroke markers fill;stop-color:#000000"
        d="m 808,13 v 2 h 1 v 4 h 2 v -4 h 1 v -2 z m 5,0 v 6 h 2 v -3.171875 l 2,2 V 19 h 2 v -6 h -2 v 2 l -2,-2 z m 7,0 v 2 h 1 v 4 h 2 v -4 h 1 v -2 z" /><rect
        style="fill:#ffffff;fill-opacity:0;stroke:none;stroke-width:0.264583;paint-order:stroke markers fill;stop-color:#000000"
        id="rect128412-7-9-7"

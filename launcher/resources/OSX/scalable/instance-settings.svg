@@ -4,7 +4,7 @@
 <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 24 24" enable-background="new 0 0 24 24" xml:space="preserve">
 <rect fill="none" width="24" height="24"/>
-<path fill-rule="evenodd" clip-rule="evenodd" fill="#F2F2F2" d="M22,6c0-0.6-0.4-1-1-1H9C8.4,5,8,5.4,8,6v12c0,0.6,0.4,1,1,1h12
+<path fill-rule="evenodd" clip-rule="evenodd" fill="#f2f2f2" d="M22,6c0-0.6-0.4-1-1-1H9C8.4,5,8,5.4,8,6v12c0,0.6,0.4,1,1,1h12
 	c0.6,0,1-0.4,1-1V6z"/>
 <g id="_x32__10_">
 	<g>
@@ -19,7 +19,7 @@
 			c-0.7,0-1.2-0.5-1.2-1.2c0-0.7,0.5-1.2,1.2-1.2s1.2,0.5,1.2,1.2C18.2,13.2,17.7,13.7,17,13.7z"/>
 	</g>
 </g>
-<circle fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" cx="12.5" cy="16.5" r="1.2"/>
-<circle fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" cx="17" cy="12.5" r="1.2"/>
-<circle fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" cx="12.5" cy="8.5" r="1.2"/>
+<circle fill-rule="evenodd" clip-rule="evenodd" fill="#ffffff" cx="12.5" cy="16.5" r="1.2"/>
+<circle fill-rule="evenodd" clip-rule="evenodd" fill="#ffffff" cx="17" cy="12.5" r="1.2"/>
+<circle fill-rule="evenodd" clip-rule="evenodd" fill="#ffffff" cx="12.5" cy="8.5" r="1.2"/>
 </svg>

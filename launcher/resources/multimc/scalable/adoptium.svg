@@ -36,11 +36,11 @@
        spreadMethod="pad"
        id="linearGradient248">
       <stop
-         style="stop-opacity:1;stop-color:#421644"
+         style="stop-opacity:1;stop-color:#232323"
          offset="0"
          id="stop244" />
       <stop
-         style="stop-opacity:1;stop-color:#151530"
+         style="stop-opacity:1;stop-color:#171717"
          offset="1"
          id="stop246" />
     </linearGradient>
@@ -61,11 +61,11 @@
        spreadMethod="pad"
        id="linearGradient264">
       <stop
-         style="stop-opacity:1;stop-color:#a21058"
+         style="stop-opacity:1;stop-color:#343434"
          offset="0"
          id="stop260" />
       <stop
-         style="stop-opacity:1;stop-color:#421644"
+         style="stop-opacity:1;stop-color:#232323"
          offset="1"
          id="stop262" />
     </linearGradient>
@@ -86,11 +86,11 @@
        spreadMethod="pad"
        id="linearGradient280">
       <stop
-         style="stop-opacity:1;stop-color:#ee1a6d"
+         style="stop-opacity:1;stop-color:#4d4d4d"
          offset="0"
          id="stop276" />
       <stop
-         style="stop-opacity:1;stop-color:#a21058"
+         style="stop-opacity:1;stop-color:#343434"
          offset="1"
          id="stop278" />
     </linearGradient>

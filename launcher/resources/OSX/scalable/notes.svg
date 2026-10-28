@@ -4,7 +4,7 @@
 <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 24 24" enable-background="new 0 0 24 24" xml:space="preserve">
 <rect fill="none" width="24" height="24"/>
-<path fill-rule="evenodd" clip-rule="evenodd" fill="#E6E6E6" d="M22,7c0-0.6-0.4-1-1-1h-1.5v2h-7V6H11c-0.6,0-1,0.4-1,1v10
+<path fill-rule="evenodd" clip-rule="evenodd" fill="#e6e6e6" d="M22,7c0-0.6-0.4-1-1-1h-1.5v2h-7V6H11c-0.6,0-1,0.4-1,1v10
 	c0,0.6,0.4,1,1,1h10c0.6,0,1-0.4,1-1V7z"/>
 <g id="_x38__6_">
 	<g>
@@ -16,6 +16,6 @@
 			c0,0.3,0.2,0.5,0.5,0.5h7c0.3,0,0.5-0.2,0.5-0.5C20,10.2,19.8,10,19.5,10z"/>
 	</g>
 </g>
-<path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M18.5,5h-1.1c0-0.6-0.6-1-1.4-1c-0.8,0-1.4,0.4-1.4,1h-1.1v2h5V5z"
+<path fill-rule="evenodd" clip-rule="evenodd" fill="#ffffff" d="M18.5,5h-1.1c0-0.6-0.6-1-1.4-1c-0.8,0-1.4,0.4-1.4,1h-1.1v2h5V5z"
 	/>
 </svg>

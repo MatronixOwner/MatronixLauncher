@@ -40,11 +40,11 @@
        spreadMethod="pad"
        id="linearGradient1722">
       <stop
-         style="stop-opacity:1;stop-color:#dfe3e5"
+         style="stop-opacity:1;stop-color:#e2e2e2"
          offset="0"
          id="stop1724" />
       <stop
-         style="stop-opacity:1;stop-color:#bcc5ca"
+         style="stop-opacity:1;stop-color:#c3c3c3"
          offset="1"
          id="stop1726" />
     </linearGradient>
@@ -94,11 +94,11 @@
        spreadMethod="pad"
        id="linearGradient1722-2">
       <stop
-         style="stop-opacity:1;stop-color:#dfe3e5"
+         style="stop-opacity:1;stop-color:#e2e2e2"
          offset="0"
          id="stop1724-7" />
       <stop
-         style="stop-opacity:1;stop-color:#bcc5ca"
+         style="stop-opacity:1;stop-color:#c3c3c3"
          offset="1"
          id="stop1726-8" />
     </linearGradient>
@@ -431,7 +431,7 @@
                         <path
                            inkscape:connector-curvature="0"
                            d="m 0,0 -85.328,0 c -11.735,0 -21.336,-9.6 -21.336,-21.334 l 0,-85.32 c 0,-11.742 9.601,-21.336 21.336,-21.336 l 85.328,0 c 11.734,0 21.336,9.594 21.336,21.336 l 0,85.32 C 21.336,-9.6 11.734,0 0,0 m 0,-1 c 11.211,0 20.336,-9.123 20.336,-20.334 l 0,-85.32 c 0,-11.219 -9.125,-20.336 -20.336,-20.336 l -85.328,0 c -11.215,0 -20.336,9.117 -20.336,20.336 l 0,85.32 c 0,11.211 9.121,20.334 20.336,20.334 L 0,-1"
-                           style="fill:#b3b1b3;fill-opacity:1;fill-rule:nonzero;stroke:none"
+                           style="fill:#b2b2b2;fill-opacity:1;fill-rule:nonzero;stroke:none"
                            id="path1704" />
                       </g>
                     </g>
@@ -664,7 +664,7 @@
               <path
                  inkscape:connector-curvature="0"
                  d="M 0,0 C 0,0 -3.941,-2.289 2.809,-3.063 10.984,-4 15.168,-3.867 24.18,-2.164 c 0,0 2.367,-1.484 5.675,-2.766 C 9.648,-13.594 -15.867,-4.434 0,0"
-                 style="fill:#5382a1;fill-opacity:1;fill-rule:nonzero;stroke:none"
+                 style="fill:#7a7a7a;fill-opacity:1;fill-rule:nonzero;stroke:none"
                  id="path1886-9" />
             </g>
             <g
@@ -673,7 +673,7 @@
               <path
                  inkscape:connector-curvature="0"
                  d="m 0,0 c 0,0 -4.422,-3.273 2.336,-3.969 8.734,-0.902 15.633,-0.976 27.57,1.321 0,0 1.649,-1.672 4.242,-2.586 C 9.727,-12.379 -17.48,-5.797 0,0"
-                 style="fill:#5382a1;fill-opacity:1;fill-rule:nonzero;stroke:none"
+                 style="fill:#7a7a7a;fill-opacity:1;fill-rule:nonzero;stroke:none"
                  id="path1890-8" />
             </g>
             <g
@@ -682,7 +682,7 @@
               <path
                  inkscape:connector-curvature="0"
                  d="m 0,0 c 4.98,-5.73 -1.309,-10.887 -1.309,-10.887 0,0 12.641,6.524 6.832,14.696 -5.421,7.617 -9.574,11.406 12.93,24.461 0,0 -35.328,-8.829 -18.453,-28.27"
-                 style="fill:#f8981d;fill-opacity:1;fill-rule:nonzero;stroke:none"
+                 style="fill:#a4a4a4;fill-opacity:1;fill-rule:nonzero;stroke:none"
                  id="path1894-5" />
             </g>
             <g
@@ -691,7 +691,7 @@
               <path
                  inkscape:connector-curvature="0"
                  d="m 0,0 c 0,0 2.922,-2.406 -3.215,-4.27 -11.66,-3.531 -48.535,-4.597 -58.777,-0.14 -3.68,1.605 3.226,3.824 5.398,4.293 2.262,0.488 3.559,0.398 3.559,0.398 -4.098,2.883 -26.473,-5.664 -11.367,-8.113 C -23.211,-14.508 10.684,-4.824 0,0"
-                 style="fill:#5382a1;fill-opacity:1;fill-rule:nonzero;stroke:none"
+                 style="fill:#7a7a7a;fill-opacity:1;fill-rule:nonzero;stroke:none"
                  id="path1898-7" />
             </g>
             <g
@@ -700,7 +700,7 @@
               <path
                  inkscape:connector-curvature="0"
                  d="m 0,0 c 0,0 -18.758,-4.457 -6.645,-6.078 5.114,-0.68 15.313,-0.524 24.809,0.273 7.766,0.649 15.555,2.047 15.555,2.047 0,0 -2.735,-1.176 -4.711,-2.527 -19.051,-5.012 -55.84,-2.676 -45.25,2.441 C -7.281,0.492 0,0 0,0"
-                 style="fill:#5382a1;fill-opacity:1;fill-rule:nonzero;stroke:none"
+                 style="fill:#7a7a7a;fill-opacity:1;fill-rule:nonzero;stroke:none"
                  id="path1902-4" />
             </g>
             <g
@@ -709,7 +709,7 @@
               <path
                  inkscape:connector-curvature="0"
                  d="m 0,0 c 19.359,10.059 10.406,19.727 4.156,18.422 -1.527,-0.32 -2.215,-0.594 -2.215,-0.594 0,0 0.571,0.895 1.653,1.274 12.367,4.347 21.871,-12.813 -3.985,-19.614 0,0 0.297,0.27 0.391,0.512"
-                 style="fill:#5382a1;fill-opacity:1;fill-rule:nonzero;stroke:none"
+                 style="fill:#7a7a7a;fill-opacity:1;fill-rule:nonzero;stroke:none"
                  id="path1906-4" />
             </g>
             <g
@@ -718,7 +718,7 @@
               <path
                  inkscape:connector-curvature="0"
                  d="m 0,0 c 0,0 10.723,-10.723 -10.168,-27.223 -16.75,-13.226 -3.824,-20.769 -0.004,-29.39 -9.781,8.824 -16.961,16.59 -12.144,23.82 C -15.25,-22.18 4.332,-17.035 0,0"
-                 style="fill:#f8981d;fill-opacity:1;fill-rule:nonzero;stroke:none"
+                 style="fill:#a4a4a4;fill-opacity:1;fill-rule:nonzero;stroke:none"
                  id="path1910-0" />
             </g>
             <g
@@ -727,7 +727,7 @@
               <path
                  inkscape:connector-curvature="0"
                  d="m 0,0 c 18.582,-1.188 47.121,0.664 47.801,9.453 0,0 -1.301,-3.336 -15.36,-5.98 C 16.578,0.488 -2.988,0.836 -14.59,2.75 -14.59,2.75 -12.215,0.781 0,0"
-                 style="fill:#5382a1;fill-opacity:1;fill-rule:nonzero;stroke:none"
+                 style="fill:#7a7a7a;fill-opacity:1;fill-rule:nonzero;stroke:none"
                  id="path1914-4" />
             </g>
             <g

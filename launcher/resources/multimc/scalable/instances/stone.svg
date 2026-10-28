@@ -23,10 +23,10 @@
        y2="6"
        gradientUnits="userSpaceOnUse" /><linearGradient
        id="linearGradient25803"><stop
-         style="stop-color:#8e8e86;stop-opacity:1;"
+         style="stop-color:#8d8d8d;stop-opacity:1;"
          offset="0"
          id="stop25799" /><stop
-         style="stop-color:#a2a29b;stop-opacity:1;"
+         style="stop-color:#a1a1a1;stop-opacity:1;"
          offset="1"
          id="stop25801" /></linearGradient></defs><title
      id="title132">Prism Launcher Logo</title><metadata
@@ -48,8 +48,8 @@
        x="772"
        y="4" /><path
        id="path47261"
-       style="opacity:0.5;fill:#bfbfbb;fill-opacity:1;stroke-width:0.999997;stroke-linecap:square;stroke-linejoin:bevel;paint-order:stroke markers fill;stop-color:#000000"
+       style="opacity:0.5;fill:#bfbfbf;fill-opacity:1;stroke-width:0.999997;stroke-linecap:square;stroke-linejoin:bevel;paint-order:stroke markers fill;stop-color:#000000"
        d="m 777,11 v 1 h 12 v -1 z m 14,2 v 1 h 2 v -1 z m -17,2 v 1 h 8 v -1 z m 16,4 v 1 h 4 v -1 z m -8,2 v 1 h 2 v -1 z m 2,3 v 1 h 5 v -1 z" /><path
        id="path47259"
-       style="opacity:0.5;fill:#7e7e77;fill-opacity:1;stroke-width:0.999997;stroke-linecap:square;stroke-linejoin:bevel;paint-order:stroke markers fill;stop-color:#000000"
+       style="opacity:0.5;fill:#7d7d7d;fill-opacity:1;stroke-width:0.999997;stroke-linecap:square;stroke-linejoin:bevel;paint-order:stroke markers fill;stop-color:#000000"
        d="m 774,8 v 1 h 7 V 8 Z m 15,0 v 1 h 5 V 8 Z m -4,8 v 1 h 5 v -1 z m -11,4 v 1 h 6 v -1 z m 3,3 v 1 h 2 v -1 z m 14,0 v 1 h 3 v -1 z" /></g></svg>

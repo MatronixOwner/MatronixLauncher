@@ -12,8 +12,8 @@
 			V16.5z"/>
 	</g>
 </g>
-<path fill-rule="evenodd" clip-rule="evenodd" fill="#E6E6E6" d="M9,5C8.4,5,8,5.4,8,6v10.5c0,0.6,0.4,0.8,1,1c0,0,2.8,0.8,5.5,1.5
+<path fill-rule="evenodd" clip-rule="evenodd" fill="#e6e6e6" d="M9,5C8.4,5,8,5.4,8,6v10.5c0,0.6,0.4,0.8,1,1c0,0,2.8,0.8,5.5,1.5
 	V6.5L9,5z"/>
-<path fill-rule="evenodd" clip-rule="evenodd" fill="#F2F2F2" d="M22,6c0-0.6-0.4-1-1-1l-5.5,1.5V19c2.8-0.7,5.5-1.5,5.5-1.5
+<path fill-rule="evenodd" clip-rule="evenodd" fill="#f2f2f2" d="M22,6c0-0.6-0.4-1-1-1l-5.5,1.5V19c2.8-0.7,5.5-1.5,5.5-1.5
 	c0.5-0.2,1-0.4,1-1V6z"/>
 </svg>
