@@ -1,13 +1,11 @@
 name: Windows installer and GitHub release
 
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: Release tag (for example v0.1.0-alpha.1)
-        required: true
-        type: string
-        default: v0.1.0-alpha.1
+  push:
+    branches:
+      - "arena/**"
+    paths:
+      - ".release-preview"
 
 permissions: {}
 
@@ -27,6 +25,13 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout release version
+        uses: actions/checkout@v6
+
+      - name: Read release version
+        shell: bash
+        run: echo "VERSION=$(cat .release-preview)" >> "$GITHUB_ENV"
+
       - name: Download Windows installer artifact
         uses: actions/download-artifact@v8
         with:
@@ -37,15 +42,15 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: ${{ inputs.version }}
+          tag_name: ${{ env.VERSION }}
           target_commitish: ${{ github.sha }}
-          name: MatronixLauncher ${{ inputs.version }}
+          name: MatronixLauncher ${{ env.VERSION }}
           body: |
             Preview build of MatronixLauncher.
 
             - Managed mod discovery and downloads use Modrinth only.
             - The installer is unsigned and may trigger a Windows SmartScreen warning.
-            - Ely.by login requires the project's own OAuth Client ID and is not enabled in this preview build.
+            - Ely.by sign-in requires the project's own OAuth Client ID and is not enabled in this preview build.
           draft: false
           prerelease: true
           files: MatronixLauncher-Setup.exe
