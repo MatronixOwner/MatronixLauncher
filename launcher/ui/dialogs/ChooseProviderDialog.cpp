@@ -13,6 +13,8 @@ ChooseProviderDialog::ChooseProviderDialog(QWidget* parent, bool single_choice, 
 
     addProviders();
     m_providers.button(0)->click();
+    ui->tryOthersCheckbox->setChecked(false);
+    ui->tryOthersCheckbox->hide();
 
     connect(ui->skipOneButton, &QPushButton::clicked, this, &ChooseProviderDialog::skipOne);
     connect(ui->skipAllButton, &QPushButton::clicked, this, &ChooseProviderDialog::skipAll);
@@ -75,11 +77,10 @@ void ChooseProviderDialog::addProviders()
     int btn_index = 0;
     QRadioButton* btn;
 
-    for (auto& provider : { ModPlatform::ResourceProvider::MODRINTH, ModPlatform::ResourceProvider::FLAME }) {
-        btn = new QRadioButton(ModPlatform::ProviderCapabilities::readableName(provider), this);
-        m_providers.addButton(btn, btn_index++);
-        ui->providersLayout->addWidget(btn);
-    }
+    const auto provider = ModPlatform::ResourceProvider::MODRINTH;
+    btn = new QRadioButton(ModPlatform::ProviderCapabilities::readableName(provider), this);
+    m_providers.addButton(btn, btn_index++);
+    ui->providersLayout->addWidget(btn);
 }
 
 void ChooseProviderDialog::disableInput()

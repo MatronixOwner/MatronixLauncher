@@ -123,15 +123,12 @@
 #include "minecraft/mod/tasks/LocalResourceParse.h"
 
 #include "modplatform/ModIndex.h"
-#include "modplatform/flame/FlameAPI.h"
-#include "modplatform/flame/FlameModIndex.h"
 
 #include "KonamiCode.h"
 
 #include "InstanceCopyTask.h"
 #include "InstanceDirUpdate.h"
 
-#include "Json.h"
 
 #include "MMCTime.h"
 
@@ -956,66 +953,14 @@ void MainWindow::processURLs(QList<QUrl> urls)
             const bool isExternalURLImport = (url.host().toLower() == "import") || (url.path().startsWith("/import", Qt::CaseInsensitive));
 
             QUrl dl_url;
-            if (url.scheme() == "curseforge" || (url.scheme() == BuildConfig.LAUNCHER_APP_BINARY_NAME && url.host() == "install")) {
-                // need to find the download link for the modpack / resource
-                // format of url curseforge://install?addonId=IDHERE&fileId=IDHERE
-                // format of url binaryname://install?platform=curseforge&addonId=IDHERE&fileId=IDHERE
-                QUrlQuery query(url);
-
-                // check if this is a binaryname:// url
-                if (url.scheme() == BuildConfig.LAUNCHER_APP_BINARY_NAME) {
-                    // check this is an curseforge platform request
-                    if (query.queryItemValue("platform").toLower() != "curseforge") {
-                        qDebug() << "Invalid mod distribution platform:" << query.queryItemValue("platform");
-                        continue;
-                    }
-                }
-
-                if (query.allQueryItemValues("addonId").isEmpty() || query.allQueryItemValues("fileId").isEmpty()) {
-                    qDebug() << "Invalid curseforge link:" << url;
-                    continue;
-                }
-
-                auto addonId = query.allQueryItemValues("addonId")[0];
-                auto fileId = query.allQueryItemValues("fileId")[0];
-
-                extra_info.insert("pack_id", addonId);
-                extra_info.insert("pack_version_id", fileId);
-
-                auto api = FlameAPI();
-                auto [job, array] = api.getFile(addonId, fileId);
-
-                connect(job.get(), &Task::failed, this,
-                        [this](QString reason) { CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->show(); });
-                connect(job.get(), &Task::succeeded, this, [this, array, addonId, fileId, &dl_url, &version] {
-                    qDebug() << "Returned CFURL Json:\n" << array->toStdString().c_str();
-                    auto doc = Json::requireDocument(*array);
-                    auto data = doc.object()["data"].toObject();
-                    // No way to find out if it's a mod or a modpack before here
-                    // And also we need to check if it ends with .zip, instead of any better way
-                    version = FlameMod::loadIndexedPackVersion(data);
-                    auto fileName = version.fileName;
-
-                    // Have to use ensureString then use QUrl to get proper url encoding
-                    dl_url = QUrl(version.downloadUrl);
-                    if (!dl_url.isValid()) {
-                        CustomMessageBox::selectable(
-                            this, tr("Error"),
-                            tr("The modpack, mod, or resource %1 is blocked for third-parties! Please download it manually.").arg(fileName),
-                            QMessageBox::Critical)
-                            ->show();
-                        return;
-                    }
-
-                    QFileInfo dl_file(dl_url.fileName());
-                });
-
-                {  // drop stack
-                    ProgressDialog dlUrlDialod(this);
-                    dlUrlDialod.setSkipButton(true, tr("Abort"));
-                    dlUrlDialod.execWithTask(job.get());
-                }
-
+            const bool isCurseForgeInstall = url.scheme() == "curseforge" ||
+                                              (url.scheme() == BuildConfig.LAUNCHER_APP_BINARY_NAME && url.host() == "install");
+            if (isCurseForgeInstall) {
+                CustomMessageBox::selectable(this, tr("Unsupported mod source"),
+                                             tr("CurseForge downloads are disabled. Use a Modrinth link instead."),
+                                             QMessageBox::Information)
+                    ->show();
+                continue;
             } else if (url.scheme() == BuildConfig.LAUNCHER_APP_BINARY_NAME && !isExternalURLImport) {
                 QVariantMap receivedData;
                 const QUrlQuery query(url.query());

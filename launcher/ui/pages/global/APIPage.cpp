@@ -40,7 +40,6 @@
 #include "ui_APIPage.h"
 
 #include <QFileDialog>
-#include <QMessageBox>
 #include <QRegularExpression>
 #include <QStandardPaths>
 #include <QTabBar>
@@ -51,10 +50,8 @@
 #include "BuildConfig.h"
 #include "PineconeNetworkCheck.h"
 #include "net/PasteUpload.h"
-#include "net/flame/FetchFlameAPIKey.h"
 #include "settings/SettingsObject.h"
 #include "tools/BaseProfiler.h"
-#include "ui/dialogs/ProgressDialog.h"
 
 APIPage::APIPage(QWidget* parent) : QWidget(parent), ui(new Ui::APIPage)
 {
@@ -112,20 +109,12 @@ APIPage::APIPage(QWidget* parent) : QWidget(parent), ui(new Ui::APIPage)
         ui->legacyFMLLibsURL->setText(PineconeNetworkCheck::fmlLibsUrls().value(key));
     });
 
-    connect(ui->fetchFlameKey, &QPushButton::clicked, this, [this] {
-        FetchFlameAPIKey task{};
-        connect(&task, &Task::succeeded, this, [this, &task] {
-            ui->flameKey->setText(task.result());
-        });
-        connect(&task, &Task::failed, this, [this, &task] {
-            QMessageBox::critical(this, tr("Could not fetch API key"),
-                tr("Could not fetch CurseForge API key:\n%1").arg(task.failReason()));
-        });
-
-        ProgressDialog dialog{this};
-        dialog.setSkipButton(true, tr("Abort"));
-        dialog.execWithTask(&task);
-    });
+    // Keep the legacy CurseForge controls out of the UI. Managed mod downloads
+    // are intentionally restricted to Modrinth in this build.
+    ui->fetchFlameKey->hide();
+    ui->flameKey->hide();
+    ui->flameKeyLabel->hide();
+    ui->FallbackMRBlockedMods->hide();
 }
 
 APIPage::~APIPage()
@@ -201,8 +190,6 @@ void APIPage::loadSettings()
     ui->resourceURL->setText(resourceURL);
     QString fmlLibsURL = s->get("LegacyFMLLibsURLOverride").toString();
     ui->legacyFMLLibsURL->setText(fmlLibsURL);
-    QString flameKey = s->get("FlameKeyOverride").toString();
-    ui->flameKey->setText(flameKey);
     QString modrinthToken = s->get("ModrinthToken").toString();
     ui->modrinthToken->setText(modrinthToken);
     QString customUserAgent = s->get("UserAgentOverride").toString();
@@ -255,8 +242,6 @@ void APIPage::applySettings()
     s->set("MetaRefreshOnLaunch", ui->metaRefreshOnLaunchCB->checkState() == Qt::Checked);
     s->set("ResourceURLOverride", resourceURL.toString());
     s->set("LegacyFMLLibsURLOverride", fmlLibsURL.toString());
-    QString flameKey = ui->flameKey->text();
-    s->set("FlameKeyOverride", flameKey);
     QString modrinthToken = ui->modrinthToken->text();
     s->set("ModrinthToken", modrinthToken);
     s->set("UserAgentOverride", ui->userAgentLineEdit->text());

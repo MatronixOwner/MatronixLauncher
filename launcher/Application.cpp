@@ -1851,8 +1851,8 @@ void Application::updateCapabilities()
     m_capabilities = None;
     if (!getMSAClientID().isEmpty())
         m_capabilities |= SupportsMSA;
-    if (!getFlameAPIKey().isEmpty())
-        m_capabilities |= SupportsFlame;
+    // CurseForge downloads are intentionally disabled in MatronixLauncher.
+    // Mod and resource downloads are provided by Modrinth only.
 
 #ifdef Q_OS_LINUX
     if (gamemode_query_status() >= 0)
@@ -1911,12 +1911,8 @@ QString Application::getElyClientID()
 
 QString Application::getFlameAPIKey()
 {
-    QString keyOverride = m_settings->get("FlameKeyOverride").toString();
-    if (!keyOverride.isEmpty()) {
-        return keyOverride;
-    }
-
-    return BuildConfig.FLAME_API_KEY;
+    // Keep CurseForge API access disabled even if an old profile contains an override.
+    return {};
 }
 
 QString Application::getModrinthAPIToken()

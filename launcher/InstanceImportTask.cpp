@@ -240,7 +240,7 @@ void InstanceImportTask::extractFinished()
             processTechnic();
             return;
         case ModpackType::Flame:
-            processFlame();
+            emitFailed(tr("CurseForge packs are disabled. Choose a Modrinth modpack instead."));
             return;
         case ModpackType::Modrinth:
             processModrinth();

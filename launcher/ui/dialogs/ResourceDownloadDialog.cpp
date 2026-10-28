@@ -437,8 +437,11 @@ void ResourceDownloadDialog::setResourceMetadata(const std::shared_ptr<Metadata:
             selectPage(Modrinth::id());
             break;
         case ModPlatform::ResourceProvider::FLAME:
-            selectPage(Flame::id());
-            break;
+            CustomMessageBox::selectable(this, tr("Mod source unavailable"),
+                                         tr("CurseForge downloads are disabled. Search for this mod on Modrinth instead."),
+                                         QMessageBox::Information)
+                ->exec();
+            return;
     }
 
     setWindowTitle(tr("Change %1 version").arg(meta->name));

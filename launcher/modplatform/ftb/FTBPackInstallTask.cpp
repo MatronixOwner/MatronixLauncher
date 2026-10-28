@@ -145,20 +145,15 @@ void PackInstallTask::resolveMods()
     Flame::Manifest manifest;
     for (const auto& file : m_version.files) {
         if (!file.serverOnly && file.url.isEmpty()) {
-            if (file.curseforge.file_id <= 0) {
-                emitFailed(tr("Invalid manifest: There's no information available to download the file '%1'!").arg(file.name));
-                return;
-            }
-
-            Flame::File flameFile;
-            flameFile.projectId = file.curseforge.project_id;
-            flameFile.fileId = file.curseforge.file_id;
-
-            manifest.files.insert(flameFile.fileId, flameFile);
-            m_fileIds.append(flameFile.fileId);
-        } else {
-            m_fileIds.append(-1);
+            const auto message = file.curseforge.file_id > 0
+                                     ? tr("This FTB pack requires CurseForge downloads, which are disabled. Choose a Modrinth modpack instead.")
+                                     : tr("Invalid manifest: There's no information available to download the file '%1'!").arg(file.name);
+            emitFailed(message);
+            return;
         }
+
+        // FTB files with direct URLs do not need CurseForge ID resolution.
+        m_fileIds.append(-1);
     }
 
     m_modIdResolverTask.reset(new Flame::FileResolvingTask(manifest));
