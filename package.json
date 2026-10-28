@@ -9,8 +9,7 @@
   "scripts": {
     "start": "electron .",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder --win --x64",
-    "postinstall": "electron-builder install-app-deps"
+    "dist": "electron-builder --win --x64"
   },
   "build": {
     "appId": "org.matronixlauncher",
