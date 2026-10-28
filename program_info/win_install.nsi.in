@@ -14,8 +14,8 @@ RequestExecutionLevel user
 OutFile "../MatronixPrismLauncher-Setup.exe"
 
 !define MUI_ICON "../@Launcher_Branding_ICO@"
-!define MUI_WELCOMEFINISHPAGE_BITMAP "../program_info/matronixprism-installer.bmp"
-!define MUI_UNWELCOMEFINISHPAGE_BITMAP "../program_info/matronixprism-installer.bmp"
+!define MUI_WELCOMEFINISHPAGE_BITMAP "@Launcher_Installer_Bitmap@"
+!define MUI_UNWELCOMEFINISHPAGE_BITMAP "@Launcher_Installer_Bitmap@"
 
 !define UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\@Launcher_CommonName@"
 
