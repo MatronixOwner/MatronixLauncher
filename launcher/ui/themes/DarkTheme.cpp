@@ -44,27 +44,34 @@ QString DarkTheme::id()
 
 QString DarkTheme::name()
 {
-    return QObject::tr("Dark");
+    return QObject::tr("Matronix Black");
 }
 
 QPalette DarkTheme::colorScheme()
 {
-    QPalette darkPalette;
-    darkPalette.setColor(QPalette::Window, QColor(49, 49, 49));
-    darkPalette.setColor(QPalette::WindowText, Qt::white);
-    darkPalette.setColor(QPalette::Base, QColor(34, 34, 34));
-    darkPalette.setColor(QPalette::AlternateBase, QColor(42, 42, 42));
-    darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
-    darkPalette.setColor(QPalette::ToolTipText, Qt::white);
-    darkPalette.setColor(QPalette::Text, Qt::white);
-    darkPalette.setColor(QPalette::Button, QColor(48, 48, 48));
-    darkPalette.setColor(QPalette::ButtonText, Qt::white);
-    darkPalette.setColor(QPalette::BrightText, Qt::red);
-    darkPalette.setColor(QPalette::Link, QColor(47, 163, 198));
-    darkPalette.setColor(QPalette::Highlight, QColor(150, 219, 89));
-    darkPalette.setColor(QPalette::HighlightedText, Qt::black);
-    darkPalette.setColor(QPalette::PlaceholderText, Qt::darkGray);
-    return fadeInactive(darkPalette, fadeAmount(), fadeColor());
+    // Keep the launcher genuinely black while using subtle grayscale surfaces
+    // to distinguish controls and selection states.
+    QPalette blackPalette;
+    blackPalette.setColor(QPalette::Window, QColor("#000000"));
+    blackPalette.setColor(QPalette::WindowText, QColor("#f2f2f2"));
+    blackPalette.setColor(QPalette::Base, QColor("#000000"));
+    blackPalette.setColor(QPalette::AlternateBase, QColor("#101010"));
+    blackPalette.setColor(QPalette::ToolTipBase, QColor("#111111"));
+    blackPalette.setColor(QPalette::ToolTipText, QColor("#f5f5f5"));
+    blackPalette.setColor(QPalette::Text, QColor("#f2f2f2"));
+    blackPalette.setColor(QPalette::Button, QColor("#111111"));
+    blackPalette.setColor(QPalette::ButtonText, QColor("#f2f2f2"));
+    blackPalette.setColor(QPalette::BrightText, QColor("#ff6666"));
+    blackPalette.setColor(QPalette::Link, QColor("#d0d0d0"));
+    blackPalette.setColor(QPalette::Highlight, QColor("#444444"));
+    blackPalette.setColor(QPalette::HighlightedText, QColor("#ffffff"));
+    blackPalette.setColor(QPalette::PlaceholderText, QColor("#858585"));
+    blackPalette.setColor(QPalette::Light, QColor("#3a3a3a"));
+    blackPalette.setColor(QPalette::Midlight, QColor("#252525"));
+    blackPalette.setColor(QPalette::Mid, QColor("#1b1b1b"));
+    blackPalette.setColor(QPalette::Dark, QColor("#0b0b0b"));
+    blackPalette.setColor(QPalette::Shadow, QColor("#000000"));
+    return fadeInactive(blackPalette, fadeAmount(), fadeColor());
 }
 
 double DarkTheme::fadeAmount()
@@ -74,7 +81,7 @@ double DarkTheme::fadeAmount()
 
 QColor DarkTheme::fadeColor()
 {
-    return QColor(49, 49, 49);
+    return QColor("#000000");
 }
 
 bool DarkTheme::hasStyleSheet()
@@ -84,7 +91,19 @@ bool DarkTheme::hasStyleSheet()
 
 QString DarkTheme::appStyleSheet()
 {
-    return "QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }";
+    return QStringLiteral(
+        "QWidget { background-color: #000000; color: #f2f2f2; }"
+        "QPushButton, QToolButton, QComboBox, QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit, QPlainTextEdit {"
+        "  background-color: #101010; border: 1px solid #333333; border-radius: 3px; padding: 3px; }"
+        "QPushButton:hover, QToolButton:hover, QComboBox:hover { background-color: #1b1b1b; border-color: #555555; }"
+        "QPushButton:pressed, QToolButton:pressed, QToolButton:checked { background-color: #292929; }"
+        "QPushButton:disabled, QToolButton:disabled { color: #777777; border-color: #222222; }"
+        "QMenu { background-color: #080808; border: 1px solid #333333; }"
+        "QMenu::item:selected { background-color: #303030; color: #ffffff; }"
+        "QHeaderView::section { background-color: #111111; color: #eeeeee; border: 1px solid #292929; padding: 4px; }"
+        "QToolTip { color: #f5f5f5; background-color: #111111; border: 1px solid #555555; padding: 4px; }"
+        "QProgressBar { background-color: #080808; border: 1px solid #333333; text-align: center; }"
+        "QProgressBar::chunk { background-color: #777777; }");
 }
 
 QString DarkTheme::tooltip()

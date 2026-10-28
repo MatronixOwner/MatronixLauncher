@@ -273,8 +273,8 @@ void ThemeManager::applyCurrentlySelectedTheme(bool initial)
     setIconTheme(settings->get("IconTheme").toString());
     themeDebugLog() << "<> Icon theme set.";
     auto applicationTheme = settings->get("ApplicationTheme").toString();
-    if (applicationTheme == "") {
-        applicationTheme = m_defaultStyle;
+    if (applicationTheme.isEmpty()) {
+        applicationTheme = QStringLiteral("dark");
     }
     setApplicationTheme(applicationTheme, initial);
     themeDebugLog() << "<> Application theme set.";

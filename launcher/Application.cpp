@@ -648,6 +648,7 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
         // Theming
         m_settings->registerSetting("IconTheme", QString());
         m_settings->registerSetting("ApplicationTheme", QString());
+        m_settings->registerSetting("MatronixBlackThemeMigrationComplete", false);
         m_settings->registerSetting("BackgroundCat", QString("kitteh"));
         m_settings->registerSetting("CatButtonVisible", true);
 
@@ -967,6 +968,13 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
     // Themes
     m_themeManager = std::make_unique<ThemeManager>();
 
+    // Move existing installations to Matronix's black interface once, while
+    // still allowing users to choose another theme later if they want to.
+    if (!m_settings->get("MatronixBlackThemeMigrationComplete").toBool()) {
+        m_settings->set("ApplicationTheme", QStringLiteral("dark"));
+        m_settings->set("MatronixBlackThemeMigrationComplete", true);
+    }
+
 #ifdef Q_OS_MACOS
     // for macOS: getting directory settings will generate URL security-scoped bookmarks if needed and not present
     // this facilitates a smooth transition from a non-sandboxed version of the launcher, that likely can access the directory,
@@ -1255,14 +1263,7 @@ bool Application::createSetupWizard()
         if (!validIcons)
             settings()->set("IconTheme", QString("pe_colored"));
         if (!validWidgets) {
-#if defined(Q_OS_WIN32) && QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-            const QString style =
-                QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? QStringLiteral("dark") : QStringLiteral("bright");
-#else
-            const QString style = QStringLiteral("system");
-#endif
-
-            settings()->set("ApplicationTheme", style);
+            settings()->set("ApplicationTheme", QStringLiteral("dark"));
         }
 
         m_themeManager->applyCurrentlySelectedTheme(true);

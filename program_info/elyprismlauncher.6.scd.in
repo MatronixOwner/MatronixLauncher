@@ -13,10 +13,10 @@
 
 # DESCRIPTION
 
-PineconeMC is a fork of Prism Launcher, a custom launcher for Minecraft that allows you to easily manage
-multiple installations of Minecraft at once, with integrated support for Ely.by accounts & skin system.
+MatronixLauncher is an independent Minecraft launcher based on open-source Prism Launcher code. It lets
+you manage multiple Minecraft installations and includes support for mod loaders and Minecraft accounts.
 
-PineconeMC is not endorsed by Prism Launcher or Ely.by.
+MatronixLauncher is not endorsed by Prism Launcher, Ely.by, Mojang, or Microsoft.
 
 # OPTIONS
 
