@@ -1,29 +1,32 @@
 # MatronixLauncher
 
-Лаунчер для Minecraft на базе кода ElyPrismLauncher (форк Prism Launcher) с интеграцией **ely.by**.
+Лаунчер для Minecraft с поддержкой **Ely.by**, всех версий игры, модов и анимированным интерфейсом.
 
 ## Возможности
-- **Все версии Minecraft** — Vanilla, Fabric, Forge
-- **Скачивание модов** — Modrinth и CurseForge API
-- **Регистрация и вход через ely.by** — Auth API (с поддержкой 2FA)
-- **Анимированный интерфейс** — тёмная тема в стиле ElyPrismLauncher
+- **Все версии Minecraft** — Vanilla (Release), Fabric, Forge
+- **Моды** — скачивание с Modrinth API (CurseForge требует API ключ)
+- **Вход через ely.by** — Auth API с поддержкой 2FA, сохранение сессии
+- **Анимированный интерфейс** — тёмная тема, плавные переходы
 - **EXE инсталлятор** — собирается через GitHub Actions (Windows) и выкладывается в релизы
 - **Работа в России и во всём мире**
 
-## Сборка
-
-### Локально (требуется Qt 6 + CMake)
+## Установка для разработки
 ```bash
-mkdir build && cd build
-cmake ..
-make -j$(nproc)
+npm ci
+npm start
 ```
 
-### Windows EXE (GitHub Actions)
-Запушить в репозиторий — workflow `.github/workflows/windows-release.yml` соберёт EXE и создаст релиз.
+## Сборка EXE
+```bash
+npm run dist
+```
+Или запуште тэг `v*` — GitHub Actions соберёт EXE и создаст релиз:
+```bash
+git tag v1.0.0 && git push origin v1.0.0
+```
 
 ## Иконка
-Иконка взята из ElyPrismLauncher (`elyprismlauncher.ico`) и перекрашена в чёрно-белый (grayscale).
+Чёрно-белая иконка (`assets/icon.ico`) перекрашена из иконки ElyPrismLauncher.
 
-## Авторизация ely.by
-Используется `https://authserver.ely.by/auth/authenticate` (логин/пароль, 2FA через токен).
+## Авторизация
+Используется `https://authserver.ely.by/auth/authenticate` (ely.by).

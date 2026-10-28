@@ -1,40 +1,11 @@
-# Build artifacts (not sources)
+node_modules/
+dist/
 build/
-build-*/
-*.o
-*.a
-*.so
-*.dylib
-*.dll
 *.exe
-*.app
-
-# Qt
-*.pro.user
-*.qml.user
-*.qmake.*
-moc_*.cpp
-ui_*.h
-qrc_*.cpp
-Makefile
-*.moc
-*.orig
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs
+*.dll
 *.log
-logs/
-
-# Minecraft instances
-instances/
-.launcher/
+.DS_Store
+.idea/
+.vscode/
+*.pem
+.env

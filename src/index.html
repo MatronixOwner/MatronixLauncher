@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MatronixLauncher</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="bg-animation"></div>
+
+  <div id="app">
+    <nav class="sidebar">
+      <div class="logo">
+        <img src="../assets/icon.ico" alt="Matronix" class="logo-img">
+        <div class="logo-text">MATRONIX</div>
+        <div class="logo-sub">Launcher v1.0.0</div>
+      </div>
+
+      <ul class="nav">
+        <li><button class="nav-item active" data-page="versions">Версии</button></li>
+        <li><button class="nav-item" data-page="mods">Моды</button></li>
+        <li><button class="nav-item" data-page="account">Аккаунт</button></li>
+        <li><button class="nav-item" data-page="settings">Настройки</button></li>
+      </ul>
+
+      <div class="auth-section">
+        <button id="btn-login" class="btn-login">Войти через Ely.by</button>
+        <button id="btn-logout" class="btn-logout" style="display:none;">Выйти</button>
+        <div id="account-info" class="account-info" style="display:none;">
+          <div class="acc-avatar">?</div>
+          <div class="acc-name" id="acc-name">Неизвестно</div>
+          <div class="acc-status acc-online">Ely.by</div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="pages">
+      <section class="page" id="page-versions">
+        <h1>Версии Minecraft</h1>
+
+        <div class="controls">
+          <button id="btn-refresh" class="btn-refresh">Обновить</button>
+          <button id="btn-install-fabric" class="btn-fabric" disabled>Fabric</button>
+          <button id="btn-install-forge" class="btn-forge" disabled>Forge</button>
+        </div>
+
+        <div class="version-list" id="version-list"></div>
+
+        <div class="launch-bar">
+          <span id="launch-status" class="status-text">Выберите версию</span>
+          <button id="btn-play" class="btn-play" disabled>ИГРАТЬ</button>
+        </div>
+      </section>
+
+      <section class="page" id="page-mods" style="display:none;">
+        <h1>Моды</h1>
+        <div class="mod-search">
+          <input type="text" id="mod-search" placeholder="Поиск модов (Modrinth)...">
+          <select id="mod-loader">
+            <option value="">Любой</option>
+            <option value="fabric">Fabric</option>
+            <option value="forge">Forge</option>
+          </select>
+          <button id="btn-search-mods">Искать</button>
+        </div>
+        <div class="mod-list" id="mod-list"></div>
+      </section>
+
+      <section class="page" id="page-account" style="display:none;">
+        <h1>Аккаунт Ely.by</h1>
+        <div class="auth-card">
+          <h2>Вход</h2>
+          <input type="text" id="login-username" placeholder="Логин или e-mail">
+          <input type="password" id="login-password" placeholder="Пароль">
+          <label style="display:flex;align-items:center;gap:8px;margin:10px 0;">
+            <input type="checkbox" id="login-2fa"> 2FA код
+          </label>
+          <input type="text" id="login-otp" placeholder="Код 2FA" disabled>
+          <button id="btn-dologin">Войти</button>
+          <div id="login-error" class="error-msg"></div>
+          <p style="margin-top:12px;color:#888;font-size:13px;">
+            Нет аккаунта? <a href="#" id="link-register">Зарегистрироваться на ely.by</a>
+          </p>
+        </div>
+      </section>
+
+      <section class="page" id="page-settings" style="display:none;">
+        <h1>Настройки</h1>
+        <div class="setting">
+          <label>Папка с играми:</label>
+          <div class="path-display" id="path-appdata"></div>
+        </div>
+        <div class="setting">
+          <label>CurseForge API ключ:</label>
+          <input type="text" id="setting-curseforge-key" placeholder="API ключ CurseForge">
+          <small>Нужен для поиска модов на CurseForge</small>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
