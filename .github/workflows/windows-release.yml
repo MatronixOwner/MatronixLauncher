@@ -13,17 +13,40 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Python (required by Qt installer)
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-
-      - name: Install Qt 6
-        uses: jurplel/install-qt-action@v3
-        with:
-          version: '6.7'
-          target: 'desktop'
-          arch: 'win64'
+      - name: Install Qt 6 (direct download)
+        shell: pwsh
+        run: |
+          $ProgressPreference = 'SilentlyContinue'
+          $urls = @(
+            "https://download.qt.io/official_releases/qt/6.7/6.7.2/single/qt-6.7.2-x64-msvc2019-windows.zip",
+            "https://download.qt.io/official_releases/qt/6.5/6.5.3/single/qt-6.5.3-x64-msvc2019-64-windows.zip",
+            "https://download.qt.io/official_releases/qt/6.5/6.5.3/single/qt-6.5.3-x64-msvc2019-windows.zip"
+          )
+          $success = $false
+          foreach ($url in $urls) {
+            try {
+              Write-Host "Trying: $url"
+              Invoke-WebRequest -Uri $url -OutFile "C:\qt.zip" -TimeoutSec 600
+              $success = $true
+              break
+            } catch {
+              Write-Host "Failed: $url - $_"
+            }
+          }
+          if (-not $success) {
+            Write-Error "All Qt download URLs failed"
+            exit 1
+          }
+          Write-Host "Extracting Qt..."
+          Expand-Archive -Path "C:\qt.zip" -DestinationPath "C:\Qt"
+          $qtDir = Get-ChildItem -Path "C:\Qt" -Filter "qt-*" | Select-Object -First 1
+          if (-not $qtDir) {
+            Write-Error "Qt directory not found after extraction"
+            exit 1
+          }
+          Write-Host "Qt installed at $($qtDir.FullName)"
+          echo "Qt6_DIR=$($qtDir.FullName)" >> $env:GITHUB_ENV
+          echo "QTDIR=$($qtDir.FullName)" >> $env:GITHUB_ENV
 
       - name: Install CMake and NSIS
         run: |
