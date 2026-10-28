@@ -145,6 +145,13 @@ runs:
           }
           Expand-Archive -Path NSISPlugins\NScurl.zip -DestinationPath NSISPlugins\NScurl
 
+          $bannerSource = Join-Path $env:GITHUB_WORKSPACE 'program_info/matronixprism-installer.bmp'
+          $bannerDestination = Join-Path $env:BUILD_DIR 'program_info/matronixprism-installer.bmp'
+          Copy-Item -Path $bannerSource -Destination $bannerDestination -Force
+          if (!(Test-Path $bannerDestination)) {
+            throw "Installer bitmap was not staged at $bannerDestination"
+          }
+
           Set-Location $env:INSTALL_DIR
           $nsisOutput = & makensis -NOCD "${{ github.workspace }}/${{ env.BUILD_DIR }}/program_info/win_install.nsi" 2>&1
           $nsisExitCode = $LASTEXITCODE
