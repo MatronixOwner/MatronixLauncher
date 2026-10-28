@@ -49,11 +49,11 @@ jobs:
           body: |
             Preview build of MatronixPrismLauncher.
 
-            - Five selectable cat backgrounds were added to the launcher home screen.
-            - The installer welcome page now includes MatronixPrismLauncher artwork.
-            - Managed mod discovery and downloads use Modrinth only.
+            - The launcher window title now shows the product name without the development branch suffix.
+            - The installer welcome page uses the MatronixPrismLauncher prism logo instead of a cat image.
+            - Ely.by OAuth uses the MatronixPrismLauncher Client ID and has clearer configuration errors.
+            - Mod discovery and downloads use Modrinth only; the five cat backgrounds remain selectable.
             - The installer is unsigned and may trigger a Windows SmartScreen warning.
-            - Ely.by sign-in requires the project's own OAuth Client ID and is not enabled in this preview build.
           draft: false
           prerelease: true
           files: MatronixPrismLauncher-Setup.exe

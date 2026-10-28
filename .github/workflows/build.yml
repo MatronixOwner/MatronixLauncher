@@ -117,7 +117,7 @@ jobs:
 
       - name: Configure project
         env:
-          MATRONIX_ELY_CLIENT_ID: ${{ vars.MATRONIX_ELY_CLIENT_ID || '' }}
+          MATRONIX_ELY_CLIENT_ID: ${{ vars.MATRONIX_ELY_CLIENT_ID || 'matronixprismlauncher' }}
           MATRONIX_MSA_CLIENT_ID: ${{ vars.MATRONIX_MSA_CLIENT_ID || '' }}
           MATRONIX_IMGUR_CLIENT_ID: ${{ vars.MATRONIX_IMGUR_CLIENT_ID || '' }}
         run: |
