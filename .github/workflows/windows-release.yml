@@ -1,0 +1,48 @@
+name: Windows Release (EXE Installer)
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Qt 6
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.7'
+          target: 'desktop'
+          arch: 'win64'
+
+      - name: Install dependencies
+        run: |
+          cmake --version
+
+      - name: Configure CMake
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$env:Qt6_DIR
+
+      - name: Build
+        run: |
+          cmake --build build --config Release --parallel %NUMBER_OF_PROCESSORS%
+
+      - name: Create NSIS installer
+        run: |
+          choco install nsis -y
+          # Собираем инсталлятор (NSIS скрипт создаётся на этапеリリース)
+          makensis installer.nsi
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            MatronixLauncher.exe
+            MatronixLauncher-Setup.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
