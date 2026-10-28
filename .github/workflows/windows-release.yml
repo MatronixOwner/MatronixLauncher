@@ -13,20 +13,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Qt 6 via micromamba (conda-forge prebuilt)
-        shell: pwsh
+      - name: Install Qt 6 via choco
         run: |
-          $ProgressPreference = 'SilentlyContinue'
-          $tmp = "$env:RUNNER_TEMP"
-          # Скачиваем micromamba
-          Invoke-WebRequest -Uri "https://micro.mamba.pm/api/micromamba/windows-64/latest" -OutFile "$tmp\micromamba.exe"
-          # Создаём окружение с Qt 6 из conda-forge (готовые бинарники, без компиляции)
-          & "$tmp\micromamba.exe" create -y -p "$tmp\qt-env" -c conda-forge qt-base=6.7 qt-tools=6.7
-          # Пути к Qt
-          echo "$tmp\qt-env\Library\bin" >> $env:GITHUB_PATH
-          echo "Qt6_DIR=$tmp\qt-env\Library" >> $env:GITHUB_ENV
-          echo "CMAKE_PREFIX_PATH=$tmp\qt-env\Library" >> $env:GITHUB_ENV
-          Write-Host "Qt6_DIR=$tmp\qt-env\Library"
+          choco install qt6 -y || choco install qt -y
 
       - name: Install CMake and NSIS
         run: |
