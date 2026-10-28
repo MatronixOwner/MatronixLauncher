@@ -1,4 +1,4 @@
-name: Windows installer and GitHub release
+name: Publish MatronixLauncher preview installer
 
 on:
   push:
@@ -38,7 +38,7 @@ jobs:
           pattern: MatronixLauncher-Windows-MSVC-Setup-*
           merge-multiple: true
 
-      - name: Create public preview release
+      - name: Publish public preview release
         uses: softprops/action-gh-release@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
