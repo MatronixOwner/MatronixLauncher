@@ -31,7 +31,7 @@ jobs:
 
       - name: Read release version
         shell: bash
-        run: echo "VERSION=$(cat .release-preview)" >> "$GITHUB_ENV"
+        run: echo "VERSION=$(head -n 1 .release-preview)" >> "$GITHUB_ENV"
 
       - name: Download Windows installer artifact
         uses: actions/download-artifact@v8

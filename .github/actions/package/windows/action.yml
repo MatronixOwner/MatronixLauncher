@@ -30,6 +30,7 @@ runs:
 
   steps:
     - name: Package (MinGW)
+      id: package_mingw
       if: ${{ inputs.msystem != '' }}
       shell: msys2 {0}
       env:
@@ -41,6 +42,7 @@ runs:
         for l in $(find ${{ env.INSTALL_DIR }} -type f); do l=$(cygpath -u $l); l=${l#$(pwd)/}; l=${l#${{ env.INSTALL_DIR }}/}; l=${l#./}; echo $l; done >> ${{ env.INSTALL_DIR }}/manifest.txt
 
     - name: Package (MSVC)
+      id: package_msvc
       if: ${{ inputs.msystem == '' }}
       shell: pwsh
       env:
@@ -54,12 +56,14 @@ runs:
         Get-ChildItem ${{ env.INSTALL_DIR }} -Recurse | ForEach FullName | Resolve-Path -Relative | %{ $_.TrimStart('.\') } | %{ $_.TrimStart('${{ env.INSTALL_DIR }}') } | %{ $_.TrimStart('\') } | Out-File -FilePath ${{ env.INSTALL_DIR }}/manifest.txt
 
     - name: Emit warning for unsigned builds
+      id: unsigned_warning
       if: ${{ env.CI_HAS_ACCESS_TO_AZURE == '' || inputs.azure-client-id == '' }}
       shell: pwsh
       run: |
         ":warning: Skipped code signing for Windows, as certificate was not present." >> $env:GITHUB_STEP_SUMMARY
 
     - name: Login to Azure
+      id: login_azure
       if: ${{ env.CI_HAS_ACCESS_TO_AZURE != '' && inputs.azure-client-id != '' }}
       uses: azure/login@v3
       with:
@@ -68,6 +72,7 @@ runs:
         subscription-id: ${{ inputs.azure-subscription-id }}
 
     - name: Sign executables
+      id: sign_executables
       if: ${{ env.CI_HAS_ACCESS_TO_AZURE != '' && inputs.azure-client-id != '' }}
       uses: azure/artifact-signing-action@v2
       with:
@@ -95,6 +100,7 @@ runs:
         exclude-interactive-browser-credential: true
 
     - name: Package (MinGW, portable)
+      id: package_mingw_portable
       if: ${{ inputs.msystem != '' }}
       shell: msys2 {0}
       env:
@@ -107,6 +113,7 @@ runs:
         for l in $(find ${{ env.INSTALL_PORTABLE_DIR }} -type f); do l=$(cygpath -u $l); l=${l#$(pwd)/}; l=${l#${{ env.INSTALL_PORTABLE_DIR }}/}; l=${l#./}; echo $l; done >> ${{ env.INSTALL_PORTABLE_DIR }}/manifest.txt
 
     - name: Package (MSVC, portable)
+      id: package_msvc_portable
       if: ${{ inputs.msystem == '' }}
       shell: pwsh
       env:
@@ -120,6 +127,7 @@ runs:
         Get-ChildItem ${{ env.INSTALL_PORTABLE_DIR }} -Recurse | ForEach FullName | Resolve-Path -Relative | %{ $_.TrimStart('.\') } | %{ $_.TrimStart('${{ env.INSTALL_PORTABLE_DIR }}') } | %{ $_.TrimStart('\') } | Out-File -FilePath ${{ env.INSTALL_DIR }}/manifest.txt
 
     - name: Package (installer)
+      id: package_installer
       shell: pwsh
       env:
         BUILD_DIR: build
@@ -141,6 +149,7 @@ runs:
         makensis -NOCD "${{ github.workspace }}/${{ env.BUILD_DIR }}/program_info/win_install.nsi"
 
     - name: Sign installer
+      id: sign_installer
       if: ${{ env.CI_HAS_ACCESS_TO_AZURE != '' && inputs.azure-client-id != '' }}
       uses: azure/artifact-signing-action@v2
       with:
@@ -168,19 +177,29 @@ runs:
         exclude-interactive-browser-credential: true
 
     - name: Upload binary zip
+      id: upload_binary
       uses: actions/upload-artifact@v7
       with:
         name: MatronixPrismLauncher-${{ inputs.artifact-name }}-${{ inputs.version }}-${{ inputs.build-type }}
         path: install/**
 
     - name: Upload portable zip
+      id: upload_portable
       uses: actions/upload-artifact@v7
       with:
         name: MatronixPrismLauncher-${{ inputs.artifact-name }}-Portable-${{ inputs.version }}-${{ inputs.build-type }}
         path: install-portable/**
 
     - name: Upload installer
+      id: upload_installer
       uses: actions/upload-artifact@v7
       with:
         name: MatronixPrismLauncher-${{ inputs.artifact-name }}-Setup-${{ inputs.version }}-${{ inputs.build-type }}
         path: MatronixPrismLauncher-Setup.exe
+
+    - name: Report Windows package step outcomes
+      if: failure()
+      shell: pwsh
+      run: |
+        $summary = "mingw=${{ steps.package_mingw.outcome }}; msvc=${{ steps.package_msvc.outcome }}; unsigned_warning=${{ steps.unsigned_warning.outcome }}; login_azure=${{ steps.login_azure.outcome }}; sign_executables=${{ steps.sign_executables.outcome }}; mingw_portable=${{ steps.package_mingw_portable.outcome }}; msvc_portable=${{ steps.package_msvc_portable.outcome }}; installer=${{ steps.package_installer.outcome }}; sign_installer=${{ steps.sign_installer.outcome }}; upload_binary=${{ steps.upload_binary.outcome }}; upload_portable=${{ steps.upload_portable.outcome }}; upload_installer=${{ steps.upload_installer.outcome }}"
+        Write-Output "::error title=Windows package diagnostics::$summary"
