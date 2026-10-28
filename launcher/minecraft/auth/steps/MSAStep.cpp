@@ -113,7 +113,12 @@ class LoggingOAuthHttpServerReplyHandler final : public QOAuthHttpServerReplyHan
 
 MSAStep::MSAStep(AccountData* data, bool silent, QString clientId, QString scopes, QUrl authorizeUrl, QUrl tokenUrl) : AuthStep(data), m_silent(silent)
 {
-    m_clientId = !clientId.isEmpty() ? clientId : APPLICATION->getMSAClientID();
+    // Ely.by credentials must never fall back to the Microsoft OAuth client ID.
+    if (data->type == AccountType::Ely) {
+        m_clientId = clientId;
+    } else {
+        m_clientId = clientId.isEmpty() ? APPLICATION->getMSAClientID() : clientId;
+    }
     if (QCoreApplication::applicationFilePath().startsWith("/tmp/.mount_") || APPLICATION->isPortable() || !isSchemeHandlerRegistered() || clientId.isEmpty())
 
     {
@@ -187,6 +192,15 @@ QString MSAStep::describe()
 
 void MSAStep::perform()
 {
+    if (m_clientId.trimmed().isEmpty()) {
+        const QString provider = m_data->type == AccountType::Ely ? tr("Ely.by") : tr("Microsoft");
+        const QString message = tr("No %1 OAuth client ID is configured. "
+                                   "Add it in Settings > APIs, or provide it when building the launcher.")
+                                    .arg(provider);
+        emit finished(AccountTaskState::STATE_FAILED_HARD, message);
+        return;
+    }
+
     if (m_silent) {
         if (m_data->msaClientID != m_clientId) {
             emit finished(AccountTaskState::STATE_DISABLED,

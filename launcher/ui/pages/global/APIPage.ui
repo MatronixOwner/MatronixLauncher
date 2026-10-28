@@ -412,14 +412,14 @@
           <item>
            <widget class="QLineEdit" name="elyClientID">
             <property name="placeholderText">
-             <string>Use Default</string>
+             <string>OAuth Client ID registered for MatronixPrismLauncher</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="label_31">
             <property name="text">
-             <string>Note: you probably don't need to set this if logging in via Ely.by Authentication already works.</string>
+             <string>A client ID registered for MatronixPrismLauncher is required for Ely.by sign-in. Enter it here or provide it at build time. Do not enter a client secret.</string>
             </property>
             <property name="textFormat">
              <enum>Qt::TextFormat::RichText</enum>

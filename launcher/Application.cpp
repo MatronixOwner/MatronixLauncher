@@ -298,7 +298,8 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
     setOrganizationName(BuildConfig.LAUNCHER_NAME);
     setOrganizationDomain(BuildConfig.LAUNCHER_DOMAIN);
     setApplicationName(BuildConfig.LAUNCHER_NAME);
-    setApplicationDisplayName(QString("%1 %2").arg(BuildConfig.LAUNCHER_DISPLAYNAME, BuildConfig.printableVersionString()));
+    // Keep branch/build metadata out of the launcher window title; it remains visible in About.
+    setApplicationDisplayName(BuildConfig.LAUNCHER_DISPLAYNAME);
     setApplicationVersion(BuildConfig.printableVersionString() + "\n" + BuildConfig.GIT_COMMIT);
     setDesktopFileName(BuildConfig.LAUNCHER_APPID);
     m_startTime = QDateTime::currentDateTime();
@@ -1902,12 +1903,12 @@ QString Application::getMSAClientID()
 
 QString Application::getElyClientID()
 {
-    QString clientIDOverride = m_settings->get("ElyClientIDOverride").toString();
+    const QString clientIDOverride = m_settings->get("ElyClientIDOverride").toString().trimmed();
     if (!clientIDOverride.isEmpty()) {
         return clientIDOverride;
     }
 
-    return BuildConfig.ELY_CLIENT_ID;
+    return BuildConfig.ELY_CLIENT_ID.trimmed();
 }
 
 QString Application::getFlameAPIKey()

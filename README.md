@@ -13,9 +13,9 @@ MatronixPrismLauncher is a Minecraft launcher project. Its initial implementatio
 
 ## Build and release status
 
-The Windows packaging workflow is configured in `.github/workflows/build.yml`; it produces an unsigned installer until project-owned code-signing is configured. Preview releases are published by `.github/workflows/matronix-preview-release.yml`. The launcher uses a black interface by default, with bundled UI, instance, and application icons converted to monochrome grayscale. Ely.by sign-in requires the project's own OAuth Client ID. A GitHub Actions build must pass before an installer can be called tested or published.
+The Windows packaging workflow is configured in `.github/workflows/build.yml`; it produces an unsigned installer until project-owned code-signing is configured. Preview releases are published by `.github/workflows/matronix-preview-release.yml`. The launcher uses a black interface by default, with bundled UI, instance, and application icons converted to monochrome grayscale. Ely.by sign-in requires the project's own OAuth Client ID. Set it in **Settings → APIs → Ely.by Authentication** for a local install, or provide `MATRONIX_ELY_CLIENT_ID` as a GitHub Actions repository variable for CI builds. A GitHub Actions build must pass before an installer can be called tested or published.
 
-CurseForge browsing, downloads, and automatic updates are disabled in MatronixPrismLauncher; Modrinth is the sole managed mod source. The upstream CurseForge key is not reused. Ely.by sign-in still needs a MatronixPrismLauncher-owned OAuth Client ID (`MATRONIX_ELY_CLIENT_ID` in GitHub Actions variables); do not paste credentials into chat.
+CurseForge browsing, downloads, and automatic updates are disabled in MatronixPrismLauncher; Modrinth is the sole managed mod source. The upstream CurseForge key is not reused. Use an Ely.by OAuth Client ID registered for MatronixPrismLauncher; never enter or share a client secret.
 
 ## License
 

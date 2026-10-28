@@ -57,6 +57,15 @@ QString MSADeviceCodeStep::describe()
 
 void MSADeviceCodeStep::perform()
 {
+    if (m_clientId.trimmed().isEmpty()) {
+        const QString provider = m_data->type == AccountType::Ely ? tr("Ely.by") : tr("Microsoft");
+        const QString message = tr("No %1 OAuth client ID is configured. "
+                                   "Add it in Settings > APIs, or provide it when building the launcher.")
+                                    .arg(provider);
+        emit finished(AccountTaskState::STATE_FAILED_HARD, message);
+        return;
+    }
+
     QUrlQuery data;
     data.addQueryItem("client_id", m_clientId);
     data.addQueryItem("scope", m_scopes);
