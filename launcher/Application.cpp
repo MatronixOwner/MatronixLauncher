@@ -650,7 +650,7 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
         m_settings->registerSetting("IconTheme", QString());
         m_settings->registerSetting("ApplicationTheme", QString());
         m_settings->registerSetting("MatronixBlackThemeMigrationComplete", false);
-        m_settings->registerSetting("BackgroundCat", QStringLiteral("matronix-dark-kitten"));
+        m_settings->registerSetting("BackgroundCat", QStringLiteral("kitteh"));
         m_settings->registerSetting("CatButtonVisible", true);
 
         // Remembered state

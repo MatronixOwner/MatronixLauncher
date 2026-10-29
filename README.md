@@ -6,7 +6,7 @@ MatronixPrismLauncher is a Minecraft launcher project. Its initial implementatio
 
 - Keep the upstream instance management, Minecraft version support, and vanilla/mod-loader launch flow as the technical foundation.
 - Build a MatronixPrismLauncher-branded Windows installer (`MatronixPrismLauncher-Setup.exe`) from CI on code pushes, and publish verified builds as GitHub releases.
-- Use the five owner-provided cat images as selectable home-screen backgrounds.
+- Keep the original selectable home-screen cat backgrounds: Kitteh, Rory, Rory Flat, and Teawie.
 - Improve the UI and customization; mod discovery, downloads, and managed updates are Modrinth-only.
 - Support Ely.by sign-in only with a MatronixPrismLauncher-owned OAuth application.
 - Provide configurable endpoints and mirror/fallback behavior. No launcher can promise access in every country: Minecraft, account, and mod services are operated by third parties and can be restricted or unavailable on a user's network.
