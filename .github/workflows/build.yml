@@ -45,18 +45,34 @@ on:
       environment:
         description: Deployment environment to run under
         type: string
+      platform:
+        description: Build only one platform or all platforms
+        type: string
+        default: all
   workflow_dispatch:
     inputs:
       build-type:
         description: Type of build (Debug or Release)
-        type: string
+        type: choice
+        options:
+          - Debug
+          - Release
         default: Debug
+      platform:
+        description: Build only one platform or all platforms
+        type: choice
+        options:
+          - all
+          - linux
+          - windows
+        default: all
 
 permissions: {}
 
 jobs:
   build:
     name: Build (${{ matrix.artifact-name }})
+    if: ${{ inputs.platform == 'all' || inputs.platform == '' || matrix.platform == inputs.platform }}
 
     environment: ${{ inputs.environment || '' }}
 
@@ -71,11 +87,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-24.04
+          - platform: linux
+            os: ubuntu-24.04
             artifact-name: Linux
             cmake-preset: linux
             qt-version: 6.10.2
-          - os: windows-2022
+          - platform: windows
+            os: windows-2022
             artifact-name: Windows-MSVC
             cmake-preset: windows_msvc
             vcvars-arch: amd64
