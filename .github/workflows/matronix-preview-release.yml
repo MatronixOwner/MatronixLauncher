@@ -52,7 +52,8 @@ jobs:
             - The launcher window title now shows the product name without the development branch suffix.
             - The installer welcome page uses the MatronixPrismLauncher prism logo instead of a cat image.
             - Ely.by OAuth uses the MatronixPrismLauncher Client ID and has clearer configuration errors.
-            - Mod discovery and downloads use Modrinth only; the original Kitteh, Rory, Rory Flat, and Teawie backgrounds are restored.
+            - Mod discovery and downloads use Modrinth only; the built-in collection now includes seven selectable cats with proper Wikimedia Commons attribution.
+            - Appearance settings now support importing personal cat images, adjusting background opacity, and dimming the background for readability.
             - The installer is unsigned and may trigger a Windows SmartScreen warning.
           draft: false
           prerelease: true

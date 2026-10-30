@@ -26,5 +26,17 @@
         <file alias="teawie-spooky">teawie-spooky.png</file>
 
         <!-- https://commons.wikimedia.org/wiki/File:Teawie_Halloween.png -->
+
+        <!-- Additional cat backgrounds sourced from Wikimedia Commons, unchanged and licensed CC BY-SA 4.0. -->
+        <!-- License terms: https://creativecommons.org/licenses/by-sa/4.0/ -->
+        <!-- Asian tabby: photographer Matt Buck; background removal by YukiKoKo; CC BY-SA 4.0. -->
+        <!-- https://commons.wikimedia.org/wiki/File:Asian_tabby_cat_transparent.png -->
+        <file alias="asian-tabby">asian-tabby.png</file>
+        <!-- Toyger: Heikki Siltala / catza.net; background removal by YukiKoKo; CC BY-SA 4.0. -->
+        <!-- https://commons.wikimedia.org/wiki/File:Toyger_cat_transparent.png -->
+        <file alias="toyger">toyger.png</file>
+        <!-- Exotic Shorthair: Heikki Siltala / catza.net; background removal by YukiKoKo; CC BY-SA 4.0. -->
+        <!-- https://commons.wikimedia.org/wiki/File:Exotic_cat_transparent.png -->
+        <file alias="exotic-shorthair">exotic-shorthair.png</file>
     </qresource>
 </RCC>

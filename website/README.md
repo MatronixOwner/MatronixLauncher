@@ -2,7 +2,7 @@
 
 This is a static, dependency-free landing page. GitHub Pages serves the files in this directory; the deployment workflow is `.github/workflows/deploy-website.yml`.
 
-- Intended URL: <https://d50130483-ship-it.github.io/MatronixLauncher/>
+- Intended URL: <https://matronixowner.github.io/MatronixLauncher/>
 - Hosting: GitHub Pages (free for this public repository; no web server or database to keep running).
 - The download buttons query the public GitHub Releases API for the newest release with `MatronixPrismLauncher-Setup.exe`. A pinned installer URL is kept as a fallback.
 - A custom domain is optional. If one is added, its owner must keep the domain registration renewed; the default GitHub Pages address does not require a domain purchase.

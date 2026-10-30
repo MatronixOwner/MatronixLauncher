@@ -120,6 +120,16 @@
         <item row="4" column="2">
          <layout class="QHBoxLayout" name="horizontalLayout_8">
           <item>
+           <widget class="QPushButton" name="importCatButton">
+            <property name="toolTip">
+             <string>Copy an image into your personal cat packs.</string>
+            </property>
+            <property name="text">
+             <string>Import Image…</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="reloadThemesButton">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -317,6 +327,40 @@
          </item>
         </layout>
        </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="catDarknessLabel">
+        <property name="text">
+         <string>Background dimming</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="catDarknessLayout">
+        <item>
+         <widget class="QSlider" name="catDarknessSlider">
+          <property name="maximum">
+           <number>80</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="catDarknessValue">
+          <property name="minimumSize">
+           <size>
+            <width>36</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>0%</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <spacer name="verticalSpacer">
@@ -631,10 +675,12 @@
   <tabstop>iconsFolder</tabstop>
   <tabstop>catPackComboBox</tabstop>
   <tabstop>catPackFolder</tabstop>
+  <tabstop>importCatButton</tabstop>
   <tabstop>consoleFont</tabstop>
   <tabstop>fontSizeBox</tabstop>
   <tabstop>catFitComboBox</tabstop>
   <tabstop>catOpacitySlider</tabstop>
+  <tabstop>catDarknessSlider</tabstop>
   <tabstop>consolePreview</tabstop>
  </tabstops>
  <resources/>

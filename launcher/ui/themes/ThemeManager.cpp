@@ -311,6 +311,9 @@ void ThemeManager::initializeCatPacks()
         { "rory", QObject::tr("Rory ID 11 (drawn by Ashtaka)") },
         { "rory-flat", QObject::tr("Rory ID 11 (flat edition, drawn by Ashtaka)") },
         { "teawie", QObject::tr("Teawie (drawn by SympathyTea)") },
+        { "asian-tabby", QObject::tr("Asian Tabby (CC BY-SA 4.0)") },
+        { "toyger", QObject::tr("Toyger (CC BY-SA 4.0)") },
+        { "exotic-shorthair", QObject::tr("Exotic Shorthair (CC BY-SA 4.0)") },
     };
     for (auto [id, name] : defaultCats) {
         addCatPack(std::unique_ptr<CatPack>(new BasicCatPack(id, name)));

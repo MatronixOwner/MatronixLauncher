@@ -1,6 +1,6 @@
 (() => {
-  const repository = "d50130483-ship-it/MatronixLauncher";
-  const fallbackVersion = "v0.1.0-alpha.9";
+  const repository = "MatronixOwner/MatronixLauncher";
+  const fallbackVersion = "v0.1.0-alpha.10";
   const fallbackInstaller = `https://github.com/${repository}/releases/download/${fallbackVersion}/MatronixPrismLauncher-Setup.exe`;
   const fallbackRelease = `https://github.com/${repository}/releases/tag/${fallbackVersion}`;
 
@@ -35,5 +35,31 @@
     }
   }
 
+  function enableScrollReveals() {
+    if (!("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+      return;
+
+    const animated = document.querySelectorAll(
+      ".section-heading, .feature-card, .cats-copy, .cat-tile, .download-copy, .download-side, .about-copy, .about-details"
+    );
+    if (!animated.length) return;
+
+    document.body.classList.add("js");
+    const observer = new IntersectionObserver((entries, currentObserver) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          currentObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -35px 0px" });
+
+    animated.forEach(element => {
+      element.classList.add("will-reveal");
+      observer.observe(element);
+    });
+  }
+
   refreshReleaseLinks();
+  enableScrollReveals();
 })();

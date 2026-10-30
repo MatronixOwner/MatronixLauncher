@@ -17,6 +17,7 @@
  */
 
 #include "ui/themes/CatPainter.h"
+#include <QColor>
 #include <QPixmap>
 #include "Application.h"
 #include "settings/SettingsObject.h"
@@ -64,4 +65,9 @@ void CatPainter::paint(QPainter* painter, const QRect& viewport)
     rectOfPixmap.moveBottomRight(viewport.bottomRight());
     painter->drawPixmap(rectOfPixmap.topLeft(), pixmap);
     painter->setOpacity(1.0);
+
+    const int darkness = qBound(0, APPLICATION->settings()->get("CatDarkness").toInt(), 80);
+    if (darkness > 0) {
+        painter->fillRect(viewport, QColor(0, 0, 0, darkness * 255 / 100));
+    }
 };

@@ -39,6 +39,13 @@
 
 #include <DesktopServices.h>
 #include <QGraphicsOpacityEffect>
+#include <QDir>
+#include <QFile>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QImageReader>
+#include <QMessageBox>
+#include <QStringList>
 #include "BuildConfig.h"
 #include "ui/themes/ITheme.h"
 #include "ui/themes/ThemeManager.h"
@@ -59,6 +66,7 @@ AppearanceWidget::AppearanceWidget(bool themesOnly, QWidget* parent)
         m_ui->catPackLabel->hide();
         m_ui->catPackComboBox->hide();
         m_ui->catPackFolder->hide();
+        m_ui->importCatButton->hide();
         m_ui->settingsBox->hide();
         m_ui->consolePreview->hide();
         m_ui->catPreview->hide();
@@ -78,6 +86,9 @@ AppearanceWidget::AppearanceWidget(bool themesOnly, QWidget* parent)
     connect(m_ui->widgetStyleComboBox, &QComboBox::currentIndexChanged, this, &AppearanceWidget::applyWidgetTheme);
     connect(m_ui->catPackComboBox, &QComboBox::currentIndexChanged, this, &AppearanceWidget::applyCatTheme);
     connect(m_ui->catOpacitySlider, &QAbstractSlider::valueChanged, this, &AppearanceWidget::updateCatPreview);
+    connect(m_ui->catDarknessSlider, &QAbstractSlider::valueChanged, this, [this](int value) {
+        m_ui->catDarknessValue->setText(QStringLiteral("%1%").arg(value));
+    });
 
     connect(m_ui->iconsFolder, &QPushButton::clicked, this,
             [] { DesktopServices::openPath(APPLICATION->themeManager()->getIconThemesFolder().path()); });
@@ -85,6 +96,49 @@ AppearanceWidget::AppearanceWidget(bool themesOnly, QWidget* parent)
             [] { DesktopServices::openPath(APPLICATION->themeManager()->getApplicationThemesFolder().path()); });
     connect(m_ui->catPackFolder, &QPushButton::clicked, this,
             [] { DesktopServices::openPath(APPLICATION->themeManager()->getCatPacksFolder().path()); });
+    connect(m_ui->importCatButton, &QPushButton::clicked, this, [this] {
+        QStringList imagePatterns;
+        for (const auto& format : QImageReader::supportedImageFormats())
+            imagePatterns << QStringLiteral("*.%1").arg(QString::fromLatin1(format));
+
+        const QString imagePath = QFileDialog::getOpenFileName(
+            this, tr("Import a cat image"), QString(), tr("Images (%1)").arg(imagePatterns.join(QLatin1Char(' '))));
+        if (imagePath.isEmpty())
+            return;
+
+        QImageReader imageReader(imagePath);
+        if (!imageReader.canRead()) {
+            QMessageBox::warning(this, tr("Unsupported image"), tr("The selected file is not a readable image."));
+            return;
+        }
+
+        QDir catFolder = APPLICATION->themeManager()->getCatPacksFolder();
+        if (!catFolder.mkpath(".")) {
+            QMessageBox::warning(this, tr("Import failed"), tr("The personal cat-packs folder could not be created."));
+            return;
+        }
+
+        const QFileInfo sourceInfo(imagePath);
+        const QString baseName = sourceInfo.completeBaseName().trimmed().isEmpty() ? QStringLiteral("Custom cat")
+                                                                                   : sourceInfo.completeBaseName().trimmed();
+        const QString suffix = sourceInfo.suffix().isEmpty() ? QStringLiteral("png") : sourceInfo.suffix();
+        QString packName = baseName;
+        QString destination = catFolder.filePath(packName + QLatin1Char('.') + suffix);
+        for (int duplicate = 2; QFile::exists(destination); ++duplicate) {
+            packName = QStringLiteral("%1 (%2)").arg(baseName).arg(duplicate);
+            destination = catFolder.filePath(packName + QLatin1Char('.') + suffix);
+        }
+
+        if (!QFile::copy(imagePath, destination)) {
+            QMessageBox::warning(this, tr("Import failed"), tr("The image could not be copied to the cat-packs folder."));
+            return;
+        }
+
+        loadThemeSettings();
+        const int index = m_ui->catPackComboBox->findData(packName);
+        if (index >= 0)
+            m_ui->catPackComboBox->setCurrentIndex(index);
+    });
     connect(m_ui->reloadThemesButton, &QPushButton::pressed, this, &AppearanceWidget::loadThemeSettings);
 }
 
@@ -100,9 +154,12 @@ void AppearanceWidget::applySettings()
     settings->set("ConsoleFont", consoleFontFamily);
     settings->set("ConsoleFontSize", m_ui->fontSizeBox->value());
     settings->set("CatOpacity", m_ui->catOpacitySlider->value());
+    settings->set("CatDarkness", m_ui->catDarknessSlider->value());
     auto catFit = m_ui->catFitComboBox->currentIndex();
     settings->set("CatFit", catFit == 0 ? "fit" : catFit == 1 ? "fill" : "strech");
     settings->set("CatButtonVisible", !m_ui->hideCatButtonCheckBox->isChecked());
+    if (!m_themesOnly)
+        APPLICATION->currentCatChanged(m_ui->catPackComboBox->currentIndex());
 }
 
 void AppearanceWidget::loadSettings()
@@ -120,6 +177,9 @@ void AppearanceWidget::loadSettings()
     m_ui->fontSizeBox->setValue(fontSize);
 
     m_ui->catOpacitySlider->setValue(settings->get("CatOpacity").toInt());
+    const int catDarkness = settings->get("CatDarkness").toInt();
+    m_ui->catDarknessSlider->setValue(qBound(0, catDarkness, 80));
+    m_ui->catDarknessValue->setText(QStringLiteral("%1%").arg(m_ui->catDarknessSlider->value()));
 
     auto catFit = settings->get("CatFit").toString();
     m_ui->catFitComboBox->setCurrentIndex(catFit == "fit" ? 0 : catFit == "fill" ? 1 : 2);
