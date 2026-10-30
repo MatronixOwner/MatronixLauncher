@@ -139,9 +139,14 @@ jobs:
             {
               echo '### CMake configure failed'
               echo '```text'
-              tail -n 100 "$RUNNER_TEMP/cmake-configure.log"
+              tail -n 40 "$RUNNER_TEMP/cmake-configure.log"
               echo '```'
             } >> "$GITHUB_STEP_SUMMARY"
+            while IFS= read -r line; do
+              line="${line//'%'/'%25'}"
+              line="${line//$'\r'/'%0D'}"
+              echo "::error title=CMake configure output::$line"
+            done < <(tail -n 30 "$RUNNER_TEMP/cmake-configure.log")
             exit 1
           fi
 
@@ -152,9 +157,14 @@ jobs:
             {
               echo '### CMake build failed'
               echo '```text'
-              tail -n 120 "$RUNNER_TEMP/cmake-build.log"
+              tail -n 40 "$RUNNER_TEMP/cmake-build.log"
               echo '```'
             } >> "$GITHUB_STEP_SUMMARY"
+            while IFS= read -r line; do
+              line="${line//'%'/'%25'}"
+              line="${line//$'\r'/'%0D'}"
+              echo "::error title=CMake build output::$line"
+            done < <(tail -n 30 "$RUNNER_TEMP/cmake-build.log")
             exit 1
           fi
 
