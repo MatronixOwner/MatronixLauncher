@@ -19,7 +19,6 @@ jobs:
       packages: write
     with:
       build-type: Release
-      platform: all
 
   create_release:
     needs: build_release
