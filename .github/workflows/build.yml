@@ -72,7 +72,7 @@ permissions: {}
 jobs:
   build:
     name: Build (${{ matrix.artifact-name }})
-    if: ${{ inputs.platform == 'all' || inputs.platform == '' || matrix.platform == inputs.platform }}
+    if: ${{ (github.event_name != 'workflow_dispatch' && github.event_name != 'workflow_call') || inputs.platform == 'all' || matrix.platform == inputs.platform }}
 
     environment: ${{ inputs.environment || '' }}
 
