@@ -115,19 +115,16 @@
     const menu = document.querySelector("#main-nav");
     if (!button || !menu) return;
 
-    const icon = button.querySelector("use");
     const closeMenu = () => {
       button.setAttribute("aria-expanded", "false");
       button.setAttribute("aria-label", "Открыть меню");
       menu.classList.remove("is-open");
-      if (icon) icon.setAttribute("href", "assets/lucide-icons.svg#menu");
     };
     button.addEventListener("click", () => {
       const open = button.getAttribute("aria-expanded") !== "true";
       button.setAttribute("aria-expanded", String(open));
       button.setAttribute("aria-label", open ? "Закрыть меню" : "Открыть меню");
       menu.classList.toggle("is-open", open);
-      if (icon) icon.setAttribute("href", `assets/lucide-icons.svg#${open ? "x" : "menu"}`);
     });
     menu.addEventListener("click", event => {
       if (event.target.closest("a")) closeMenu();

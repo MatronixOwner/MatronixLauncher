@@ -8,7 +8,7 @@ This is a static, dependency-free landing page. GitHub Pages serves the files in
 - The update history is generated from published GitHub release notes. The FAQ and support link clarify the current Windows installer, Ely.by login, Modrinth-only mod source, unsigned installer warning, and issue reporting.
 - The launcher preview on the page is an interactive design mockup, not a screenshot of a running build. No authentic launcher screenshots are checked into this repository.
 - The cat gallery switches the mockup artwork client-side; its image files live in `assets/`. Project cards link to public MatronixOwner GitHub repositories.
-- UI pictograms in `assets/lucide-icons.svg` are based on the [Lucide icon set](https://github.com/lucide-icons/lucide), licensed under ISC; the site has no external runtime dependency.
+- UI pictograms are inline SVGs based on the [Lucide icon set](https://github.com/lucide-icons/lucide), licensed under ISC; the site has no external runtime dependency.
 - A custom domain is optional. If one is added, its owner must keep the domain registration renewed; the default GitHub Pages address does not require a domain purchase.
 - In repository **Settings → Pages**, set **Build and deployment → Source** to **GitHub Actions**. Later updates to this directory deploy automatically.
 
