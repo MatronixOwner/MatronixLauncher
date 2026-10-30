@@ -8,8 +8,6 @@
     const installLinks = [...document.querySelectorAll("[data-download]")];
     const releaseLinks = [...document.querySelectorAll("[data-release]")];
     const versionLabels = [...document.querySelectorAll("[data-version]")];
-    const checksum = document.querySelector("[data-checksum]");
-    const checksumBox = document.querySelector("[data-checksum-box]");
     const updateList = document.querySelector("[data-update-list]");
 
     try {
@@ -30,15 +28,6 @@
       releaseLinks.forEach(link => { link.href = latest.html_url; });
       versionLabels.forEach(label => { label.textContent = latest.tag_name; });
 
-      const digest = installer.digest?.match(/^sha256:([a-f0-9]{64})$/i)?.[1];
-      if (checksum && checksumBox) {
-        if (digest) {
-          checksum.textContent = digest.toLowerCase();
-          checksumBox.hidden = false;
-        } else {
-          checksumBox.hidden = true;
-        }
-      }
       renderReleaseHistory(releases, updateList);
     } catch (error) {
       // Keep the known-good release URL in the page if the API is unavailable.
@@ -92,35 +81,6 @@
     container.replaceChildren(fragment);
   }
 
-  function enableChecksumCopy() {
-    const button = document.querySelector("[data-copy-checksum]");
-    const checksum = document.querySelector("[data-checksum]");
-    const status = document.querySelector("[data-copy-status]");
-    if (!button || !checksum || !status) return;
-
-    button.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(checksum.textContent.trim());
-      } catch {
-        const helper = document.createElement("textarea");
-        helper.value = checksum.textContent.trim();
-        helper.setAttribute("readonly", "");
-        helper.style.position = "fixed";
-        helper.style.opacity = "0";
-        document.body.append(helper);
-        helper.select();
-        const copied = document.execCommand("copy");
-        helper.remove();
-        if (!copied) {
-          status.textContent = "Не удалось скопировать";
-          return;
-        }
-      }
-      status.textContent = "Скопировано";
-      window.setTimeout(() => { status.textContent = ""; }, 2200);
-    });
-  }
-
   function enableCatPreview() {
     const buttons = [...document.querySelectorAll("[data-cat-src]")];
     const previewImage = document.querySelector("[data-cat-preview-image]");
@@ -147,6 +107,36 @@
         selectedName.textContent = button.dataset.catName;
         buttons.forEach(item => item.setAttribute("aria-pressed", String(item === button)));
       });
+    });
+  }
+
+  function enableMobileMenu() {
+    const button = document.querySelector(".menu-toggle");
+    const menu = document.querySelector("#main-nav");
+    if (!button || !menu) return;
+
+    const icon = button.querySelector("use");
+    const closeMenu = () => {
+      button.setAttribute("aria-expanded", "false");
+      button.setAttribute("aria-label", "Открыть меню");
+      menu.classList.remove("is-open");
+      if (icon) icon.setAttribute("href", "assets/lucide-icons.svg#menu");
+    };
+    button.addEventListener("click", () => {
+      const open = button.getAttribute("aria-expanded") !== "true";
+      button.setAttribute("aria-expanded", String(open));
+      button.setAttribute("aria-label", open ? "Закрыть меню" : "Открыть меню");
+      menu.classList.toggle("is-open", open);
+      if (icon) icon.setAttribute("href", `assets/lucide-icons.svg#${open ? "x" : "menu"}`);
+    });
+    menu.addEventListener("click", event => {
+      if (event.target.closest("a")) closeMenu();
+    });
+    document.addEventListener("click", event => {
+      if (!menu.contains(event.target) && !button.contains(event.target)) closeMenu();
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeMenu();
     });
   }
 
@@ -177,6 +167,6 @@
 
   refreshReleaseLinks();
   enableCatPreview();
-  enableChecksumCopy();
+  enableMobileMenu();
   enableScrollReveals();
 })();
