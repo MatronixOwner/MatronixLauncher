@@ -153,18 +153,22 @@ jobs:
       - name: Run build
         run: |
           set -o pipefail
-          if ! cmake --build --preset "$CMAKE_PRESET" --config "$BUILD_TYPE" 2>&1 | tee "$RUNNER_TEMP/cmake-build.log"; then
+          build_jobs=4
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            build_jobs=2
+          fi
+          if ! cmake --build --preset "$CMAKE_PRESET" --config "$BUILD_TYPE" --parallel "$build_jobs" 2>&1 | tee "$RUNNER_TEMP/cmake-build.log"; then
             {
               echo '### CMake build failed'
               echo '```text'
-              tail -n 40 "$RUNNER_TEMP/cmake-build.log"
+              tail -n 100 "$RUNNER_TEMP/cmake-build.log"
               echo '```'
             } >> "$GITHUB_STEP_SUMMARY"
-            while IFS= read -r line; do
-              line="${line//'%'/'%25'}"
-              line="${line//$'\r'/'%0D'}"
-              echo "::error title=CMake build output::$line"
-            done < <(tail -n 30 "$RUNNER_TEMP/cmake-build.log")
+            diagnostics="$(tail -n 80 "$RUNNER_TEMP/cmake-build.log")"
+            diagnostics="${diagnostics//'%'/'%25'}"
+            diagnostics="${diagnostics//$'\r'/'%0D'}"
+            diagnostics="${diagnostics//$'\n'/'%0A'}"
+            echo "::error title=CMake build output::$diagnostics"
             exit 1
           fi
 
