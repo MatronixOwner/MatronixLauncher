@@ -145,7 +145,7 @@
       return;
 
     const animated = document.querySelectorAll(
-      ".section-heading, .feature-card, .cats-copy, .launcher-preview-wrap, .cat-tile, .project-card, .all-projects-link, .download-copy, .download-side, .release-card, .faq-item, .support-card, .about-copy, .about-details"
+      ".section-heading, .feature-card, .cats-copy, .hero-preview, .cat-tile, .project-card, .all-projects-link, .download-copy, .download-side, .release-card, .faq-item, .support-card, .about-copy, .about-details"
     );
     if (!animated.length) return;
 

@@ -41,33 +41,46 @@
     <section class="hero section-wrap">
       <div class="hero-copy">
         <div class="eyebrow"><span class="status-dot"></span> Лаунчер для Minecraft Java</div>
-        <h1>Твой Minecraft.<br><span>Твои правила.</span></h1>
-        <p class="hero-lead">Удобно запускай разные сборки, входи через Ely.by и находи моды в Modrinth — всё в одном месте.</p>
+        <div class="hero-brand-lockup">
+          <span class="hero-brand-mark"><img src="assets/prism-shards.svg" alt=""></span>
+          <h1>Matronix<span>PrismLauncher</span></h1>
+        </div>
+        <p class="hero-lead">Твой Minecraft — твои правила. Управляй сборками, входи через Ely.by и находи моды на Modrinth.</p>
         <div class="hero-actions">
           <a class="button button-primary" href="https://github.com/MatronixOwner/MatronixLauncher/releases/download/v0.1.0-alpha.10/MatronixPrismLauncher-Setup.exe" data-download>
             <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#download"/></svg>
             <span><strong>Скачать для Windows</strong><small>Установщик · <span data-version>v0.1.0-alpha.10</span></small></span>
           </a>
-          <a class="button button-secondary" href="https://github.com/MatronixOwner/MatronixLauncher" target="_blank" rel="noreferrer">
-            Смотреть проект <span aria-hidden="true">↗</span>
-          </a>
+          <a class="button button-secondary" href="https://github.com/MatronixOwner/MatronixLauncher" target="_blank" rel="noreferrer">Проект на GitHub <span aria-hidden="true">↗</span></a>
         </div>
         <div class="hero-note"><span class="windows-icon">⊞</span> Windows · Бесплатно · Открытый исходный код</div>
       </div>
-
-      <div class="hero-art" aria-label="Персонаж Teawie из встроенных тем лаунчера">
-        <div class="art-orbit art-orbit--one"></div>
-        <div class="art-orbit art-orbit--two"></div>
-        <div class="art-star art-star--one">✦</div>
-        <div class="art-star art-star--two">✧</div>
-        <div class="mascot-card">
-          <div class="mascot-card-top"><span>ТВОЁ ПРОСТРАНСТВО</span><span class="tiny-pill">MPL</span></div>
-          <img src="assets/teawie.png" alt="Teawie — один из персонажей встроенных оформлений лаунчера">
-          <div class="mascot-caption"><span class="caption-dot"></span> Собери свой игровой мир</div>
+        <div class="hero-preview">
+          <div class="launcher-mockup" aria-label="Интерактивный макет окна лаунчера">
+            <div class="mockup-titlebar">
+              <span class="mockup-app-mark">✦</span>
+              <span>MatronixPrismLauncher</span>
+              <span class="mockup-window-controls" aria-hidden="true">−　□　×</span>
+            </div>
+            <div class="mockup-body">
+              <aside class="mockup-sidebar" aria-hidden="true">
+                <div class="mockup-side-label">БИБЛИОТЕКА</div>
+                <div class="mockup-nav-item mockup-nav-item--active"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#layers"/></svg><span>Сборки</span></div>
+                <div class="mockup-nav-item"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#user-round"/></svg><span>Аккаунты</span></div>
+                <div class="mockup-nav-item"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#settings"/></svg><span>Настройки</span></div>
+                <div class="mockup-side-bottom">Matronix · Alpha</div>
+              </aside>
+              <div class="mockup-main">
+                <div class="mockup-cat-art"><img data-cat-preview-image src="assets/kitteh.png" alt="Kitteh на фоне предпросмотра лаунчера"></div>
+                <div class="mockup-main-head"><div><small>МОЯ БИБЛИОТЕКА</small><strong>Сборки</strong></div><span class="mockup-new">＋ Новая</span></div>
+                <div class="mockup-instance mockup-instance--selected"><span class="mockup-instance-icon">✦</span><span><b>Мой мир</b><small>Minecraft · Fabric</small></span><i>v1.21</i></div>
+                <div class="mockup-instance"><span class="mockup-instance-icon mockup-instance-icon--green">▧</span><span><b>Тихая долина</b><small>Minecraft · Vanilla</small></span><i>v1.20</i></div>
+                <div class="mockup-launch"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#gamepad-2"/></svg><span>Запустить Minecraft</span></div>
+              </div>
+            </div>
+          </div>
+          <p class="mockup-note">Интерактивный макет интерфейса, не скриншот собранного приложения.</p>
         </div>
-        <div class="floating-chip chip-modrinth"><span class="chip-icon chip-icon--green">M</span><span><b>Modrinth</b><small>моды и сборки</small></span></div>
-        <div class="floating-chip chip-ely"><span class="chip-icon chip-icon--violet">✦</span><span><b>Ely.by</b><small>вход в аккаунт</small></span></div>
-      </div>
       <a class="scroll-cue" href="#features"><span></span> Листай вниз</a>
     </section>
 
@@ -119,36 +132,11 @@
         <div class="cats-copy">
           <div class="eyebrow eyebrow-muted">Интерактивный предпросмотр</div>
           <h2>Выбери кота<br>для <span>своего мира.</span></h2>
-          <p>Нажми на карточку, чтобы примерить фон в окне лаунчера. В настройках можно импортировать и собственное изображение.</p>
+          <p>Выбранный кот появится в интерактивном макете выше. В настройках лаунчера можно использовать и собственное изображение.</p>
           <div class="selected-cat-line">Сейчас выбран <strong id="selected-cat-name" aria-live="polite">Kitteh</strong></div>
           <a class="text-link" href="https://github.com/MatronixOwner/MatronixLauncher" target="_blank" rel="noreferrer">Посмотреть проект <span aria-hidden="true">→</span></a>
         </div>
-        <div class="launcher-preview-wrap">
-          <div class="launcher-mockup" aria-label="Интерактивный макет окна лаунчера">
-            <div class="mockup-titlebar">
-              <span class="mockup-app-mark">✦</span>
-              <span>MatronixPrismLauncher</span>
-              <span class="mockup-window-controls" aria-hidden="true">−　□　×</span>
-            </div>
-            <div class="mockup-body">
-              <aside class="mockup-sidebar" aria-hidden="true">
-                <div class="mockup-side-label">БИБЛИОТЕКА</div>
-                <div class="mockup-nav-item mockup-nav-item--active"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#layers"/></svg><span>Сборки</span></div>
-                <div class="mockup-nav-item"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#user-round"/></svg><span>Аккаунты</span></div>
-                <div class="mockup-nav-item"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#settings"/></svg><span>Настройки</span></div>
-                <div class="mockup-side-bottom">Matronix · Alpha</div>
-              </aside>
-              <div class="mockup-main">
-                <div class="mockup-cat-art"><img data-cat-preview-image src="assets/kitteh.png" alt="Kitteh на фоне предпросмотра лаунчера"></div>
-                <div class="mockup-main-head"><div><small>МОЯ БИБЛИОТЕКА</small><strong>Сборки</strong></div><span class="mockup-new">＋ Новая</span></div>
-                <div class="mockup-instance mockup-instance--selected"><span class="mockup-instance-icon">✦</span><span><b>Мой мир</b><small>Minecraft · Fabric</small></span><i>v1.21</i></div>
-                <div class="mockup-instance"><span class="mockup-instance-icon mockup-instance-icon--green">▧</span><span><b>Тихая долина</b><small>Minecraft · Vanilla</small></span><i>v1.20</i></div>
-                <div class="mockup-launch"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#gamepad-2"/></svg><span>Запустить Minecraft</span></div>
-              </div>
-            </div>
-          </div>
-          <p class="mockup-note">Интерактивный макет интерфейса, не скриншот собранного приложения.</p>
-        </div>
+
         <div class="cat-gallery" role="group" aria-label="Выбрать одного из семи котов">
           <button class="cat-tile cat-tile--kitteh" type="button" data-cat-name="Kitteh" data-cat-src="assets/kitteh.png" aria-pressed="true" aria-label="Показать Kitteh">
             <img src="assets/kitteh.png" alt=""><span class="cat-label">Kitteh</span>
