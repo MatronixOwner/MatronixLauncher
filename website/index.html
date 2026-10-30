@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101016">
-  <meta name="description" content="MatronixPrismLauncher — лаунчер Minecraft Java с входом Ely.by, управлением версиями и модами из Modrinth.">
-  <meta property="og:title" content="MatronixPrismLauncher — Minecraft по-твоему">
-  <meta property="og:description" content="Управляй версиями Minecraft Java, входи через Ely.by и собирай моды из Modrinth.">
+  <meta name="theme-color" content="#0b0c0d">
+  <meta name="description" content="MatronixPrismLauncher — лаунчер Minecraft Java с поддержкой Ely.by, Modrinth и оформления котами.">
+  <meta property="og:title" content="MatronixPrismLauncher">
+  <meta property="og:description" content="Твои сборки Minecraft Java — в одном месте.">
   <meta property="og:type" content="website">
   <title>MatronixPrismLauncher — Minecraft по-твоему</title>
   <link rel="icon" href="assets/prism-shards.svg" type="image/svg+xml">
@@ -14,9 +14,6 @@
   <script src="app.js" defer></script>
 </head>
 <body>
-  <div class="page-glow page-glow--top" aria-hidden="true"></div>
-  <div class="page-glow page-glow--bottom" aria-hidden="true"></div>
-
   <header class="site-header">
     <a class="brand" href="#top" aria-label="MatronixPrismLauncher — на главную">
       <span class="brand-mark"><img src="assets/prism-shards.svg" alt=""></span>
@@ -24,297 +21,166 @@
     </a>
     <nav class="main-nav" id="main-nav" aria-label="Основная навигация">
       <a href="#features">Возможности</a>
-      <a href="#cats">Оформление</a>
-      <a href="#updates">Обновления</a>
+      <a href="#appearance">Оформление</a>
+      <a href="#releases">Загрузки</a>
+      <a href="#projects">Проекты</a>
       <a href="#faq">Помощь</a>
-      <a href="#about">О проекте</a>
     </nav>
     <div class="header-actions">
       <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="main-nav">
-        <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#menu"/></svg>
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#menu"/></svg>
       </button>
-      <a class="header-download" href="#download">Скачать <span aria-hidden="true">↗</span></a>
+      <a class="header-download" href="#releases"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#download"/></svg><span>Скачать</span></a>
     </div>
   </header>
 
   <main id="top">
-    <section class="hero section-wrap">
-      <div class="hero-copy">
-        <div class="eyebrow"><span class="status-dot"></span> Лаунчер для Minecraft Java</div>
-        <div class="hero-brand-lockup">
-          <span class="hero-brand-mark"><img src="assets/prism-shards.svg" alt=""></span>
-          <h1>Matronix<span>PrismLauncher</span></h1>
-        </div>
-        <p class="hero-lead">Твой Minecraft — твои правила. Управляй сборками, входи через Ely.by и находи моды на Modrinth.</p>
-        <div class="hero-actions">
-          <a class="button button-primary" href="https://github.com/MatronixOwner/MatronixLauncher/releases/download/v0.1.0-alpha.10/MatronixPrismLauncher-Setup.exe" data-download>
-            <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#download"/></svg>
-            <span><strong>Скачать для Windows</strong><small>Установщик · <span data-version>v0.1.0-alpha.10</span></small></span>
-          </a>
-          <a class="button button-secondary" href="https://github.com/MatronixOwner/MatronixLauncher" target="_blank" rel="noreferrer">Проект на GitHub <span aria-hidden="true">↗</span></a>
-        </div>
-        <div class="hero-note"><span class="windows-icon">⊞</span> Windows · Бесплатно · Открытый исходный код</div>
+    <section class="hero">
+      <p class="eyebrow"><span class="status-dot"></span> Лаунчер для Minecraft Java</p>
+      <div class="hero-title-lockup">
+        <img class="hero-logo" src="assets/prism-shards.svg" alt="">
+        <h1>Matronix<span>PrismLauncher</span></h1>
       </div>
-        <div class="hero-preview">
-          <div class="launcher-mockup" aria-label="Интерактивный макет окна лаунчера">
-            <div class="mockup-titlebar">
-              <span class="mockup-app-mark">✦</span>
-              <span>MatronixPrismLauncher</span>
-              <span class="mockup-window-controls" aria-hidden="true">−　□　×</span>
-            </div>
-            <div class="mockup-body">
-              <aside class="mockup-sidebar" aria-hidden="true">
-                <div class="mockup-side-label">БИБЛИОТЕКА</div>
-                <div class="mockup-nav-item mockup-nav-item--active"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#layers"/></svg><span>Сборки</span></div>
-                <div class="mockup-nav-item"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#user-round"/></svg><span>Аккаунты</span></div>
-                <div class="mockup-nav-item"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#settings"/></svg><span>Настройки</span></div>
-                <div class="mockup-side-bottom">Matronix · Alpha</div>
-              </aside>
-              <div class="mockup-main">
-                <div class="mockup-cat-art"><img data-cat-preview-image src="assets/kitteh.png" alt="Kitteh на фоне предпросмотра лаунчера"></div>
-                <div class="mockup-main-head"><div><small>МОЯ БИБЛИОТЕКА</small><strong>Сборки</strong></div><span class="mockup-new">＋ Новая</span></div>
-                <div class="mockup-instance mockup-instance--selected"><span class="mockup-instance-icon">✦</span><span><b>Мой мир</b><small>Minecraft · Fabric</small></span><i>v1.21</i></div>
-                <div class="mockup-instance"><span class="mockup-instance-icon mockup-instance-icon--green">▧</span><span><b>Тихая долина</b><small>Minecraft · Vanilla</small></span><i>v1.20</i></div>
-                <div class="mockup-launch"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#gamepad-2"/></svg><span>Запустить Minecraft</span></div>
-              </div>
-            </div>
+      <p class="hero-lead">Сборки и версии Minecraft — в одном месте.<br class="desktop-break"> Моды из Modrinth, вход через Ely.by и своё оформление.</p>
+      <div class="hero-actions">
+        <a class="button button-primary" href="https://github.com/MatronixOwner/MatronixLauncher/releases/download/v0.1.0-alpha.10/MatronixPrismLauncher-Setup.exe" data-download>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#download"/></svg>
+          <span><strong>Скачать для Windows</strong><small>Установщик · <span data-version>v0.1.0-alpha.10</span></small></span>
+        </a>
+        <a class="button button-quiet" href="https://github.com/MatronixOwner/MatronixLauncher" target="_blank" rel="noreferrer">Открытый исходный код <svg class="icon icon-small" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#arrow-up-right"/></svg></a>
+      </div>
+
+      <div class="launcher-preview" aria-label="Демонстрационный макет интерфейса лаунчера">
+        <div class="launcher-window">
+          <div class="window-titlebar">
+            <span class="window-brand"><img src="assets/prism-shards.svg" alt=""><span>MatronixPrismLauncher</span></span>
+            <span class="window-titlebar-center">МОИ СБОРКИ</span>
+            <span class="window-controls" aria-hidden="true"><i></i><i></i><i></i></span>
           </div>
-          <p class="mockup-note">Интерактивный макет интерфейса, не скриншот собранного приложения.</p>
+          <div class="window-layout">
+            <aside class="app-sidebar" aria-label="Навигация макета">
+              <span class="sidebar-caption">БИБЛИОТЕКА</span>
+              <div class="sidebar-item sidebar-item--active"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#layers"/></svg><span>Сборки</span><b>8</b></div>
+              <div class="sidebar-item"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#user-round"/></svg><span>Аккаунты</span></div>
+              <div class="sidebar-item"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#settings"/></svg><span>Настройки</span></div>
+              <div class="sidebar-bottom"><span class="online-dot"></span> Matronix · Preview</div>
+            </aside>
+            <div class="app-content">
+              <div class="app-toolbar">
+                <div><span class="toolbar-kicker">ВАША БИБЛИОТЕКА</span><h2>Все сборки</h2></div>
+                <span class="toolbar-button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#plus"/></svg> Новая сборка</span>
+              </div>
+              <div class="instance-grid" aria-hidden="true">
+                <article class="instance-card instance-card--selected"><span class="instance-symbol">M</span><strong>Мой мир</strong><small>Minecraft · Fabric</small><span class="instance-version">1.21.4</span></article>
+                <article class="instance-card"><span class="instance-symbol">V</span><strong>Vanilla</strong><small>Обычная игра</small><span class="instance-version">1.21.1</span></article>
+                <article class="instance-card"><span class="instance-symbol">F</span><strong>Тихая долина</strong><small>Minecraft · Forge</small><span class="instance-version">1.20.6</span></article>
+                <article class="instance-card"><span class="instance-symbol">+</span><strong>Новая сборка</strong><small>Создай свой профиль</small><span class="instance-version">Добавить</span></article>
+              </div>
+              <div class="app-statusbar"><span><i></i> Готов к запуску</span><span>Java · 64-bit</span></div>
+            </div>
+            <aside class="instance-detail">
+              <div class="detail-art"><img data-cat-preview-image src="assets/kitteh.png" alt="Kitteh — выбранный персонаж макета"></div>
+              <span class="detail-kicker">ВЫБРАННЫЙ ПРОФИЛЬ</span>
+              <strong>Мой мир</strong>
+              <span class="detail-meta">Fabric · 1.21.4</span>
+              <div class="launch-button" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><use href="assets/lucide-icons.svg#gamepad-2"/></svg> Запустить</div>
+            </aside>
+          </div>
         </div>
+        <p class="mockup-note"><svg class="icon icon-small" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#info"/></svg> Демонстрационный макет — не скриншот собранного приложения</p>
+      </div>
       <a class="scroll-cue" href="#features"><span></span> Листай вниз</a>
     </section>
 
-    <section class="trust-strip" aria-label="Ключевые особенности">
-      <div class="trust-item"><span class="trust-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#layers"/></svg></span><span>Твои сборки<br><b>под рукой</b></span></div>
-      <div class="trust-divider"></div>
-      <div class="trust-item"><span class="trust-icon trust-icon--green"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#blocks"/></svg></span><span>Моды из<br><b>Modrinth</b></span></div>
-      <div class="trust-divider"></div>
-      <div class="trust-item"><span class="trust-icon trust-icon--peach"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#user-round"/></svg></span><span>Вход через<br><b>Ely.by</b></span></div>
-      <div class="trust-divider"></div>
-      <div class="trust-item"><span class="trust-icon trust-icon--pink"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#cat"/></svg></span><span>Свой вид<br><b>и настроение</b></span></div>
+    <section class="quick-facts" aria-label="Ключевые особенности">
+      <div><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#layers"/></svg><span>Сборки и версии</span></div>
+      <div><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#blocks"/></svg><span>Моды из Modrinth</span></div>
+      <div><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#user-round"/></svg><span>Вход Ely.by</span></div>
+      <div><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#cat"/></svg><span>Свои изображения</span></div>
     </section>
 
-    <section class="features section-wrap" id="features">
+    <section class="section section-wrap" id="features">
       <div class="section-heading">
-        <div>
-          <div class="eyebrow eyebrow-muted">Всё важное — рядом</div>
-          <h2>Меньше возни.<br><span>Больше игры.</span></h2>
-        </div>
-        <p>Создан на основе открытого кода Prism Launcher и настроен для простого старта в Minecraft Java.</p>
+        <div><span class="section-kicker">ПОНЯТНО И УДОБНО</span><h2>Меньше настроек.<br><span>Больше игры.</span></h2></div>
+        <p>Всё для запуска Minecraft Java собрано в аккуратном, знакомом интерфейсе.</p>
       </div>
       <div class="feature-grid">
-        <article class="feature-card feature-card--versions">
-          <div class="feature-icon icon-lilac"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#layers"/></svg></div>
-          <div class="feature-kicker">Сборки и версии</div>
-          <h3>Каждому миру —<br>свой запуск</h3>
-          <p>Разделяй игровые профили и запускай Minecraft с нужной версией и загрузчиком.</p>
-          <div class="mini-stack" aria-hidden="true"><span>Vanilla</span><span>Fabric</span><span>Forge</span></div>
-        </article>
-        <article class="feature-card feature-card--mods">
-          <div class="feature-icon icon-green"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#blocks"/></svg></div>
-          <div class="feature-kicker">Моды и контент</div>
-          <h3>Ищи новое<br>в Modrinth</h3>
-          <p>Каталог модов и поддерживаемый источник загрузок — Modrinth.</p>
-          <div class="source-label"><span></span> Один понятный источник</div>
-        </article>
-        <article class="feature-card feature-card--account">
-          <div class="feature-icon icon-peach"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#user-round"/></svg></div>
-          <div class="feature-kicker">Аккаунт</div>
-          <h3>Вход через<br>Ely.by</h3>
-          <p>Подключай поддерживаемый аккаунт Ely.by и продолжай играть со своим профилем.</p>
-          <div class="secure-label"><span>↗</span> Авторизация Ely.by</div>
-        </article>
+        <article class="feature-card"><span class="feature-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#layers"/></svg></span><span class="feature-kicker">ПРОФИЛИ</span><h3>Отдельный мир<br>для каждой сборки</h3><p>Храни игровые версии и настройки раздельно — нужный профиль всегда под рукой.</p></article>
+        <article class="feature-card"><span class="feature-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#blocks"/></svg></span><span class="feature-kicker">КАТАЛОГ МОДОВ</span><h3>Открывай новое<br>в Modrinth</h3><p>Ищи и загружай моды из Modrinth — единственного поддерживаемого источника.</p></article>
+        <article class="feature-card"><span class="feature-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#shield-check"/></svg></span><span class="feature-kicker">АККАУНТ</span><h3>Вход через<br>Ely.by</h3><p>Подключай поддерживаемый аккаунт Ely.by и запускай игру со своим профилем.</p></article>
       </div>
     </section>
 
-    <section class="cats-section section-wrap" id="cats">
-      <div class="cats-panel">
-        <div class="cats-copy">
-          <div class="eyebrow eyebrow-muted">Интерактивный предпросмотр</div>
-          <h2>Выбери кота<br>для <span>своего мира.</span></h2>
-          <p>Выбранный кот появится в интерактивном макете выше. В настройках лаунчера можно использовать и собственное изображение.</p>
-          <div class="selected-cat-line">Сейчас выбран <strong id="selected-cat-name" aria-live="polite">Kitteh</strong></div>
-          <a class="text-link" href="https://github.com/MatronixOwner/MatronixLauncher" target="_blank" rel="noreferrer">Посмотреть проект <span aria-hidden="true">→</span></a>
+    <section class="section section-wrap appearance-section" id="appearance">
+      <div class="appearance-panel">
+        <div class="appearance-copy">
+          <span class="section-kicker">ТВОЙ ВЫБОР</span>
+          <h2>Добавь миру<br><span>свой характер.</span></h2>
+          <p>Выбери кота — его изображение появится в макете лаунчера выше. В самом приложении можно добавить собственную картинку.</p>
+          <div class="selected-cat-line">Выбран: <strong id="selected-cat-name" aria-live="polite">Kitteh</strong></div>
         </div>
-
-        <div class="cat-gallery" role="group" aria-label="Выбрать одного из семи котов">
-          <button class="cat-tile cat-tile--kitteh" type="button" data-cat-name="Kitteh" data-cat-src="assets/kitteh.png" aria-pressed="true" aria-label="Показать Kitteh">
-            <img src="assets/kitteh.png" alt=""><span class="cat-label">Kitteh</span>
-          </button>
-          <button class="cat-tile cat-tile--rory" type="button" data-cat-name="Rory" data-cat-src="assets/rory.png" aria-pressed="false" aria-label="Показать Rory">
-            <img src="assets/rory.png" alt=""><span class="cat-label">Rory</span>
-          </button>
-          <button class="cat-tile cat-tile--flat" type="button" data-cat-name="Rory Flat" data-cat-src="assets/rory-flat.png" aria-pressed="false" aria-label="Показать Rory Flat">
-            <img src="assets/rory-flat.png" alt=""><span class="cat-label">Rory Flat</span>
-          </button>
-          <button class="cat-tile cat-tile--teawie" type="button" data-cat-name="Teawie" data-cat-src="assets/teawie.png" aria-pressed="false" aria-label="Показать Teawie">
-            <img src="assets/teawie.png" alt=""><span class="cat-label">Teawie</span>
-          </button>
-          <button class="cat-tile cat-tile--tabby" type="button" data-cat-name="Азиатская табби" data-cat-src="assets/asian-tabby.png" aria-pressed="false" aria-label="Показать азиатскую табби">
-            <img src="assets/asian-tabby.png" alt=""><span class="cat-label">Табби</span>
-          </button>
-          <button class="cat-tile cat-tile--toyger" type="button" data-cat-name="Тойгер" data-cat-src="assets/toyger.png" aria-pressed="false" aria-label="Показать тойгера">
-            <img src="assets/toyger.png" alt=""><span class="cat-label">Тойгер</span>
-          </button>
-          <button class="cat-tile cat-tile--exotic" type="button" data-cat-name="Экзотическая короткошёрстная" data-cat-src="assets/exotic-shorthair.png" aria-pressed="false" aria-label="Показать экзотическую короткошёрстную">
-            <img src="assets/exotic-shorthair.png" alt=""><span class="cat-label">Экзот</span>
-          </button>
+        <div class="cat-gallery" role="group" aria-label="Выбрать персонажа для макета">
+          <button class="cat-tile" type="button" data-cat-name="Kitteh" data-cat-src="assets/kitteh.png" aria-pressed="true" aria-label="Показать Kitteh"><img src="assets/kitteh.png" alt=""><span>Kitteh</span></button>
+          <button class="cat-tile" type="button" data-cat-name="Rory" data-cat-src="assets/rory.png" aria-pressed="false" aria-label="Показать Rory"><img src="assets/rory.png" alt=""><span>Rory</span></button>
+          <button class="cat-tile" type="button" data-cat-name="Rory Flat" data-cat-src="assets/rory-flat.png" aria-pressed="false" aria-label="Показать Rory Flat"><img src="assets/rory-flat.png" alt=""><span>Rory Flat</span></button>
+          <button class="cat-tile" type="button" data-cat-name="Teawie" data-cat-src="assets/teawie.png" aria-pressed="false" aria-label="Показать Teawie"><img src="assets/teawie.png" alt=""><span>Teawie</span></button>
+          <button class="cat-tile" type="button" data-cat-name="Азиатская табби" data-cat-src="assets/asian-tabby.png" aria-pressed="false" aria-label="Показать азиатскую табби"><img src="assets/asian-tabby.png" alt=""><span>Табби</span></button>
+          <button class="cat-tile" type="button" data-cat-name="Тойгер" data-cat-src="assets/toyger.png" aria-pressed="false" aria-label="Показать тойгера"><img src="assets/toyger.png" alt=""><span>Тойгер</span></button>
+          <button class="cat-tile" type="button" data-cat-name="Экзот" data-cat-src="assets/exotic-shorthair.png" aria-pressed="false" aria-label="Показать экзотическую короткошёрстную"><img src="assets/exotic-shorthair.png" alt=""><span>Экзот</span></button>
         </div>
       </div>
     </section>
 
-    <section class="download-section section-wrap" id="download">
+    <section class="section section-wrap" id="releases">
       <div class="download-panel">
-        <div class="download-decoration" aria-hidden="true"><div></div><div></div><div></div></div>
         <div class="download-copy">
-          <div class="eyebrow"><span class="status-dot"></span> Начни с одного файла</div>
-          <h2>Готов к<br><span>новому миру?</span></h2>
-          <p>Скачай установщик MatronixPrismLauncher для Windows. Версия и ссылка обновляются с выходом новых релизов.</p>
-          <a class="button button-primary button-large" href="https://github.com/MatronixOwner/MatronixLauncher/releases/download/v0.1.0-alpha.10/MatronixPrismLauncher-Setup.exe" data-download>
-            <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#download"/></svg>
+          <span class="section-kicker">ТЕКУЩАЯ ВЕРСИЯ</span>
+          <h2>Начни своё<br><span>приключение.</span></h2>
+          <p>Предварительная версия для Windows. Установщик распространяется через официальный GitHub Releases.</p>
+          <a class="button button-primary" href="https://github.com/MatronixOwner/MatronixLauncher/releases/download/v0.1.0-alpha.10/MatronixPrismLauncher-Setup.exe" data-download>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#download"/></svg>
             <span><strong>Скачать установщик</strong><small>Windows · <span data-version>v0.1.0-alpha.10</span></small></span>
           </a>
-          <a class="release-link" data-release href="https://github.com/MatronixOwner/MatronixLauncher/releases/tag/v0.1.0-alpha.10" target="_blank" rel="noreferrer">Релиз и заметки <span aria-hidden="true">↗</span></a>
+          <a class="release-link" data-release href="https://github.com/MatronixOwner/MatronixLauncher/releases/tag/v0.1.0-alpha.10" target="_blank" rel="noreferrer">Заметки к релизу <svg class="icon icon-small" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#arrow-up-right"/></svg></a>
         </div>
-        <div class="download-side">
-          <div class="download-art"><img src="assets/prism-shards.svg" alt="" aria-hidden="true"><span class="download-ring download-ring--one"></span><span class="download-ring download-ring--two"></span></div>
-          <div class="version-card"><span class="version-card-label">ТЕКУЩИЙ РЕЛИЗ</span><b data-version>v0.1.0-alpha.10</b><span class="alpha-badge"><i></i> Предварительная версия</span></div>
-        </div>
+        <div class="download-version"><span class="version-mark"><img src="assets/prism-shards.svg" alt=""></span><span class="version-label">АКТУАЛЬНЫЙ РЕЛИЗ</span><strong data-version>v0.1.0-alpha.10</strong><span class="version-status"><i></i> Preview</span></div>
       </div>
-      <p class="download-caveat">Это предварительная версия: возможны ошибки. Установщик распространяется через GitHub Releases.</p>
-    </section>
-
-    <section class="updates-section section-wrap" id="updates">
-      <div class="section-heading">
-        <div>
-          <div class="eyebrow eyebrow-muted"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#clock-arrow-up"/></svg> Свежие релизы</div>
-          <h2>Что <span>изменилось.</span></h2>
-        </div>
-        <p>Последние версии и краткие заметки берутся из GitHub Releases. Полный список доступен в репозитории.</p>
-      </div>
+      <div class="release-heading"><div><span class="section-kicker">ИСТОРИЯ ИЗМЕНЕНИЙ</span><h3>Последние обновления</h3></div><a href="https://github.com/MatronixOwner/MatronixLauncher/releases" target="_blank" rel="noreferrer">Все релизы <svg class="icon icon-small" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#arrow-up-right"/></svg></a></div>
       <div class="release-list" data-update-list aria-live="polite">
-        <article class="release-card">
-          <div class="release-card-top"><strong>MatronixPrismLauncher v0.1.0-alpha.10</strong><time datetime="2026-10-30">30 окт. 2026 г.</time></div>
-          <p>Обновлены интерфейс лаунчера и установщик, вход Ely.by, Modrinth и набор котов. Подробности — в заметках релиза.</p>
-          <a href="https://github.com/MatronixOwner/MatronixLauncher/releases/tag/v0.1.0-alpha.10" target="_blank" rel="noreferrer">Полные заметки релиза <span aria-hidden="true">↗</span></a>
-        </article>
-      </div>
-      <a class="all-releases-link" href="https://github.com/MatronixOwner/MatronixLauncher/releases" target="_blank" rel="noreferrer">Все релизы на GitHub <span aria-hidden="true">↗</span></a>
-    </section>
-
-    <section class="about section-wrap" id="about">
-      <div class="about-copy">
-        <div class="eyebrow eyebrow-muted">Независимый проект</div>
-        <h2>Открытый код.<br><span>Своя атмосфера.</span></h2>
-      </div>
-      <div class="about-details">
-        <p>MatronixPrismLauncher основан на открытом коде лаунчера и развивается как самостоятельный проект. Он не связан с Mojang, Microsoft, Prism Launcher или Ely.by.</p>
-        <a class="button button-outline" href="https://github.com/MatronixOwner/MatronixLauncher" target="_blank" rel="noreferrer">Код и обновления на GitHub <span aria-hidden="true">↗</span></a>
-        <article class="creator-card">
-          <div class="creator-avatar" aria-hidden="true">MO</div>
-          <div class="creator-copy">
-            <span class="creator-label">Создатель лаунчера</span>
-            <strong>MatronixOwner</strong>
-            <span class="creator-subtitle">Разработчик многих проектов</span>
-          </div>
-          <div class="creator-links">
-            <a href="https://github.com/MatronixOwner" target="_blank" rel="me noreferrer">Профиль <span aria-hidden="true">↗</span></a>
-            <a href="https://github.com/MatronixOwner?tab=repositories" target="_blank" rel="noreferrer">Проекты <span aria-hidden="true">↗</span></a>
-          </div>
-        </article>
+        <article class="release-card"><div class="release-card-top"><strong>MatronixPrismLauncher v0.1.0-alpha.10</strong><time datetime="2026-10-30">30 окт. 2026 г.</time></div><p>Обновлены оформление, Ely.by, Modrinth и набор встроенных персонажей.</p><a href="https://github.com/MatronixOwner/MatronixLauncher/releases/tag/v0.1.0-alpha.10" target="_blank" rel="noreferrer">Подробнее о версии <svg class="icon icon-small" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#arrow-up-right"/></svg></a></article>
       </div>
     </section>
 
-    <section class="projects-section section-wrap" id="projects">
-      <div class="section-heading">
-        <div>
-          <div class="eyebrow eyebrow-muted">Другие проекты</div>
-          <h2>Ещё от <span>MatronixOwner.</span></h2>
-        </div>
-        <p>Лаунчер — только один из проектов автора. Открой репозиторий, чтобы посмотреть подробности и исходный код.</p>
-      </div>
+    <section class="section section-wrap" id="projects">
+      <div class="section-heading"><div><span class="section-kicker">ОТКРЫТЫЙ КОД</span><h2>Проекты<br><span>MatronixOwner.</span></h2></div><p>Посмотри исходный код лаунчера и другие проекты автора на GitHub.</p></div>
       <div class="projects-grid">
-        <a class="project-card" href="https://github.com/MatronixOwner/Matronix_Browser" target="_blank" rel="noreferrer">
-          <span class="project-mark project-mark--violet">MB</span><span class="project-info"><strong>Matronix_Browser</strong><small>Python · браузерный проект</small></span><span class="project-arrow">↗</span>
-        </a>
-        <a class="project-card" href="https://github.com/MatronixOwner/YoroOS" target="_blank" rel="noreferrer">
-          <span class="project-mark project-mark--green">YO</span><span class="project-info"><strong>YoroOS</strong><small>Проект на GitHub</small></span><span class="project-arrow">↗</span>
-        </a>
-        <a class="project-card" href="https://github.com/MatronixOwner/EroDist" target="_blank" rel="noreferrer">
-          <span class="project-mark project-mark--peach">ED</span><span class="project-info"><strong>EroDist</strong><small>Проект на GitHub</small></span><span class="project-arrow">↗</span>
-        </a>
-        <a class="project-card" href="https://github.com/MatronixOwner/OnlyUnlocker" target="_blank" rel="noreferrer">
-          <span class="project-mark project-mark--pink">OU</span><span class="project-info"><strong>OnlyUnlocker</strong><small>Проект на GitHub</small></span><span class="project-arrow">↗</span>
-        </a>
-        <a class="project-card" href="https://github.com/MatronixOwner/Matronix" target="_blank" rel="noreferrer">
-          <span class="project-mark project-mark--blue">M</span><span class="project-info"><strong>Matronix</strong><small>Проект на GitHub</small></span><span class="project-arrow">↗</span>
-        </a>
-        <a class="project-card" href="https://github.com/MatronixOwner/MatronixLauncher" target="_blank" rel="noreferrer">
-          <span class="project-mark project-mark--lilac">MP</span><span class="project-info"><strong>MatronixPrismLauncher</strong><small>Лаунчер Minecraft Java</small></span><span class="project-arrow">↗</span>
-        </a>
+        <a class="project-card" href="https://github.com/MatronixOwner/MatronixLauncher" target="_blank" rel="noreferrer"><span class="project-mark">MP</span><span><strong>MatronixPrismLauncher</strong><small>Лаунчер Minecraft Java</small></span><svg class="icon project-arrow" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#arrow-up-right"/></svg></a>
+        <a class="project-card" href="https://github.com/MatronixOwner/Matronix_Browser" target="_blank" rel="noreferrer"><span class="project-mark">MB</span><span><strong>Matronix_Browser</strong><small>Python · браузерный проект</small></span><svg class="icon project-arrow" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#arrow-up-right"/></svg></a>
+        <a class="project-card" href="https://github.com/MatronixOwner/YoroOS" target="_blank" rel="noreferrer"><span class="project-mark">YO</span><span><strong>YoroOS</strong><small>Проект на GitHub</small></span><svg class="icon project-arrow" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#arrow-up-right"/></svg></a>
+        <a class="project-card" href="https://github.com/MatronixOwner/EroDist" target="_blank" rel="noreferrer"><span class="project-mark">ED</span><span><strong>EroDist</strong><small>Проект на GitHub</small></span><svg class="icon project-arrow" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#arrow-up-right"/></svg></a>
+        <a class="project-card" href="https://github.com/MatronixOwner/OnlyUnlocker" target="_blank" rel="noreferrer"><span class="project-mark">OU</span><span><strong>OnlyUnlocker</strong><small>Проект на GitHub</small></span><svg class="icon project-arrow" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#arrow-up-right"/></svg></a>
+        <a class="project-card" href="https://github.com/MatronixOwner/Matronix" target="_blank" rel="noreferrer"><span class="project-mark">M</span><span><strong>Matronix</strong><small>Проект на GitHub</small></span><svg class="icon project-arrow" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#arrow-up-right"/></svg></a>
       </div>
-      <a class="all-projects-link" href="https://github.com/MatronixOwner?tab=repositories" target="_blank" rel="noreferrer">Все репозитории MatronixOwner <span aria-hidden="true">↗</span></a>
     </section>
 
-    <section class="faq-section section-wrap" id="faq">
-      <div class="section-heading">
-        <div>
-          <div class="eyebrow eyebrow-muted"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#circle-question-mark"/></svg> Помощь и поддержка</div>
-          <h2>Частые <span>вопросы.</span></h2>
-        </div>
-        <p>Короткие ответы про установку, аккаунт и моды.</p>
-      </div>
+    <section class="section section-wrap" id="faq">
+      <div class="section-heading"><div><span class="section-kicker">ЕСТЬ ВОПРОСЫ?</span><h2>Коротко<br><span>об основном.</span></h2></div><p>Важная информация об установщике и возможностях лаунчера.</p></div>
       <div class="faq-list">
-        <details class="faq-item">
-          <summary>Для каких систем есть установщик?</summary>
-          <p>Сейчас на сайте опубликован установщик для Windows. Пакеты для других операционных систем здесь не заявлены.</p>
-        </details>
-        <details class="faq-item">
-          <summary>Какие аккаунты поддерживаются?</summary>
-          <p>Вход в лаунчере поддерживает Ely.by. Не отправляй пароль или секреты аккаунта в обращениях поддержки; авторизуйся только в окне входа самого лаунчера или на официальном сайте сервиса.</p>
-        </details>
-        <details class="faq-item">
-          <summary>Откуда загружаются моды?</summary>
-          <p>Каталог и загрузка модов в MatronixPrismLauncher используют Modrinth. Другие источники модов лаунчер не использует.</p>
-        </details>
-        <details class="faq-item">
-          <summary>Windows показывает предупреждение при запуске установщика — что делать?</summary>
-          <p>Текущий установщик не подписан сертификатом издателя, поэтому Windows может показать предупреждение SmartScreen. Скачивай его только со страницы официального GitHub Releases. Само предупреждение не является проверкой безопасности файла — всегда проверяй, что ссылка ведёт на репозиторий MatronixOwner.</p>
-        </details>
-        <details class="faq-item">
-          <summary>Лаунчер включает саму игру?</summary>
-          <p>Нет. Установщик лаунчера не содержит Minecraft. Для доступа к игре и аккаунту действуют условия соответствующих сервисов.</p>
-        </details>
+        <details class="faq-item"><summary>Для какой системы есть установщик?</summary><p>Сейчас на сайте размещён установщик для Windows. Пакеты для других систем не заявлены.</p></details>
+        <details class="faq-item"><summary>Какие аккаунты поддерживаются?</summary><p>Вход в лаунчере поддерживает Ely.by. Не отправляй пароли и секреты аккаунта в обращения поддержки.</p></details>
+        <details class="faq-item"><summary>Откуда загружаются моды?</summary><p>Каталог и загрузка модов используют Modrinth — другие источники модов лаунчер не использует.</p></details>
+        <details class="faq-item"><summary>Почему Windows предупреждает об установщике?</summary><p>Текущий установщик не подписан сертификатом издателя. Скачивай его только со страницы официального GitHub Releases. Такое предупреждение не является проверкой безопасности файла.</p></details>
+        <details class="faq-item"><summary>Лаунчер включает Minecraft?</summary><p>Нет. Установщик лаунчера не содержит Minecraft. Для доступа к игре и аккаунту действуют условия соответствующих сервисов.</p></details>
       </div>
-      <aside class="support-card">
-        <div><strong>Не нашли ответ?</strong><p>Сообщите об ошибке или задайте вопрос в репозитории проекта. Не прикладывай пароли, токены или личные данные.</p></div>
-        <a class="button button-outline" href="https://github.com/MatronixOwner/MatronixLauncher/issues/new?template=bug_report.yml" target="_blank" rel="noreferrer"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#bug"/></svg> Сообщить об ошибке <span aria-hidden="true">↗</span></a>
-      </aside>
+      <aside class="support-panel"><div><strong>Нашёл ошибку?</strong><p>Напиши о ней в GitHub Issues. Не прикладывай пароли, токены и личные данные.</p></div><a class="button button-secondary" href="https://github.com/MatronixOwner/MatronixLauncher/issues/new?template=bug_report.yml" target="_blank" rel="noreferrer"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#bug"/></svg> Сообщить об ошибке <svg class="icon icon-small" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/lucide-icons.svg#arrow-up-right"/></svg></a></aside>
     </section>
   </main>
 
   <footer class="site-footer">
-    <div class="footer-top">
-      <a class="brand brand-footer" href="#top">
-        <span class="brand-mark"><img src="assets/prism-shards.svg" alt=""></span>
-        <span class="brand-name">Matronix<span>PrismLauncher</span></span>
-      </a>
-      <span class="footer-note">Сделано для тех, кто любит свой Minecraft.</span>
-      <a class="back-top" href="#top">Наверх ↑</a>
-    </div>
-    <div class="footer-bottom">
-      <p>Лаунчер: GPL-3.0-only · графика: см. атрибуцию в репозитории.</p>
-      <p>Создатель: <a href="https://github.com/MatronixOwner" target="_blank" rel="me noreferrer">MatronixOwner</a>.</p>
-      <p>MatronixPrismLauncher не является официальным продуктом Mojang или Microsoft.</p>
-    </div>
-    <details class="art-credits">
-      <summary>Атрибуция изображений персонажей</summary>
-      <p>Kitteh — MultiMC; Rory и Rory Flat — Rory ID 11, рисунок Ashtaka; Teawie — SympathyTea, CC BY-SA 4.0 (<a href="https://commons.wikimedia.org/wiki/File:Teawie.png" target="_blank" rel="noreferrer">источник</a>). Азиатская табби — фото Matt Buck, отделение фона YukiKoKo; тойгер и экзотическая короткошёрстная — Heikki Siltala / catza.net, отделение фона YukiKoKo. Три фотографии из Wikimedia Commons распространяются по <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="license noreferrer">CC BY-SA 4.0</a>: <a href="https://commons.wikimedia.org/wiki/File:Asian_tabby_cat_transparent.png" target="_blank" rel="noreferrer">Asian tabby</a>, <a href="https://commons.wikimedia.org/wiki/File:Toyger_cat_transparent.png" target="_blank" rel="noreferrer">Toyger</a>, <a href="https://commons.wikimedia.org/wiki/File:Exotic_cat_transparent.png" target="_blank" rel="noreferrer">Exotic cat</a>.</p>
-    </details>
-    <details class="art-credits">
-      <summary>Источник интерфейсных иконок</summary>
-      <p>SVG-иконки основаны на наборе <a href="https://github.com/lucide-icons/lucide" target="_blank" rel="noreferrer">Lucide</a> и распространяются по лицензии <a href="https://github.com/lucide-icons/lucide/blob/main/LICENSE" target="_blank" rel="license noreferrer">ISC</a>.</p>
-    </details>
+    <a class="brand" href="#top"><span class="brand-mark"><img src="assets/prism-shards.svg" alt=""></span><span class="brand-name">Matronix<span>PrismLauncher</span></span></a>
+    <p>Независимый проект MatronixOwner · <a href="https://github.com/MatronixOwner" target="_blank" rel="me noreferrer">GitHub</a></p>
+    <details class="credits"><summary>Лицензии и атрибуция</summary><p>Лаунчер: GPL-3.0-only. UI-иконки: <a href="https://github.com/lucide-icons/lucide" target="_blank" rel="noreferrer">Lucide, ISC</a>. Kitteh — MultiMC; Rory и Rory Flat — Rory ID 11, рисунок Ashtaka; Teawie — SympathyTea, CC BY-SA 4.0; Asian Tabby — Matt Buck, Toyger и Exotic — Heikki Siltala / catza.net; отделение фона — YukiKoKo. Источники и атрибуция CC BY-SA 4.0: <a href="https://commons.wikimedia.org/wiki/File:Asian_tabby_cat_transparent.png" target="_blank" rel="noreferrer">Asian tabby</a>, <a href="https://commons.wikimedia.org/wiki/File:Toyger_cat_transparent.png" target="_blank" rel="noreferrer">Toyger</a>, <a href="https://commons.wikimedia.org/wiki/File:Exotic_cat_transparent.png" target="_blank" rel="noreferrer">Exotic cat</a>.</p></details>
+    <span class="footer-legal">MatronixPrismLauncher не является официальным продуктом Mojang или Microsoft.</span>
   </footer>
 </body>
 </html>
