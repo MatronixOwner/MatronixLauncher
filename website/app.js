@@ -8,6 +8,9 @@
     const installLinks = [...document.querySelectorAll("[data-download]")];
     const releaseLinks = [...document.querySelectorAll("[data-release]")];
     const versionLabels = [...document.querySelectorAll("[data-version]")];
+    const checksum = document.querySelector("[data-checksum]");
+    const checksumBox = document.querySelector("[data-checksum-box]");
+    const updateList = document.querySelector("[data-update-list]");
 
     try {
       const response = await fetch(`https://api.github.com/repos/${repository}/releases?per_page=20`, {
@@ -26,6 +29,17 @@
       installLinks.forEach(link => { link.href = installer.browser_download_url; });
       releaseLinks.forEach(link => { link.href = latest.html_url; });
       versionLabels.forEach(label => { label.textContent = latest.tag_name; });
+
+      const digest = installer.digest?.match(/^sha256:([a-f0-9]{64})$/i)?.[1];
+      if (checksum && checksumBox) {
+        if (digest) {
+          checksum.textContent = digest.toLowerCase();
+          checksumBox.hidden = false;
+        } else {
+          checksumBox.hidden = true;
+        }
+      }
+      renderReleaseHistory(releases, updateList);
     } catch (error) {
       // Keep the known-good release URL in the page if the API is unavailable.
       installLinks.forEach(link => { link.href = fallbackInstaller; });
@@ -33,6 +47,78 @@
       versionLabels.forEach(label => { label.textContent = fallbackVersion; });
       console.info("Using the fallback installer link.", error);
     }
+  }
+
+  function renderReleaseHistory(releases, container) {
+    if (!container) return;
+    const published = releases.filter(release => !release.draft).slice(0, 3);
+    if (!published.length) return;
+
+    const fragment = document.createDocumentFragment();
+    published.forEach(release => {
+      const card = document.createElement("article");
+      card.className = "release-card";
+
+      const header = document.createElement("div");
+      header.className = "release-card-top";
+      const title = document.createElement("strong");
+      title.textContent = release.name || release.tag_name;
+      const date = document.createElement("time");
+      const publishedAt = new Date(release.published_at || release.created_at);
+      if (!Number.isNaN(publishedAt.getTime())) {
+        date.dateTime = publishedAt.toISOString().slice(0, 10);
+        date.textContent = new Intl.DateTimeFormat("ru-RU", { dateStyle: "medium" }).format(publishedAt);
+      }
+      header.append(title, date);
+
+      const summary = document.createElement("p");
+      const plainNotes = (release.body || "Подробности изменений — в заметках релиза.")
+        .replace(/\s+/g, " ")
+        .trim();
+      summary.textContent = plainNotes.length > 260 ? `${plainNotes.slice(0, 257)}…` : plainNotes;
+
+      const link = document.createElement("a");
+      link.href = release.html_url;
+      link.target = "_blank";
+      link.rel = "noreferrer";
+      link.append(document.createTextNode("Полные заметки релиза "));
+      const arrow = document.createElement("span");
+      arrow.setAttribute("aria-hidden", "true");
+      arrow.textContent = "↗";
+      link.append(arrow);
+      card.append(header, summary, link);
+      fragment.append(card);
+    });
+    container.replaceChildren(fragment);
+  }
+
+  function enableChecksumCopy() {
+    const button = document.querySelector("[data-copy-checksum]");
+    const checksum = document.querySelector("[data-checksum]");
+    const status = document.querySelector("[data-copy-status]");
+    if (!button || !checksum || !status) return;
+
+    button.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(checksum.textContent.trim());
+      } catch {
+        const helper = document.createElement("textarea");
+        helper.value = checksum.textContent.trim();
+        helper.setAttribute("readonly", "");
+        helper.style.position = "fixed";
+        helper.style.opacity = "0";
+        document.body.append(helper);
+        helper.select();
+        const copied = document.execCommand("copy");
+        helper.remove();
+        if (!copied) {
+          status.textContent = "Не удалось скопировать";
+          return;
+        }
+      }
+      status.textContent = "Скопировано";
+      window.setTimeout(() => { status.textContent = ""; }, 2200);
+    });
   }
 
   function enableCatPreview() {
@@ -69,7 +155,7 @@
       return;
 
     const animated = document.querySelectorAll(
-      ".section-heading, .feature-card, .cats-copy, .launcher-preview-wrap, .cat-tile, .project-card, .all-projects-link, .download-copy, .download-side, .about-copy, .about-details"
+      ".section-heading, .feature-card, .cats-copy, .launcher-preview-wrap, .cat-tile, .project-card, .all-projects-link, .download-copy, .download-side, .release-card, .faq-item, .support-card, .about-copy, .about-details"
     );
     if (!animated.length) return;
 
@@ -91,5 +177,6 @@
 
   refreshReleaseLinks();
   enableCatPreview();
+  enableChecksumCopy();
   enableScrollReveals();
 })();

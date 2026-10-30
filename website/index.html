@@ -25,8 +25,9 @@
     <nav class="main-nav" aria-label="Основная навигация">
       <a href="#features">Возможности</a>
       <a href="#cats">Оформление</a>
+      <a href="#updates">Обновления</a>
+      <a href="#faq">Помощь</a>
       <a href="#about">О проекте</a>
-      <a href="#projects">Проекты автора</a>
     </nav>
     <a class="header-download" href="#download">Скачать <span aria-hidden="true">↗</span></a>
   </header>
@@ -181,6 +182,11 @@
             <span><strong>Скачать установщик</strong><small>Windows · <span data-version>v0.1.0-alpha.10</span></small></span>
           </a>
           <a class="release-link" data-release href="https://github.com/MatronixOwner/MatronixLauncher/releases/tag/v0.1.0-alpha.10" target="_blank" rel="noreferrer">Релиз и заметки <span aria-hidden="true">↗</span></a>
+          <div class="checksum-box" data-checksum-box>
+            <div><span class="checksum-label">SHA-256 установщика</span><code data-checksum>710aebfe63a40d7d3b88645ab7f6ab36155c8f586403e537e6e3d31fcc4358e2</code></div>
+            <button type="button" class="copy-checksum" data-copy-checksum aria-label="Скопировать SHA-256">Копировать</button>
+            <span class="copy-status" data-copy-status aria-live="polite"></span>
+          </div>
         </div>
         <div class="download-side">
           <div class="download-art"><img src="assets/prism-shards.svg" alt="" aria-hidden="true"><span class="download-ring download-ring--one"></span><span class="download-ring download-ring--two"></span></div>
@@ -188,6 +194,24 @@
         </div>
       </div>
       <p class="download-caveat">Это предварительная версия: возможны ошибки. Установщик распространяется через GitHub Releases.</p>
+    </section>
+
+    <section class="updates-section section-wrap" id="updates">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow eyebrow-muted">Свежие релизы</div>
+          <h2>Что <span>изменилось.</span></h2>
+        </div>
+        <p>Последние версии и краткие заметки берутся из GitHub Releases. Полный список доступен в репозитории.</p>
+      </div>
+      <div class="release-list" data-update-list aria-live="polite">
+        <article class="release-card">
+          <div class="release-card-top"><strong>MatronixPrismLauncher v0.1.0-alpha.10</strong><time datetime="2026-10-30">30 окт. 2026 г.</time></div>
+          <p>Обновлены интерфейс лаунчера и установщик, вход Ely.by, Modrinth и набор котов. Подробности — в заметках релиза.</p>
+          <a href="https://github.com/MatronixOwner/MatronixLauncher/releases/tag/v0.1.0-alpha.10" target="_blank" rel="noreferrer">Полные заметки релиза <span aria-hidden="true">↗</span></a>
+        </article>
+      </div>
+      <a class="all-releases-link" href="https://github.com/MatronixOwner/MatronixLauncher/releases" target="_blank" rel="noreferrer">Все релизы на GitHub <span aria-hidden="true">↗</span></a>
     </section>
 
     <section class="about section-wrap" id="about">
@@ -242,6 +266,42 @@
         </a>
       </div>
       <a class="all-projects-link" href="https://github.com/MatronixOwner?tab=repositories" target="_blank" rel="noreferrer">Все репозитории MatronixOwner <span aria-hidden="true">↗</span></a>
+    </section>
+
+    <section class="faq-section section-wrap" id="faq">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow eyebrow-muted">Помощь и поддержка</div>
+          <h2>Частые <span>вопросы.</span></h2>
+        </div>
+        <p>Короткие ответы про установку, аккаунт и моды.</p>
+      </div>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>Для каких систем есть установщик?</summary>
+          <p>Сейчас на сайте опубликован установщик для Windows. Пакеты для других операционных систем здесь не заявлены.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Какие аккаунты поддерживаются?</summary>
+          <p>Вход в лаунчере поддерживает Ely.by. Не отправляй пароль или секреты аккаунта в обращениях поддержки; авторизуйся только в окне входа самого лаунчера или на официальном сайте сервиса.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Откуда загружаются моды?</summary>
+          <p>Каталог и загрузка модов в MatronixPrismLauncher используют Modrinth. Другие источники модов лаунчер не использует.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Windows показывает предупреждение при запуске установщика — что делать?</summary>
+          <p>Текущий установщик не подписан сертификатом издателя, поэтому Windows может показать предупреждение SmartScreen. Скачивай его только из официального GitHub Releases и при необходимости сравни SHA-256 на этой странице. Контрольная сумма помогает проверить целостность файла, но сама по себе не является гарантией безопасности.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Лаунчер включает саму игру?</summary>
+          <p>Нет. Установщик лаунчера не содержит Minecraft. Для доступа к игре и аккаунту действуют условия соответствующих сервисов.</p>
+        </details>
+      </div>
+      <aside class="support-card">
+        <div><strong>Не нашли ответ?</strong><p>Сообщите об ошибке или задайте вопрос в репозитории проекта. Не прикладывай пароли, токены или личные данные.</p></div>
+        <a class="button button-outline" href="https://github.com/MatronixOwner/MatronixLauncher/issues/new?template=bug_report.yml" target="_blank" rel="noreferrer">Сообщить об ошибке <span aria-hidden="true">↗</span></a>
+      </aside>
     </section>
   </main>
 

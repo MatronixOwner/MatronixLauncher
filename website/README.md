@@ -4,7 +4,8 @@ This is a static, dependency-free landing page. GitHub Pages serves the files in
 
 - Intended URL: <https://matronixowner.github.io/MatronixLauncher/>
 - Hosting: GitHub Pages (free for this public repository; no web server or database to keep running).
-- The download buttons query the public GitHub Releases API for the newest release with `MatronixPrismLauncher-Setup.exe`. A pinned installer URL is kept as a fallback.
+- The download buttons query the public GitHub Releases API for the newest release with `MatronixPrismLauncher-Setup.exe`. A pinned installer URL and SHA-256 are kept as fallbacks; when GitHub exposes an asset digest, it updates the displayed checksum automatically.
+- The update history is generated from published GitHub release notes. The FAQ and support link clarify the current Windows installer, Ely.by login, Modrinth-only mod source, unsigned installer warning, and issue reporting.
 - The launcher preview on the page is an interactive design mockup, not a screenshot of a running build. No authentic launcher screenshots are checked into this repository.
 - The cat gallery switches the mockup artwork client-side; its image files live in `assets/`. Project cards link to public MatronixOwner GitHub repositories.
 - A custom domain is optional. If one is added, its owner must keep the domain registration renewed; the default GitHub Pages address does not require a domain purchase.
