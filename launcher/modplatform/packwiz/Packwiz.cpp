@@ -84,17 +84,6 @@ auto stringEntry(toml::table table, const QString& entryName) -> QString
     return node->value_or("");
 }
 
-auto intEntry(toml::table table, const QString& entryName) -> int
-{
-    auto* node = table.get(StringUtils::toStdString(entryName));
-    if (!node) {
-        qDebug() << "Failed to read int property '" + entryName + "' in mod metadata.";
-        return {};
-    }
-
-    return node->value_or(0);
-}
-
 bool sortMCVersions(const QString& a, const QString& b)
 {
     auto cmp = Version(a) <=> Version(b);

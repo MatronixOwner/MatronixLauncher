@@ -164,6 +164,13 @@ jobs:
               tail -n 100 "$RUNNER_TEMP/cmake-build.log"
               echo '```'
             } >> "$GITHUB_STEP_SUMMARY"
+            diagnostics="$(grep -E 'error:|fatal error:|undefined reference|ninja: build stopped' "$RUNNER_TEMP/cmake-build.log" | tail -n 10 || true)"
+            if [[ -n "$diagnostics" ]]; then
+              diagnostics="${diagnostics//'%'/'%25'}"
+              diagnostics="${diagnostics//$'\\r'/'%0D'}"
+              diagnostics="${diagnostics//$'\\n'/'%0A'}"
+              echo "::error title=Compiler diagnostics::$diagnostics"
+            fi
             diagnostics="$(tail -n 20 "$RUNNER_TEMP/cmake-build.log")"
             diagnostics="${diagnostics//'%'/'%25'}"
             diagnostics="${diagnostics//$'\r'/'%0D'}"
