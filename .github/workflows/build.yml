@@ -58,16 +58,6 @@ on:
 permissions: {}
 
 jobs:
-  linux-runner-check:
-    name: Linux runner preflight
-    runs-on: ubuntu-24.04
-    permissions: {}
-    steps:
-      - name: Verify Linux runner
-        run: |
-          uname -a
-          echo "Linux runner ready"
-
   build:
     name: Build (${{ matrix.artifact-name }})
 
