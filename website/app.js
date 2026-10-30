@@ -35,12 +35,41 @@
     }
   }
 
+  function enableCatPreview() {
+    const buttons = [...document.querySelectorAll("[data-cat-src]")];
+    const previewImage = document.querySelector("[data-cat-preview-image]");
+    const selectedName = document.querySelector("#selected-cat-name");
+    if (!buttons.length || !previewImage || !selectedName) return;
+
+    let selection = 0;
+    buttons.forEach(button => {
+      button.addEventListener("click", () => {
+        const currentSelection = ++selection;
+        const nextImage = new Image();
+        previewImage.style.opacity = "0";
+        nextImage.onload = () => {
+          if (currentSelection !== selection) return;
+          previewImage.src = nextImage.src;
+          previewImage.alt = `${button.dataset.catName} на фоне предпросмотра лаунчера`;
+          previewImage.style.opacity = "1";
+        };
+        nextImage.onerror = () => {
+          if (currentSelection === selection) previewImage.style.opacity = "1";
+        };
+        nextImage.src = button.dataset.catSrc;
+
+        selectedName.textContent = button.dataset.catName;
+        buttons.forEach(item => item.setAttribute("aria-pressed", String(item === button)));
+      });
+    });
+  }
+
   function enableScrollReveals() {
     if (!("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches)
       return;
 
     const animated = document.querySelectorAll(
-      ".section-heading, .feature-card, .cats-copy, .cat-tile, .download-copy, .download-side, .about-copy, .about-details"
+      ".section-heading, .feature-card, .cats-copy, .launcher-preview-wrap, .cat-tile, .project-card, .all-projects-link, .download-copy, .download-side, .about-copy, .about-details"
     );
     if (!animated.length) return;
 
@@ -61,5 +90,6 @@
   }
 
   refreshReleaseLinks();
+  enableCatPreview();
   enableScrollReveals();
 })();
