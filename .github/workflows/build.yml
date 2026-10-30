@@ -125,14 +125,32 @@ jobs:
           MATRONIX_MSA_CLIENT_ID: ${{ vars.MATRONIX_MSA_CLIENT_ID || '' }}
           MATRONIX_IMGUR_CLIENT_ID: ${{ vars.MATRONIX_IMGUR_CLIENT_ID || '' }}
         run: |
-          cmake --preset "$CMAKE_PRESET" \
+          set -o pipefail
+          if ! cmake --preset "$CMAKE_PRESET" \
             -DLauncher_ELY_CLIENT_ID="$MATRONIX_ELY_CLIENT_ID" \
             -DLauncher_MSA_CLIENT_ID="$MATRONIX_MSA_CLIENT_ID" \
-            -DLauncher_IMGUR_CLIENT_ID="$MATRONIX_IMGUR_CLIENT_ID"
+            -DLauncher_IMGUR_CLIENT_ID="$MATRONIX_IMGUR_CLIENT_ID" 2>&1 | tee "$RUNNER_TEMP/cmake-configure.log"; then
+            {
+              echo '### CMake configure failed'
+              echo '```text'
+              tail -n 100 "$RUNNER_TEMP/cmake-configure.log"
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
 
       - name: Run build
         run: |
-          cmake --build --preset "$CMAKE_PRESET" --config "$BUILD_TYPE"
+          set -o pipefail
+          if ! cmake --build --preset "$CMAKE_PRESET" --config "$BUILD_TYPE" 2>&1 | tee "$RUNNER_TEMP/cmake-build.log"; then
+            {
+              echo '### CMake build failed'
+              echo '```text'
+              tail -n 120 "$RUNNER_TEMP/cmake-build.log"
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
 
       #- name: Run tests
       #  run: |

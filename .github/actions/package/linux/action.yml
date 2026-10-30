@@ -42,6 +42,8 @@ runs:
     - name: Setup build variables
       shell: bash
       run: |
+        set -Eeuo pipefail
+        trap 'status=$?; command=$BASH_COMMAND; line=$LINENO; { echo "### Linux package setup failed"; echo "Command: \`$command\` (line $line, exit $status)"; } >> "$GITHUB_STEP_SUMMARY"; exit "$status"' ERR
         # Fixup architecture naming for AppImages
         dpkg_arch="$(dpkg-architecture -q DEB_HOST_ARCH_CPU)"
         case "$dpkg_arch" in
@@ -70,6 +72,8 @@ runs:
 
         GPG_PRIVATE_KEY: ${{ inputs.gpg-private-key }}
       run: |
+        set -Eeuo pipefail
+        trap 'status=$?; command=$BASH_COMMAND; line=$LINENO; { echo "### Linux AppImage packaging failed"; echo "Command: \`$command\` (line $line, exit $status)"; } >> "$GITHUB_STEP_SUMMARY"; exit "$status"' ERR
         cmake --install ${{ env.BUILD_DIR }} --config ${{ inputs.build-type }} --prefix ${{ env.INSTALL_APPIMAGE_DIR }}
 
         if [ '${{ inputs.gpg-private-key-id }}' != '' ]; then
@@ -110,6 +114,7 @@ runs:
           --updateinformation "gh-releases-zsync|${{ github.repository_owner }}|${{ github.event.repository.name }}|latest|MatronixPrismLauncher-Linux-$APPIMAGE_ARCH.AppImage.zsync" \
           "$INSTALL_APPIMAGE_DIR" \
           "$APPIMAGE_DEST"
+        echo "AppImage created: $APPIMAGE_DEST" >> "$GITHUB_STEP_SUMMARY"
 
     - name: Package portable tarball
       shell: bash
@@ -118,6 +123,8 @@ runs:
 
         INSTALL_PORTABLE_DIR: install-portable
       run: |
+        set -Eeuo pipefail
+        trap 'status=$?; command=$BASH_COMMAND; line=$LINENO; { echo "### Linux portable packaging failed"; echo "Command: \`$command\` (line $line, exit $status)"; } >> "$GITHUB_STEP_SUMMARY"; exit "$status"' ERR
         cmake --install ${{ env.BUILD_DIR }} --config ${{ inputs.build-type }} --prefix ${{ env.INSTALL_PORTABLE_DIR }}
         cmake --install ${{ env.BUILD_DIR }} --config ${{ inputs.build-type }} --prefix ${{ env.INSTALL_PORTABLE_DIR }} --component portable
 

@@ -8,18 +8,23 @@ runs:
     - name: Install host dependencies
       shell: bash
       run: |
+        set -Eeuo pipefail
+        trap 'status=$?; command=$BASH_COMMAND; line=$LINENO; { echo "### Linux dependency setup failed"; echo "Command: \`$command\` (line $line, exit $status)"; } >> "$GITHUB_STEP_SUMMARY"; exit "$status"' ERR
         sudo apt-get -y update
         sudo apt-get -y install \
           dpkg-dev \
           ninja-build extra-cmake-modules pkg-config scdoc \
           cmark gamemode-dev libarchive-dev libcmark-dev libqrencode-dev zlib1g-dev \
           libxcb-cursor-dev libtomlplusplus-dev
+        echo 'Linux system dependencies installed.' >> "$GITHUB_STEP_SUMMARY"
 
     - name: Setup AppImage tooling
       shell: bash
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
+        set -Eeuo pipefail
+        trap 'status=$?; command=$BASH_COMMAND; line=$LINENO; { echo "### AppImage tooling setup failed"; echo "Command: \`$command\` (line $line, exit $status)"; } >> "$GITHUB_STEP_SUMMARY"; exit "$status"' ERR
         # Determinate AppImage architecture to use
         dpkg_arch="$(dpkg-architecture -q DEB_HOST_ARCH_CPU)"
         case "$dpkg_arch" in
@@ -52,3 +57,4 @@ runs:
           --output ~/bin/AppImageUpdate.AppImage
         chmod +x ~/bin/*
         echo "$HOME/bin" >> "$GITHUB_PATH"
+        echo 'AppImage tools installed.' >> "$GITHUB_STEP_SUMMARY"
