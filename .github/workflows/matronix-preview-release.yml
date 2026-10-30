@@ -1,4 +1,4 @@
-name: Publish MatronixPrismLauncher preview installer
+name: Publish MatronixPrismLauncher preview builds
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions: {}
 
 jobs:
   build_release:
-    name: Build Windows installer
+    name: Build Windows and Linux packages
     uses: ./.github/workflows/build.yml
     permissions:
       contents: read
@@ -37,7 +37,31 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           pattern: MatronixPrismLauncher-Windows-MSVC-Setup-*
+          path: dist/windows
           merge-multiple: true
+
+      - name: Download Linux AppImage artifact
+        uses: actions/download-artifact@v8
+        with:
+          pattern: MatronixPrismLauncher-Linux-*-Release-x86_64.AppImage
+          path: dist/linux/appimage
+          merge-multiple: true
+
+      - name: Download Linux portable artifact
+        uses: actions/download-artifact@v8
+        with:
+          pattern: MatronixPrismLauncher-Linux-Qt6-Portable-*-Release
+          path: dist/linux/portable
+          merge-multiple: true
+
+      - name: Prepare release assets
+        shell: bash
+        run: |
+          cp dist/windows/MatronixPrismLauncher-Setup.exe .
+          cp dist/linux/appimage/MatronixPrismLauncher-Linux-*-Release-x86_64.AppImage \
+            MatronixPrismLauncher-Linux-x86_64.AppImage
+          cp dist/linux/portable/MatronixPrismLauncher-portable.tar.gz \
+            MatronixPrismLauncher-Linux-portable.tar.gz
 
       - name: Publish public preview release
         uses: softprops/action-gh-release@v3
@@ -54,7 +78,11 @@ jobs:
             - Ely.by OAuth uses the MatronixPrismLauncher Client ID and has clearer configuration errors.
             - Mod discovery and downloads use Modrinth only; the built-in collection now includes seven selectable cats with proper Wikimedia Commons attribution.
             - Appearance settings now support importing personal cat images, adjusting background opacity, and dimming the background for readability.
-            - The installer is unsigned and may trigger a Windows SmartScreen warning.
+            - Linux builds are provided as an AppImage and a portable tarball; the AppImage uses XDG desktop portals for desktop integration, including KDE Plasma.
+            - The Windows installer is unsigned and may trigger a Windows SmartScreen warning.
           draft: false
           prerelease: true
-          files: MatronixPrismLauncher-Setup.exe
+          files: |
+            MatronixPrismLauncher-Setup.exe
+            MatronixPrismLauncher-Linux-x86_64.AppImage
+            MatronixPrismLauncher-Linux-portable.tar.gz

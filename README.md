@@ -5,7 +5,7 @@ MatronixPrismLauncher is a Minecraft launcher project. Its initial implementatio
 ## Current direction
 
 - Keep the upstream instance management, Minecraft version support, and vanilla/mod-loader launch flow as the technical foundation.
-- Build a MatronixPrismLauncher-branded Windows installer (`MatronixPrismLauncher-Setup.exe`) from CI on code pushes, and publish verified builds as GitHub releases.
+- Build a MatronixPrismLauncher-branded Windows installer (`MatronixPrismLauncher-Setup.exe`) and Linux AppImage/portable packages from CI. Linux AppImage packaging uses XDG desktop portals for desktop integration, including KDE Plasma.
 - Host an animated, near-black product website on GitHub Pages at `https://matronixowner.github.io/MatronixLauncher/`; it points to the newest published Windows installer and credits creator [MatronixOwner](https://github.com/MatronixOwner).
 - Keep the original cat backgrounds, add three CC BY-SA 4.0 Wikimedia Commons cats, and allow users to import their own image packs.
 - Improve the UI and customization; mod discovery, downloads, and managed updates are Modrinth-only.

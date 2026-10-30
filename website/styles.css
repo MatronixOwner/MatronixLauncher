@@ -48,6 +48,9 @@ h1 span { display: block; color: #aeb0b3; }
 .button-arrow { margin-left: 3px; font-size: 17px; }
 .release-note { margin: 12px 0 0; color: var(--soft); font-size: 11px; }
 .release-note a { color: #bfc0c2; text-decoration: underline; text-decoration-color: #58595d; text-underline-offset: 3px; }
+.linux-install-link { margin: -4px 0 0; font-size: 11px; }
+.linux-install-link a { color: #c3f4da; text-decoration: underline; text-decoration-color: #47725b; text-underline-offset: 3px; transition: color .18s ease; }
+.linux-install-link a:hover { color: white; }
 
 .modrinth-card { min-height: 128px; display: grid; grid-template-columns: 62px 1fr auto; align-items: center; gap: 20px; padding: 22px 25px; border: 1px solid #393a3e; border-radius: 2px; color: #171819; background: #efefed; animation: enter .65s .08s both; }
 .modrinth-logo-link { width: 58px; height: 58px; display: grid; place-items: center; border-radius: 2px; background: white; transition: transform .2s ease; }
@@ -104,6 +107,8 @@ h1 span { display: block; color: #aeb0b3; }
 .platform-heading > p { margin: 0; color: #95969a; font-size: 11px; }
 .platform-row { display: flex; flex-wrap: wrap; gap: 9px; }
 .platform-chip { min-width: 150px; min-height: 51px; display: inline-flex; align-items: center; gap: 9px; padding: 9px 12px; border: 1px solid #333439; border-radius: 2px; color: #e6e6e5; background: #191a1d; }
+.platform-link { cursor: pointer; transition: border-color .18s ease, background .18s ease, transform .18s ease; }
+.platform-link:hover { transform: translateY(-2px); border-color: #6a6c70; background: #222326; }
 .platform-chip svg { width: 20px; height: 20px; fill: currentColor; }
 .platform-chip > span { font-size: 11px; font-weight: 700; }
 .platform-chip b { margin-left: auto; color: #a7a8ac; font-size: 9px; font-weight: 500; }
@@ -125,6 +130,7 @@ h1 span { display: block; color: #aeb0b3; }
   .hero-icon-wrap { width: 78px; height: 78px; }
 
   .hero-copy { max-width: 280px; font-size: 13px; line-height: 1.55; }
+  .linux-install-link { font-size: 10px; }
   .install-button { width: 100%; justify-content: center; padding: 0 12px; font-size: 12px; }
   .modrinth-card { grid-template-columns: 48px 1fr; gap: 13px; padding: 16px; }
   .modrinth-logo-link { width: 48px; height: 48px; }
