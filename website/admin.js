@@ -126,7 +126,7 @@
     const fallback = byId("config-copy-fallback");
     try {
       await navigator.clipboard.writeText(payload);
-      showToast(actionTab ? "JSON скопирован. В GitHub Actions вставь его в поле site_config_json и запусти публикацию сайта." : "JSON скопирован. Разреши всплывающие окна и открой workflow site-admin в GitHub.");
+      showToast(actionTab ? "JSON скопирован. В GitHub Actions выбери ветку arena/1e9c3b0a-matronixlauncher, вставь JSON в site_config_json и запусти публикацию." : "JSON скопирован. Разреши всплывающие окна и открой workflow site-admin в GitHub.");
     } catch (_) {
       fallback.hidden = false;
       fallback.value = payload;
