@@ -64,8 +64,13 @@
 #include <QMainWindow>
 #include <QMenu>
 #include <QMenuBar>
+#include <QComboBox>
+#include <QEasingCurve>
+#include <QGraphicsOpacityEffect>
+#include <QLineEdit>
 #include <QMessageBox>
 #include <QProgressDialog>
+#include <QPropertyAnimation>
 #include <QShortcut>
 #include <QStatusBar>
 #include <QToolBar>
@@ -128,6 +133,7 @@
 
 #include "InstanceCopyTask.h"
 #include "InstanceDirUpdate.h"
+#include "settings/Setting.h"
 
 
 #include "MMCTime.h"
@@ -211,6 +217,43 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         ui->actionExportInstance->setMenu(exportInstanceMenu);
     }
 
+    // Instance library controls: search, favorites filter, and sort order.
+    {
+        m_instanceSearch = new QLineEdit(ui->mainToolBar);
+        m_instanceSearch->setObjectName(QStringLiteral("instanceSearch"));
+        m_instanceSearch->setPlaceholderText(tr("Search instances…"));
+        m_instanceSearch->setClearButtonEnabled(true);
+        m_instanceSearch->setMinimumWidth(140);
+        m_instanceSearch->setMaximumWidth(220);
+        m_instanceSearch->setToolTip(tr("Search instances by name, ID, or group. Press Ctrl+F to focus."));
+        ui->mainToolBar->insertWidget(ui->actionAccountsButton, m_instanceSearch);
+
+        m_favoritesOnly = new QToolButton(ui->mainToolBar);
+        m_favoritesOnly->setObjectName(QStringLiteral("favoritesOnlyButton"));
+        m_favoritesOnly->setText(QStringLiteral("★"));
+        m_favoritesOnly->setCheckable(true);
+        m_favoritesOnly->setAutoRaise(true);
+        m_favoritesOnly->setToolTip(tr("Show favorites only"));
+        m_favoritesOnly->setAccessibleName(tr("Show favorites only"));
+        ui->mainToolBar->insertWidget(ui->actionAccountsButton, m_favoritesOnly);
+
+        m_instanceSort = new QComboBox(ui->mainToolBar);
+        m_instanceSort->setObjectName(QStringLiteral("instanceSort"));
+        m_instanceSort->setToolTip(tr("Sort instances"));
+        m_instanceSort->addItem(tr("Name"), QStringLiteral("Name"));
+        m_instanceSort->addItem(tr("Recently played"), QStringLiteral("LastLaunch"));
+        m_instanceSort->addItem(tr("Most played"), QStringLiteral("Playtime"));
+        m_instanceSort->setMinimumContentsLength(12);
+        m_instanceSort->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
+        ui->mainToolBar->insertWidget(ui->actionAccountsButton, m_instanceSort);
+
+        auto* findShortcut = new QShortcut(QKeySequence::Find, this);
+        connect(findShortcut, &QShortcut::activated, this, [this] {
+            m_instanceSearch->setFocus();
+            m_instanceSearch->selectAll();
+        });
+    }
+
     // hide, disable and show stuff
     {
         ui->actionReportBug->setVisible(!BuildConfig.BUG_TRACKER_URL.isEmpty());
@@ -247,6 +290,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->viewMenu->addAction(ui->newsToolBar->toggleViewAction());
 
     updateThemeMenu();
+    const auto applicationThemeSetting = APPLICATION->settings()->getSetting("ApplicationTheme");
+    connect(applicationThemeSetting.get(), &Setting::SettingChanged, this,
+            [this](const Setting&, const QVariant&) { animateContentChange(); });
     updateMainToolBar();
     // OSX magic.
     setUnifiedTitleAndToolBarOnMac(true);
@@ -323,8 +369,18 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
         proxymodel = new InstanceProxyModel(this);
         proxymodel->setSourceModel(APPLICATION->instances());
+        const int sortIndex = m_instanceSort->findData(APPLICATION->settings()->get("InstSortMode"));
+        if (sortIndex >= 0)
+            m_instanceSort->setCurrentIndex(sortIndex);
         proxymodel->sort(0);
         connect(proxymodel, &InstanceProxyModel::dataChanged, this, &MainWindow::instanceDataChanged);
+        connect(m_instanceSearch, &QLineEdit::textChanged, proxymodel, &InstanceProxyModel::setSearchText);
+        connect(m_favoritesOnly, &QToolButton::toggled, proxymodel, &InstanceProxyModel::setFavoritesOnly);
+        connect(m_instanceSort, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
+            const QString sortMode = m_instanceSort->itemData(index).toString();
+            APPLICATION->settings()->set("InstSortMode", sortMode);
+            proxymodel->sort(0);
+        });
 
         view->setModel(proxymodel);
         view->setSourceOfGroupCollapseStatus(
@@ -532,7 +588,11 @@ void MainWindow::showInstanceContextMenu(const QPoint& pos)
     QAction* actionSep = new QAction("", this);
     actionSep->setSeparator(true);
 
-    bool onInstance = view->indexAt(pos).isValid();
+    const QModelIndex clickedIndex = view->indexAt(pos);
+    const bool onInstance = clickedIndex.isValid();
+    if (onInstance && clickedIndex != view->currentIndex())
+        view->setCurrentIndex(clickedIndex);
+
     if (onInstance) {
         // reuse the file menu actions
         actions = ui->fileMenu->actions();
@@ -550,6 +610,13 @@ void MainWindow::showInstanceContextMenu(const QPoint& pos)
         QAction* actionVoid = new QAction(m_selectedInstance->name(), this);
         actionVoid->setEnabled(false);
         actions.prepend(actionVoid);
+
+        QAction favoriteAction(tr("Favorite"), this);
+        favoriteAction.setCheckable(true);
+        favoriteAction.setChecked(m_selectedInstance->isFavorite());
+        favoriteAction.setToolTip(tr("Keep this instance easy to find"));
+        connect(&favoriteAction, &QAction::toggled, m_selectedInstance, &BaseInstance::setFavorite);
+        actions.insert(2, &favoriteAction);
     } else {
         auto group = view->groupNameAt(pos);
 
@@ -595,6 +662,29 @@ void MainWindow::updateMainToolBar()
     ui->actionCAT->setVisible(APPLICATION->settings()->get("CatButtonVisible").toBool());
 }
 
+void MainWindow::animateContentChange()
+{
+    auto* effect = qobject_cast<QGraphicsOpacityEffect*>(ui->centralWidget->graphicsEffect());
+    if (!effect) {
+        effect = new QGraphicsOpacityEffect(ui->centralWidget);
+        effect->setOpacity(1.0);
+        ui->centralWidget->setGraphicsEffect(effect);
+    }
+
+    if (m_contentAnimation) {
+        m_contentAnimation->stop();
+        m_contentAnimation->deleteLater();
+    }
+
+    m_contentAnimation = new QPropertyAnimation(effect, "opacity", this);
+    m_contentAnimation->setDuration(180);
+    m_contentAnimation->setStartValue(0.94);
+    m_contentAnimation->setEndValue(1.0);
+    m_contentAnimation->setEasingCurve(QEasingCurve::OutCubic);
+    connect(m_contentAnimation, &QPropertyAnimation::finished, this, [this] { m_contentAnimation = nullptr; });
+    m_contentAnimation->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
 void MainWindow::updateLaunchButton()
 {
     QMenu* launchMenu = ui->actionLaunchInstance->menu();
@@ -630,7 +720,7 @@ void MainWindow::updateThemeMenu()
         }
         themeAction->setActionGroup(themesGroup);
 
-        connect(themeAction, &QAction::triggered, [theme]() {
+        connect(themeAction, &QAction::triggered, this, [this, theme] {
             APPLICATION->themeManager()->setApplicationTheme(theme->id());
             APPLICATION->settings()->set("ApplicationTheme", theme->id());
         });
@@ -1632,6 +1722,7 @@ void MainWindow::instanceChanged(const QModelIndex& current, [[maybe_unused]] co
 
         connect(m_selectedInstance, &BaseInstance::runningStatusChanged, this, &MainWindow::refreshCurrentInstance);
         connect(m_selectedInstance, &BaseInstance::profilerChanged, this, &MainWindow::refreshCurrentInstance);
+        animateContentChange();
     } else {
         APPLICATION->settings()->set("SelectedInstance", QString());
         selectionBad();

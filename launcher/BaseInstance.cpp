@@ -80,6 +80,7 @@ BaseInstance::BaseInstance(SettingsObject* globalSettings, std::unique_ptr<Setti
     m_settings->registerSetting("name", "Unnamed Instance");
     m_settings->registerSetting("iconKey", "default");
     m_settings->registerSetting("notes", "");
+    m_settings->registerSetting("favorite", false);
 
     m_settings->registerSetting("lastLaunchTime", 0);
     m_settings->registerSetting("totalTimePlayed", 0);
@@ -458,6 +459,20 @@ QList<ShortcutData> BaseInstance::shortcuts() const
 QString BaseInstance::name() const
 {
     return m_settings->get("name").toString();
+}
+
+bool BaseInstance::isFavorite() const
+{
+    return m_settings->get("favorite").toBool();
+}
+
+void BaseInstance::setFavorite(bool favorite)
+{
+    if (isFavorite() == favorite)
+        return;
+
+    m_settings->set("favorite", favorite);
+    emit propertiesChanged(this);
 }
 
 QString BaseInstance::windowTitle() const

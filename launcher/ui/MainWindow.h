@@ -52,6 +52,9 @@
 class LaunchController;
 class NewsChecker;
 class QToolButton;
+class QComboBox;
+class QLineEdit;
+class QPropertyAnimation;
 class InstanceProxyModel;
 class LabeledToolButton;
 class QLabel;
@@ -228,6 +231,7 @@ class MainWindow : public QMainWindow {
     void setSelectedInstanceById(const QString& id);
     void updateStatusCenter();
     void setInstanceActionsEnabled(bool enabled);
+    void animateContentChange();
 
     void runModalTask(Task* task);
     void instanceFromInstanceTask(InstanceTask* task);
@@ -237,6 +241,10 @@ class MainWindow : public QMainWindow {
     // these are managed by Qt's memory management model!
     InstanceView* view = nullptr;
     InstanceProxyModel* proxymodel = nullptr;
+    QLineEdit* m_instanceSearch = nullptr;
+    QToolButton* m_favoritesOnly = nullptr;
+    QComboBox* m_instanceSort = nullptr;
+    QPropertyAnimation* m_contentAnimation = nullptr;
     QToolButton* newsLabel = nullptr;
     QLabel* m_statusLeft = nullptr;
     QLabel* m_statusCenter = nullptr;

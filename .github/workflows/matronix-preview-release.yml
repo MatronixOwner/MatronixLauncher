@@ -73,11 +73,10 @@ jobs:
           body: |
             Preview build of MatronixPrismLauncher.
 
-            - The launcher window title now shows the product name without the development branch suffix.
-            - The installer welcome page uses the MatronixPrismLauncher prism logo instead of a cat image.
-            - Ely.by OAuth uses the MatronixPrismLauncher Client ID and has clearer configuration errors.
-            - Mod discovery and downloads use Modrinth only; the built-in collection now includes seven selectable cats with proper Wikimedia Commons attribution.
-            - Appearance settings now support importing personal cat images, adjusting background opacity, and dimming the background for readability.
+            - Choose the new Matronix Purple theme with a subtle violet gradient, alongside Matronix Black.
+            - Calm, short fades accompany theme changes and instance selection.
+            - Mark instances as favorites, search by name, ID, or group, and sort by name, recency, or playtime.
+            - Existing groups, instance copying, Modrinth-only mod management, and cat-background customization remain available.
             - Linux builds are provided as an AppImage and a portable tarball; the AppImage uses XDG desktop portals for desktop integration, including KDE Plasma.
             - The Windows installer is unsigned and may trigger a Windows SmartScreen warning.
           draft: false

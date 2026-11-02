@@ -17,6 +17,7 @@
 
 #include <QCollator>
 #include <QSortFilterProxyModel>
+#include <QString>
 
 class InstanceProxyModel : public QSortFilterProxyModel {
     Q_OBJECT
@@ -24,11 +25,17 @@ class InstanceProxyModel : public QSortFilterProxyModel {
    public:
     InstanceProxyModel(QObject* parent = 0);
 
+    void setSearchText(const QString& text);
+    void setFavoritesOnly(bool favoritesOnly);
+
    protected:
     QVariant data(const QModelIndex& index, int role) const override;
     bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
+    bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
     bool subSortLessThan(const QModelIndex& left, const QModelIndex& right) const;
 
    private:
     QCollator m_naturalSort;
+    QString m_searchText;
+    bool m_favoritesOnly = false;
 };

@@ -16,6 +16,7 @@
 #include "InstanceProxyModel.h"
 
 #include <BaseInstance.h>
+#include <InstanceList.h>
 #include <icons/IconList.h>
 #include "Application.h"
 #include "InstanceView.h"
@@ -36,7 +37,50 @@ QVariant InstanceProxyModel::data(const QModelIndex& index, int role) const
     if (role == Qt::DecorationRole) {
         return QVariant(APPLICATION->icons()->getIcon(data.toString()));
     }
+    if (role == Qt::DisplayRole) {
+        const QModelIndex sourceIndex = mapToSource(index);
+        auto* instance = static_cast<BaseInstance*>(sourceIndex.data(InstanceList::InstancePointerRole).value<void*>());
+        if (instance && instance->isFavorite())
+            return QStringLiteral("★ %1").arg(data.toString());
+    }
     return data;
+}
+
+void InstanceProxyModel::setSearchText(const QString& text)
+{
+    const QString normalizedText = text.trimmed();
+    if (m_searchText == normalizedText)
+        return;
+
+    m_searchText = normalizedText;
+    invalidateFilter();
+}
+
+void InstanceProxyModel::setFavoritesOnly(bool favoritesOnly)
+{
+    if (m_favoritesOnly == favoritesOnly)
+        return;
+
+    m_favoritesOnly = favoritesOnly;
+    invalidateFilter();
+}
+
+bool InstanceProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
+{
+    const QModelIndex sourceIndex = sourceModel()->index(sourceRow, 0, sourceParent);
+    auto* instance = static_cast<BaseInstance*>(sourceIndex.data(InstanceList::InstancePointerRole).value<void*>());
+    if (!instance)
+        return false;
+
+    if (m_favoritesOnly && !instance->isFavorite())
+        return false;
+
+    if (m_searchText.isEmpty())
+        return true;
+
+    return instance->name().contains(m_searchText, Qt::CaseInsensitive) ||
+           instance->id().contains(m_searchText, Qt::CaseInsensitive) ||
+           sourceIndex.data(InstanceList::GroupRole).toString().contains(m_searchText, Qt::CaseInsensitive);
 }
 
 bool InstanceProxyModel::lessThan(const QModelIndex& left, const QModelIndex& right) const

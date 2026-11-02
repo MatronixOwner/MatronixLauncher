@@ -138,6 +138,9 @@ class BaseInstance : public QObject {
     QString name() const;
     void setName(QString val);
 
+    bool isFavorite() const;
+    void setFavorite(bool favorite);
+
     /// Sync name and rename instance dir accordingly; returns true if successful
     bool syncInstanceDirName(const QString& newRoot) const;
 
