@@ -1,5 +1,16 @@
 {
   "releaseVersion": "v0.1.0-alpha.12",
   "announcementEnabled": false,
-  "announcement": ""
+  "announcement": "",
+  "customization": {
+    "theme": "matronix-black",
+    "accentColor": "#a9a9ad",
+    "eyebrow": "Лаунчер Minecraft Java",
+    "heroCopy": "Сборки Minecraft. Моды из Modrinth. Ничего лишнего.",
+    "ctaLabel": "Установить последнюю версию",
+    "showModrinth": true,
+    "showFeatures": true,
+    "showProjects": true,
+    "showPlatforms": true
+  }
 }

@@ -5,62 +5,95 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#100d18">
   <meta name="robots" content="noindex, nofollow">
-  <title>Панель сайта · MatronixPrismLauncher</title>
+  <title>Matronix Studio · Панель сайта</title>
   <link rel="icon" href="assets/matronixprismlauncher.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="admin.css?v=1">
-  <script src="site.js?v=1" defer></script>
+  <link rel="stylesheet" href="admin.css?v=3">
+  <script src="admin.js?v=2" defer></script>
 </head>
 <body>
-  <main class="admin-shell">
-    <header class="admin-topbar">
-      <a class="brand" href="index.html">
-        <img src="assets/matronixprismlauncher.svg" alt="">
-        <span>Matronix<span class="brand-muted">PrismLauncher</span></span>
-      </a>
-      <a class="back-link" href="index.html">На сайт <span aria-hidden="true">↗</span></a>
-    </header>
+  <header class="studio-topbar">
+    <a class="studio-brand" href="index.html">
+      <img src="assets/matronixprismlauncher.svg" alt="">
+      <span><strong>Matronix</strong><small>STUDIO / SITE EDITOR</small></span>
+    </a>
+    <div class="topbar-state"><span class="live-dot"></span><span>Локальный предпросмотр</span></div>
+    <a class="exit-link" href="index.html">На сайт <span aria-hidden="true">↗</span></a>
+  </header>
 
-    <section class="admin-hero">
-      <p class="eyebrow">ПАНЕЛЬ ВЛАДЕЛЬЦА</p>
-      <h1>Управление<br><span>сайтом Matronix.</span></h1>
-      <p class="intro">Версия лаунчера, объявление и публикация сайта — в одном месте.</p>
-      <div class="auth-note">
-        <span class="auth-mark" aria-hidden="true">✓</span>
-        <p><strong>Вход и права контролирует GitHub.</strong> Панель не хранит пароль; редактирование и публикация требуют авторизованного аккаунта с правами записи в репозиторий.</p>
+  <main class="studio-layout">
+    <aside class="editor-panel" aria-label="Редактор сайта">
+      <div class="panel-heading">
+        <div><p class="eyebrow">КОНТЕНТ И СТИЛЬ</p><h1>Редактор сайта</h1></div>
+        <span class="draft-badge" id="draft-state">Черновик</span>
       </div>
-    </section>
+      <p class="panel-intro">Настраивай страницу — предпросмотр справа обновляется сразу.</p>
 
-    <section class="release-card" aria-labelledby="release-heading">
-      <div>
-        <p class="eyebrow">ТЕКУЩАЯ ВЕРСИЯ</p>
-        <h2 id="release-heading" data-release-version>Загрузка…</h2>
-        <p class="muted">Ссылки ведут на опубликованные файлы релиза.</p>
+      <form id="site-editor" autocomplete="off">
+        <fieldset class="editor-group">
+          <legend><span>01</span> Оформление</legend>
+          <label class="field-label" for="theme">Тема сайта</label>
+          <select id="theme" name="theme">
+            <option value="matronix-black">Matronix Black</option>
+            <option value="matronix-purple">Matronix Purple</option>
+            <option value="graphite">Graphite</option>
+          </select>
+          <label class="field-label color-label" for="accent-color">Цвет акцента <input id="accent-color" type="color" value="#a9a9ad" aria-label="Выбрать цвет акцента"></label>
+        </fieldset>
+
+        <fieldset class="editor-group">
+          <legend><span>02</span> Первый экран</legend>
+          <label class="field-label" for="eyebrow">Надзаголовок</label>
+          <input id="eyebrow" maxlength="80" value="Лаунчер Minecraft Java">
+          <label class="field-label" for="hero-copy">Короткое описание</label>
+          <textarea id="hero-copy" rows="2" maxlength="180">Сборки Minecraft. Моды из Modrinth. Ничего лишнего.</textarea>
+          <label class="field-label" for="cta-label">Текст кнопки загрузки</label>
+          <input id="cta-label" maxlength="60" value="Установить последнюю версию">
+        </fieldset>
+
+        <fieldset class="editor-group">
+          <legend><span>03</span> Версия и объявление</legend>
+          <label class="field-label" for="release-version">Тег релиза</label>
+          <input id="release-version" maxlength="50" value="v0.1.0-alpha.12" spellcheck="false">
+          <label class="toggle-row"><span><strong>Показывать объявление</strong><small>Плашка над первым экраном</small></span><input id="announcement-enabled" type="checkbox"><i></i></label>
+          <label class="field-label" for="announcement">Текст объявления</label>
+          <textarea id="announcement" rows="2" maxlength="240" placeholder="Например: вышла новая версия лаунчера"></textarea>
+          <div class="char-count"><span id="announcement-count">0</span> / 240</div>
+        </fieldset>
+
+        <fieldset class="editor-group">
+          <legend><span>04</span> Разделы страницы</legend>
+          <label class="check-row"><input id="show-modrinth" type="checkbox" checked><span>Каталог Modrinth</span></label>
+          <label class="check-row"><input id="show-features" type="checkbox" checked><span>Возможности лаунчера</span></label>
+          <label class="check-row"><input id="show-projects" type="checkbox" checked><span>Проекты MatronixOwner</span></label>
+          <label class="check-row"><input id="show-platforms" type="checkbox" checked><span>Загрузки для платформ</span></label>
+        </fieldset>
+
+        <div class="editor-actions">
+          <button class="button-secondary" id="reset-draft" type="button">Сбросить</button>
+          <button class="button-secondary" id="export-config" type="button">Экспорт JSON</button>
+          <button class="button-primary" id="publish-config" type="button">Подготовить публикацию <span aria-hidden="true">↗</span></button>
+          <p class="publish-hint" id="publish-hint">Публикация выполняется через защищённый GitHub Actions после входа владельца.</p>
+        </div>
+      </form>
+    </aside>
+
+    <section class="preview-workspace" aria-label="Предпросмотр сайта">
+      <div class="preview-toolbar">
+        <div><span class="preview-mark"></span><strong>Предпросмотр</strong><span class="preview-url">matronixowner.github.io/MatronixLauncher</span></div>
+        <div class="preview-actions">
+          <button class="device-button is-active" data-device="desktop" type="button" aria-label="Предпросмотр на компьютере" title="Компьютер">▰</button>
+          <button class="device-button" data-device="mobile" type="button" aria-label="Предпросмотр на телефоне" title="Телефон">▯</button>
+          <a class="open-site" href="index.html" target="_blank" rel="noopener noreferrer" aria-label="Открыть сайт отдельно">↗</a>
+        </div>
       </div>
-      <a class="primary-button" href="https://github.com/MatronixOwner/MatronixLauncher/releases" target="_blank" rel="noopener noreferrer">Все релизы <span aria-hidden="true">↗</span></a>
+      <div class="preview-frame-wrap" id="preview-frame-wrap">
+        <iframe id="site-preview" src="index.html?admin-preview=1" title="Предпросмотр главной страницы Matronix"></iframe>
+      </div>
+      <div class="preview-footer"><span id="preview-message">Черновик ещё не опубликован</span><span>Изменения в превью видны только тебе</span></div>
     </section>
-
-    <section class="controls" aria-label="Настройки сайта">
-      <a class="control-card" href="https://github.com/MatronixOwner/MatronixLauncher/edit/arena/1e9c3b0a-matronixlauncher/website/site-config.json">
-        <span class="control-icon" aria-hidden="true">01</span>
-        <span class="control-copy"><strong>Изменить версию и объявление</strong><small>Открыть настройки сайта в GitHub. После сохранения файла публикация запускается автоматически.</small></span>
-        <span class="control-arrow" aria-hidden="true">↗</span>
-      </a>
-      <a class="control-card" href="https://github.com/MatronixOwner/MatronixLauncher/actions/workflows/deploy-website.yml">
-        <span class="control-icon" aria-hidden="true">02</span>
-        <span class="control-copy"><strong>Опубликовать сайт</strong><small>Повторно запустить публикацию GitHub Pages после изменения файлов сайта.</small></span>
-        <span class="control-arrow" aria-hidden="true">↗</span>
-      </a>
-      <a class="control-card" href="https://github.com/MatronixOwner/MatronixLauncher/releases">
-        <span class="control-icon" aria-hidden="true">03</span>
-        <span class="control-copy"><strong>Проверить установщик</strong><small>Открыть список релизов и проверить, что Windows installer загружен.</small></span>
-        <span class="control-arrow" aria-hidden="true">↗</span>
-      </a>
-    </section>
-
-    <footer class="admin-footer">
-      <span>Анонс на главной: <strong data-announcement-state>проверка…</strong></span>
-      <span>Управление выполняется через авторизованные GitHub Actions.</span>
-    </footer>
   </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <textarea id="config-copy-fallback" class="copy-fallback" aria-label="JSON для публикации" readonly hidden></textarea>
 </body>
 </html>
