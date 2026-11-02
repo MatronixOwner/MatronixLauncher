@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#100d18">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Панель сайта · MatronixPrismLauncher</title>
+  <link rel="icon" href="assets/matronixprismlauncher.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="admin.css?v=1">
+  <script src="site.js?v=1" defer></script>
+</head>
+<body>
+  <main class="admin-shell">
+    <header class="admin-topbar">
+      <a class="brand" href="index.html">
+        <img src="assets/matronixprismlauncher.svg" alt="">
+        <span>Matronix<span class="brand-muted">PrismLauncher</span></span>
+      </a>
+      <a class="back-link" href="index.html">На сайт <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <section class="admin-hero">
+      <p class="eyebrow">ПАНЕЛЬ ВЛАДЕЛЬЦА</p>
+      <h1>Управление<br><span>сайтом Matronix.</span></h1>
+      <p class="intro">Версия лаунчера, объявление и публикация сайта — в одном месте.</p>
+      <div class="auth-note">
+        <span class="auth-mark" aria-hidden="true">✓</span>
+        <p><strong>Доступ защищён GitHub.</strong> Изменения может запускать только владелец репозитория; пароль сайта не хранится в браузере.</p>
+      </div>
+    </section>
+
+    <section class="release-card" aria-labelledby="release-heading">
+      <div>
+        <p class="eyebrow">ТЕКУЩАЯ ВЕРСИЯ</p>
+        <h2 id="release-heading" data-release-version>Загрузка…</h2>
+        <p class="muted">Ссылки ведут на опубликованные файлы релиза.</p>
+      </div>
+      <a class="primary-button" href="https://github.com/MatronixOwner/MatronixLauncher/releases" target="_blank" rel="noopener noreferrer">Все релизы <span aria-hidden="true">↗</span></a>
+    </section>
+
+    <section class="controls" aria-label="Настройки сайта">
+      <a class="control-card" href="https://github.com/MatronixOwner/MatronixLauncher/actions/workflows/site-admin.yml">
+        <span class="control-icon" aria-hidden="true">01</span>
+        <span class="control-copy"><strong>Обновить сайт</strong><small>Выбрать версию релиза, включить или изменить объявление. После запуска сайт автоматически опубликуется.</small></span>
+        <span class="control-arrow" aria-hidden="true">↗</span>
+      </a>
+      <a class="control-card" href="https://github.com/MatronixOwner/MatronixLauncher/actions/workflows/deploy-website.yml">
+        <span class="control-icon" aria-hidden="true">02</span>
+        <span class="control-copy"><strong>Опубликовать сайт</strong><small>Повторно запустить публикацию GitHub Pages после изменения файлов сайта.</small></span>
+        <span class="control-arrow" aria-hidden="true">↗</span>
+      </a>
+      <a class="control-card" href="https://github.com/MatronixOwner/MatronixLauncher/releases">
+        <span class="control-icon" aria-hidden="true">03</span>
+        <span class="control-copy"><strong>Проверить установщик</strong><small>Открыть список релизов и проверить, что Windows installer загружен.</small></span>
+        <span class="control-arrow" aria-hidden="true">↗</span>
+      </a>
+    </section>
+
+    <footer class="admin-footer">
+      <span>Анонс на главной: <strong data-announcement-state>проверка…</strong></span>
+      <span>Управление выполняется через авторизованные GitHub Actions.</span>
+    </footer>
+  </main>
+</body>
+</html>

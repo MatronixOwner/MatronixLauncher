@@ -25,6 +25,10 @@
       });
 
       const text = typeof config.announcement === "string" ? config.announcement.trim() : "";
+      const announcementState = document.querySelector("[data-announcement-state]");
+      if (announcementState) {
+        announcementState.textContent = config.announcementEnabled === true && text ? "включён" : "выключен";
+      }
       if (config.announcementEnabled === true && text) {
         const announcement = document.getElementById("site-announcement");
         if (announcement) {
