@@ -20,7 +20,7 @@ enum ResourceId : WORD {
 bool extractResource(WORD id, const std::filesystem::path& destination)
 {
     const HMODULE module = GetModuleHandleW(nullptr);
-    const HRSRC resource = FindResourceW(module, MAKEINTRESOURCEW(id), MAKEINTRESOURCEW(10));
+    const HRSRC resource = FindResourceW(module, MAKEINTRESOURCEW(id), RT_RCDATA);
     if (!resource)
         return false;
 
