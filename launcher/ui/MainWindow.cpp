@@ -402,12 +402,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         const bool videoEnabled = APPLICATION->settings()->get("VideoBackground").toBool();
         ui->actionVideoBackground->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
         ui->actionVideoBackground->setChecked(videoEnabled);
-        connect(view, &InstanceView::videoBackgroundError, this, [this](const QString& message) {
-            APPLICATION->settings()->set("VideoBackground", false);
-            if (ui->actionVideoBackground->isChecked())
-                ui->actionVideoBackground->setChecked(false);
-            statusBar()->showMessage(tr("Video background: %1").arg(message), 12000);
-        });
         connect(ui->actionVideoBackground, &QAction::toggled, this, [this](bool enabled) {
             const QString videoPath = APPLICATION->settings()->get("VideoBackgroundPath").toString();
             if (enabled && videoPath.isEmpty()) {
