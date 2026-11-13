@@ -73,8 +73,8 @@ jobs:
           body: |
             Preview build of MatronixPrismLauncher.
 
-            - Choose the Aurora, Crimson, and Frost themes alongside Matronix Black and Matronix Purple.
-            - Select a local video as a silent, looping launcher background from Appearance settings; the toolbar includes a playback toggle next to the cat-background control.
+            - Aurora adds slow teal-violet light ribbons, Crimson gets a refined graphite-red finish, and Frost has gentle snowfall.
+            - Select a local video as a silent, looping launcher background from Appearance settings; it remains visible when the cat background is also enabled, and playback errors are reported.
             - Calm, short fades accompany theme changes and instance selection.
             - Mark instances as favorites, search by name, ID, or group, and sort by name, recency, or playtime.
             - Existing groups, instance copying, Modrinth-only mod management, and cat-background customization remain available.

@@ -38,16 +38,22 @@
 #include <QAccessible>
 #include <QApplication>
 #include <QAudioOutput>
+#include <QBrush>
 #include <QCache>
 #include <QDrag>
 #include <QFont>
+#include <QFileInfo>
+#include <QLinearGradient>
 #include <QListView>
 #include <QMediaPlayer>
 #include <QMimeData>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPainterPath>
 #include <QPersistentModelIndex>
+#include <QRandomGenerator>
 #include <QScrollBar>
+#include <QTimer>
 #include <QUrl>
 #include <QVideoFrame>
 #include <QVideoSink>
@@ -77,6 +83,32 @@ InstanceView::InstanceView(QWidget* parent) : QAbstractItemView(parent)
     setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     setAcceptDrops(true);
     setAutoScroll(true);
+    for (int i = 0; i < 42; ++i) {
+        Snowflake flake;
+        flake.x = QRandomGenerator::global()->generateDouble();
+        flake.y = QRandomGenerator::global()->generateDouble();
+        flake.speed = 0.0015 + QRandomGenerator::global()->generateDouble() * 0.004;
+        flake.radius = 1.0 + QRandomGenerator::global()->generateDouble() * 2.0;
+        flake.sway = QRandomGenerator::global()->generateDouble() * 6.28318530718;
+        m_snowflakes.append(flake);
+    }
+    m_snowTimer = new QTimer(this);
+    m_snowTimer->setInterval(50);
+    connect(m_snowTimer, &QTimer::timeout, this, [this] {
+        if (m_frostEffectsEnabled) {
+            for (auto& flake : m_snowflakes) {
+                flake.y += flake.speed;
+                flake.sway += 0.025;
+                if (flake.y > 1.02) {
+                    flake.y = -0.02;
+                    flake.x = QRandomGenerator::global()->generateDouble();
+                }
+            }
+        }
+        if (m_auroraEffectsEnabled)
+            m_auroraPhase += 0.018;
+        viewport()->update();
+    });
     setPaintCat(APPLICATION->settings()->get("TheCat").toBool());
     setVideoBackground(APPLICATION->settings()->get("VideoBackground").toBool(),
                        APPLICATION->settings()->get("VideoBackgroundPath").toString());
@@ -462,12 +494,13 @@ void InstanceView::setPaintCat(bool visible)
 
 void InstanceView::setVideoBackground(bool enabled, const QString& filePath)
 {
+    m_videoEnabled = false;
     if (!m_videoPlayer) {
         m_videoPlayer = new QMediaPlayer(this);
         auto* audioOutput = new QAudioOutput(m_videoPlayer);
         audioOutput->setMuted(true);
         m_videoPlayer->setAudioOutput(audioOutput);
-        m_videoSink = new QVideoSink(this);
+        m_videoSink = new QVideoSink(m_videoPlayer);
         m_videoPlayer->setVideoSink(m_videoSink);
         connect(m_videoSink, &QVideoSink::videoFrameChanged, this, [this](const QVideoFrame& frame) {
             const QImage image = frame.toImage();
@@ -482,15 +515,34 @@ void InstanceView::setVideoBackground(bool enabled, const QString& filePath)
                 m_videoPlayer->play();
             }
         });
+        connect(m_videoPlayer, &QMediaPlayer::errorOccurred, this,
+                [this](QMediaPlayer::Error, const QString& errorString) {
+                    m_videoEnabled = false;
+                    viewport()->update();
+                    emit videoBackgroundError(errorString.isEmpty() ? tr("The video could not be decoded.") : errorString);
+                });
     }
 
-    const QUrl source = filePath.isEmpty() ? QUrl() : QUrl::fromLocalFile(filePath);
-    if (m_videoPlayer->source() != source)
-        m_videoPlayer->setSource(source);
-    if (enabled && !source.isEmpty())
-        m_videoPlayer->play();
-    else
+    if (!enabled) {
         m_videoPlayer->pause();
+        viewport()->update();
+        return;
+    }
+
+    const QFileInfo videoFile(filePath);
+    if (filePath.isEmpty() || !videoFile.isFile() || !videoFile.isReadable()) {
+        emit videoBackgroundError(tr("Choose a readable video file in Settings → Appearance."));
+        viewport()->update();
+        return;
+    }
+
+    const QUrl source = QUrl::fromLocalFile(videoFile.absoluteFilePath());
+    if (m_videoPlayer->source() != source) {
+        m_videoFrame = QImage();
+        m_videoPlayer->setSource(source);
+    }
+    m_videoEnabled = true;
+    m_videoPlayer->play();
     viewport()->update();
 }
 
@@ -500,15 +552,82 @@ void InstanceView::paintEvent([[maybe_unused]] QPaintEvent* event)
 
     QPainter painter(this->viewport());
 
-    if (!m_videoFrame.isNull() && m_videoPlayer && m_videoPlayer->playbackState() == QMediaPlayer::PlayingState) {
+    const QString themeId = APPLICATION->settings()->get("ApplicationTheme").toString();
+    const bool frostTheme = themeId == QLatin1String("frost");
+    const bool auroraTheme = themeId == QLatin1String("aurora");
+    if (frostTheme != m_frostEffectsEnabled || auroraTheme != m_auroraEffectsEnabled) {
+        m_frostEffectsEnabled = frostTheme;
+        m_auroraEffectsEnabled = auroraTheme;
+        if (m_frostEffectsEnabled || m_auroraEffectsEnabled)
+            m_snowTimer->start();
+        else
+            m_snowTimer->stop();
+    }
+
+    if (m_auroraEffectsEnabled) {
+        painter.save();
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        const qreal width = viewport()->width();
+        const qreal height = viewport()->height();
+        QLinearGradient light(0, 0, width, 0);
+        light.setColorAt(0.0, QColor(66, 214, 197, 0));
+        light.setColorAt(0.28, QColor(66, 214, 197, 38));
+        light.setColorAt(0.68, QColor(174, 149, 255, 31));
+        light.setColorAt(1.0, QColor(174, 149, 255, 0));
+        for (int band = 0; band < 3; ++band) {
+            const qreal baseline = height * (0.18 + band * 0.14);
+            QPainterPath ribbon;
+            qreal previousX = -width * 0.08;
+            qreal previousY = baseline + qSin(m_auroraPhase + band) * height * 0.035;
+            ribbon.moveTo(previousX, previousY);
+            for (int segment = 1; segment <= 8; ++segment) {
+                const qreal x = width * (segment / 8.0);
+                const qreal y = baseline + qSin(segment * 0.82 + m_auroraPhase + band) * height * 0.035;
+                const qreal controlX = (previousX + x) / 2.0;
+                ribbon.cubicTo(controlX, previousY - height * 0.015, controlX, y + height * 0.015, x, y);
+                previousX = x;
+                previousY = y;
+            }
+            painter.setBrush(Qt::NoBrush);
+            painter.setPen(QPen(QBrush(light), 18 + band * 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+            painter.drawPath(ribbon);
+            painter.setPen(QPen(QBrush(light), 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+            painter.drawPath(ribbon);
+        }
+        painter.restore();
+    }
+
+    if (m_cat) {
+        m_cat->paint(&painter, this->viewport()->rect());
+    }
+
+    // The video is drawn after the cat so it remains visible if both toolbar toggles are on.
+    if (m_videoEnabled && !m_videoFrame.isNull() && m_videoPlayer) {
         const QSize scaled = m_videoFrame.size().scaled(viewport()->size(), Qt::KeepAspectRatioByExpanding);
         const QRect sourceRect((scaled.width() - viewport()->width()) / 2, (scaled.height() - viewport()->height()) / 2,
                                viewport()->width(), viewport()->height());
         painter.drawImage(viewport()->rect(), m_videoFrame.scaled(scaled, Qt::IgnoreAspectRatio, Qt::SmoothTransformation), sourceRect);
     }
 
-    if (m_cat) {
-        m_cat->paint(&painter, this->viewport()->rect());
+    if (m_frostEffectsEnabled) {
+        painter.save();
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        for (const auto& flake : m_snowflakes) {
+            const qreal x = flake.x * viewport()->width() + qSin(flake.sway) * 7.0;
+            const qreal y = flake.y * viewport()->height();
+            const qreal arm = flake.radius * 1.35;
+            const QColor halo(166, 218, 255, 24);
+            const QColor snow(220, 242, 255, qBound(42, static_cast<int>(62 + flake.radius * 22), 112));
+            painter.setPen(Qt::NoPen);
+            painter.setBrush(halo);
+            painter.drawEllipse(QPointF(x, y), arm * 1.9, arm * 1.9);
+            painter.setPen(QPen(snow, qMax<qreal>(0.8, flake.radius * 0.35), Qt::SolidLine, Qt::RoundCap));
+            painter.drawLine(QPointF(x - arm, y), QPointF(x + arm, y));
+            painter.drawLine(QPointF(x, y - arm), QPointF(x, y + arm));
+            painter.drawLine(QPointF(x - arm * 0.72, y - arm * 0.72), QPointF(x + arm * 0.72, y + arm * 0.72));
+            painter.drawLine(QPointF(x - arm * 0.72, y + arm * 0.72), QPointF(x + arm * 0.72, y - arm * 0.72));
+        }
+        painter.restore();
     }
 
     QStyleOptionViewItem option;

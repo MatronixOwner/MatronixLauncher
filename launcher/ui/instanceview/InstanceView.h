@@ -40,11 +40,13 @@
 #include <QLineEdit>
 #include <QListView>
 #include <QScrollBar>
+#include <QVector>
 #include <functional>
 #include "VisualGroup.h"
 #include "ui/themes/CatPainter.h"
 
 class QMediaPlayer;
+class QTimer;
 class QVideoSink;
 
 struct InstanceViewRoles {
@@ -99,6 +101,7 @@ class InstanceView : public QAbstractItemView {
    signals:
     void droppedURLs(QList<QUrl> urls);
     void groupStateChanged(QString group, bool collapsed);
+    void videoBackgroundError(QString message);
 
    protected:
     bool isIndexHidden(const QModelIndex& index) const override;
@@ -134,10 +137,24 @@ class InstanceView : public QAbstractItemView {
     int m_currentItemsPerRow = -1;
     int m_currentCursorColumn = -1;
     mutable QCache<int, QRect> m_geometryCache;
+    struct Snowflake {
+        qreal x = 0;
+        qreal y = 0;
+        qreal speed = 0;
+        qreal radius = 0;
+        qreal sway = 0;
+    };
+
     CatPainter* m_cat = nullptr;
     QMediaPlayer* m_videoPlayer = nullptr;
     QVideoSink* m_videoSink = nullptr;
     QImage m_videoFrame;
+    bool m_videoEnabled = false;
+    QVector<Snowflake> m_snowflakes;
+    QTimer* m_snowTimer = nullptr;
+    bool m_frostEffectsEnabled = false;
+    bool m_auroraEffectsEnabled = false;
+    qreal m_auroraPhase = 0;
 
     // point where the currently active mouse action started in geometry coordinates
     QPoint m_pressedPosition;
