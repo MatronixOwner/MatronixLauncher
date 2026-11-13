@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101713">
+  <meta name="description" content="Изолированный предпросмотр сезонной темы Matronix для разработчиков.">
+  <title>Winter Theme Lab — Matronix</title>
+  <link rel="icon" href="assets/matronixprismlauncher.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="winter-lab.css">
+  <script src="winter-lab.js" defer></script>
+</head>
+<body>
+  <div class="lab-shell">
+    <header class="lab-header">
+      <a class="lab-brand" href="winter-lab.html" aria-label="Matronix Winter Theme Lab">
+        <span class="brand-mark" aria-hidden="true">M</span>
+        <span><b>MATRONIX</b><small>WINTER THEME LAB</small></span>
+      </a>
+      <div class="lab-header-right">
+        <span class="lab-badge"><i></i> ОТДЕЛЬНЫЙ СТЕНД</span>
+        <a class="back-link" href="https://matronixowner.github.io/MatronixLauncher/">Сайт Matronix <span aria-hidden="true">↗</span></a>
+      </div>
+    </header>
+
+    <main>
+      <section class="lab-intro">
+        <div>
+          <p class="eyebrow">ПЕСОЧНИЦА ДЛЯ РАЗРАБОТЧИКОВ <span>·</span> СЕЗОННАЯ ТЕМА</p>
+          <h1>Зимняя тема.<br><em>Без сборок и аккаунтов.</em></h1>
+          <p class="intro-copy">Изолированный интерактивный образец оформления Matronix. Здесь можно посмотреть праздничный интерфейс и его детали — это не игровой лаунчер и он не связан со списком сборок Minecraft.</p>
+        </div>
+        <div class="season-card">
+          <span class="season-icon" aria-hidden="true">✳</span>
+          <div><small>В ОСНОВНОМ ЛАУНЧЕРЕ</small><b>Открывается 1 декабря</b><span>Доступность определяется системной датой.</span><span class="system-date" id="system-date">Проверяем системную дату…</span></div>
+        </div>
+      </section>
+
+      <section class="preview-section" aria-label="Предпросмотр зимней темы">
+        <div class="preview-heading">
+          <div><span class="section-kicker">01 / LIVE PREVIEW</span><h2>Matronix Christmas</h2></div>
+          <button class="snow-toggle" id="snow-toggle" type="button" aria-pressed="true"><span class="toggle-dot"></span><span>Снег включён</span></button>
+        </div>
+
+        <div class="mock-window" id="mock-window">
+          <div class="window-titlebar">
+            <div class="window-identity"><span class="mini-mark">M</span><b>Matronix <span>Theme Preview</span></b></div>
+            <div class="window-actions" aria-hidden="true"><i></i><i></i><i></i></div>
+            <img class="title-hat" src="assets/seasonal/santa-hat.png" alt="Праздничная шапочка">
+          </div>
+          <div class="window-body">
+            <aside class="mock-sidebar" aria-label="Пример навигации">
+              <div class="side-label">ПРЕДПРОСМОТР</div>
+              <div class="side-item active"><span class="side-icon">✳</span> Christmas</div>
+              <div class="side-item"><span class="side-icon">◌</span> Цвета</div>
+              <div class="side-item"><span class="side-icon">▤</span> Компоненты</div>
+              <div class="sidebar-note"><span class="online-dot"></span><span>Изолированный<br>демо-режим</span></div>
+            </aside>
+
+            <div class="mock-content">
+              <div class="mock-topline"><span>MAT RONIX / ЗИМНИЙ СЕЗОН</span><span class="preview-only">THEME PREVIEW</span></div>
+              <div class="welcome-row">
+                <div><p class="greeting">ТИХАЯ ЗИМА · 2026</p><h3>Праздник —<br><span>в деталях.</span></h3><p class="welcome-copy">Глубокий еловый фон, клюквенные акценты и тёплое золото — без лишнего блеска.</p></div>
+                <img class="snowman" src="assets/seasonal/snowman.png" alt="Снеговик в цилиндре">
+              </div>
+
+              <div class="sample-label">ОБРАЗЦЫ ИНТЕРФЕЙСА <span>Здесь нет игровых сборок</span></div>
+              <div class="sample-grid">
+                <article class="sample-card selected"><div class="card-top"><span class="card-icon pine">✳</span><span class="card-state">ТЕМА</span></div><b>Evergreen</b><small>Хвойный · #122019</small></article>
+                <article class="sample-card"><div class="card-top"><span class="card-icon berry">✦</span><span class="card-state">АКЦЕНТ</span></div><b>Cranberry</b><small>Клюква · #C84F59</small></article>
+                <article class="sample-card"><div class="card-top"><span class="card-icon gold">✧</span><span class="card-state">СВЕТ</span></div><b>Champagne</b><small>Тёплое золото · #E7C77E</small></article>
+              </div>
+
+              <div class="mock-footer"><span><i></i> Только визуальный предпросмотр</span><span>Сборки · Аккаунты · Загрузка <b>отключены</b></span></div>
+            </div>
+          </div>
+          <div class="snow-layer" id="snow-layer" aria-hidden="true"></div>
+        </div>
+        <p class="preview-caption"><span>ДЕМО-ОКНО</span> Макет показывает сезонную палитру и декоративные элементы; игровые данные не загружаются.</p>
+      </section>
+
+      <section class="palette-section" aria-label="Палитра зимней темы">
+        <div class="palette-heading"><span class="section-kicker">02 / PALETTE</span><span>Сдержанные праздничные оттенки</span></div>
+        <div class="palette-strip"><div><i style="--swatch:#0b1511"></i><b>Evergreen</b><small>#0B1511</small></div><div><i style="--swatch:#122019"></i><b>Fir panel</b><small>#122019</small></div><div><i style="--swatch:#c84f59"></i><b>Cranberry</b><small>#C84F59</small></div><div><i style="--swatch:#e7c77e"></i><b>Champagne</b><small>#E7C77E</small></div><div><i style="--swatch:#f2f5ec"></i><b>Snow</b><small>#F2F5EC</small></div></div>
+      </section>
+
+      <footer class="lab-footer"><span>MAT RONIX / THEME LAB</span><span>Изолированный предпросмотр · без игрового клиента</span><a href="https://matronixowner.github.io/MatronixLauncher/">На сайт ↗</a></footer>
+    </main>
+  </div>
+</body>
+</html>

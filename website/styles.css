@@ -42,6 +42,7 @@ a { color: inherit; text-decoration: none; }
 .wordmark { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 800; letter-spacing: -.035em; }
 .wordmark > img { width: 29px; height: 29px; border: 1px solid #3d3e42; border-radius: 0; object-fit: contain; }
 .wordmark-light { margin-left: 3px; color: #a8a9ac; font-weight: 500; }
+.topbar-links { display: flex; align-items: center; gap: 20px; }
 .nav-link { color: #b7b8bb; font-size: 12px; transition: color .18s ease; }
 .nav-link:hover, .footer a:hover { color: var(--text); }
 .nav-link span { padding-left: 3px; color: var(--green); }
@@ -146,6 +147,8 @@ h1 span { display: block; color: #aeb0b3; }
 @media (max-width: 620px) {
   .page-shell { width: min(100% - 32px, 500px); }
   .topbar { height: 66px; }
+  .topbar-links { gap: 10px; }
+  .nav-link { font-size: 10px; }
   .hero { min-height: 420px; padding: 55px 0 45px; }
   .hero-icon-wrap { width: 78px; height: 78px; }
 

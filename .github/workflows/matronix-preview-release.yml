@@ -73,8 +73,10 @@ jobs:
           body: |
             Preview build of MatronixPrismLauncher.
 
-            - Aurora adds slow teal-violet light ribbons, Crimson gets a refined graphite-red finish, and Frost has gentle snowfall.
-            - Select a local video as a silent, looping launcher background from Appearance settings; it remains visible when the cat background is also enabled, and playback errors are reported.
+            - Aurora and Frost now use calm, static lighting instead of moving overlays; Crimson has a refined graphite-red finish.
+            - The seasonal Christmas theme unlocks from December 1 through January 7 using the computer's local date, with a Santa hat, snowman, and restrained snowfall.
+            - The video background deployment now explicitly includes Qt Multimedia backends; playback errors are reported in the launcher.
+            - A separate Winter Theme Lab previews the Christmas palette without game builds or accounts.
             - Calm, short fades accompany theme changes and instance selection.
             - Mark instances as favorites, search by name, ID, or group, and sort by name, recency, or playtime.
             - Existing groups, instance copying, Modrinth-only mod management, and cat-background customization remain available.

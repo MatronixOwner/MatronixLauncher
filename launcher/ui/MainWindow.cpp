@@ -71,6 +71,7 @@
 #include <QMessageBox>
 #include <QProgressDialog>
 #include <QPropertyAnimation>
+#include <QPixmap>
 #include <QShortcut>
 #include <QStatusBar>
 #include <QStyle>
@@ -153,6 +154,29 @@ QString profileInUseFilter(const QString& profile, bool used)
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    m_seasonalHat = new QLabel(ui->mainToolBar);
+    m_seasonalHat->setObjectName(QStringLiteral("seasonalSantaHat"));
+    m_seasonalHat->setAlignment(Qt::AlignCenter);
+    m_seasonalHat->setFixedSize(40, 30);
+    m_seasonalHat->setPixmap(QPixmap(QStringLiteral(":/seasonal/santa-hat.png"))
+                                  .scaled(36, 26, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    m_seasonalHat->setToolTip(tr("Christmas theme — available from December 1."));
+    ui->mainToolBar->addWidget(m_seasonalHat);
+    m_seasonalSnowman = new QLabel(ui->mainToolBar);
+    m_seasonalSnowman->setObjectName(QStringLiteral("seasonalSnowman"));
+    m_seasonalSnowman->setAlignment(Qt::AlignCenter);
+    m_seasonalSnowman->setFixedSize(30, 30);
+    m_seasonalSnowman->setPixmap(QPixmap(QStringLiteral(":/seasonal/snowman.png"))
+                                     .scaled(26, 26, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    m_seasonalSnowman->setToolTip(tr("Winter preview decorations."));
+    ui->mainToolBar->addWidget(m_seasonalSnowman);
+    m_seasonalDecorationsTimer = new QTimer(this);
+    m_seasonalDecorationsTimer->setInterval(60000);
+    connect(m_seasonalDecorationsTimer, &QTimer::timeout, this, &MainWindow::updateSeasonalDecorations);
+    m_seasonalDecorationsTimer->start();
+    connect(APPLICATION, &Application::globalSettingsApplied, this, &MainWindow::updateSeasonalDecorations);
+    updateSeasonalDecorations();
 
     setWindowIcon(APPLICATION->logo());
     setWindowTitle(APPLICATION->applicationDisplayName());
@@ -690,6 +714,23 @@ void MainWindow::updateMainToolBar()
     ui->menuBar->setVisible(APPLICATION->settings()->get("MenuBarInsteadOfToolBar").toBool());
     ui->mainToolBar->setVisible(ui->menuBar->isNativeMenuBar() || !APPLICATION->settings()->get("MenuBarInsteadOfToolBar").toBool());
     ui->actionCAT->setVisible(APPLICATION->settings()->get("CatButtonVisible").toBool());
+}
+
+void MainWindow::updateSeasonalDecorations()
+{
+    const bool inChristmasSeason = ThemeManager::isChristmasThemeAvailable();
+    if (!inChristmasSeason && APPLICATION->settings()->get("ApplicationTheme").toString() == QLatin1String("christmas")) {
+        APPLICATION->settings()->set("ApplicationTheme", QStringLiteral("dark"));
+        APPLICATION->themeManager()->applyCurrentlySelectedTheme();
+    }
+    const bool christmasTheme = inChristmasSeason &&
+                               APPLICATION->settings()->get("ApplicationTheme").toString() == QLatin1String("christmas");
+    if (m_seasonalHat)
+        m_seasonalHat->setVisible(christmasTheme);
+    if (m_seasonalSnowman)
+        m_seasonalSnowman->setVisible(christmasTheme);
+    if (view)
+        view->viewport()->update();
 }
 
 void MainWindow::animateContentChange()
