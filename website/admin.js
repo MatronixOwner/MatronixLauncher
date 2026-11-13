@@ -2,7 +2,7 @@
   const DRAFT_KEY = "matronix-site-admin-draft-v1";
   const releasePattern = /^v\d+(?:\.\d+){1,3}(?:-[A-Za-z0-9.-]+)?$/;
   const defaults = {
-    releaseVersion: "v0.1.0-alpha.11",
+    releaseVersion: "v0.1.0-alpha.12",
     announcementEnabled: false,
     announcement: "",
     customization: {
@@ -98,7 +98,7 @@
       badge.classList.remove("is-saved");
     }
     const validRelease = releasePattern.test(config.releaseVersion);
-    byId("release-version").setCustomValidity(validRelease ? "" : "Укажи тег формата v0.1.0-alpha.11");
+    byId("release-version").setCustomValidity(validRelease ? "" : "Укажи тег формата v0.1.0-alpha.12");
     byId("preview-message").textContent = validRelease ? "Предпросмотр обновлён · изменения ещё не опубликованы" : "Проверь формат тега релиза";
   }
 
