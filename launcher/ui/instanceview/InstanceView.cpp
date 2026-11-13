@@ -37,20 +37,15 @@
 
 #include <QAccessible>
 #include <QApplication>
-#include <QAudioOutput>
 #include <QCache>
 #include <QDrag>
 #include <QFont>
 #include <QListView>
-#include <QMediaPlayer>
 #include <QMimeData>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPersistentModelIndex>
 #include <QScrollBar>
-#include <QUrl>
-#include <QVideoFrame>
-#include <QVideoSink>
 #include <QtMath>
 
 #include "VisualGroup.h"
@@ -78,8 +73,6 @@ InstanceView::InstanceView(QWidget* parent) : QAbstractItemView(parent)
     setAcceptDrops(true);
     setAutoScroll(true);
     setPaintCat(APPLICATION->settings()->get("TheCat").toBool());
-    setVideoBackground(APPLICATION->settings()->get("VideoBackground").toBool(),
-                       APPLICATION->settings()->get("VideoBackgroundPath").toString());
     connect(verticalScrollBar(), &QScrollBar::valueChanged, viewport(), QOverload<>::of(&QWidget::update));
     connect(horizontalScrollBar(), &QScrollBar::valueChanged, viewport(), QOverload<>::of(&QWidget::update));
 }
@@ -460,52 +453,11 @@ void InstanceView::setPaintCat(bool visible)
     }
 }
 
-void InstanceView::setVideoBackground(bool enabled, const QString& filePath)
-{
-    if (!m_videoPlayer) {
-        m_videoPlayer = new QMediaPlayer(this);
-        auto* audioOutput = new QAudioOutput(m_videoPlayer);
-        audioOutput->setMuted(true);
-        m_videoPlayer->setAudioOutput(audioOutput);
-        m_videoSink = new QVideoSink(this);
-        m_videoPlayer->setVideoSink(m_videoSink);
-        connect(m_videoSink, &QVideoSink::videoFrameChanged, this, [this](const QVideoFrame& frame) {
-            const QImage image = frame.toImage();
-            if (!image.isNull()) {
-                m_videoFrame = image;
-                viewport()->update();
-            }
-        });
-        connect(m_videoPlayer, &QMediaPlayer::mediaStatusChanged, this, [this](QMediaPlayer::MediaStatus status) {
-            if (status == QMediaPlayer::EndOfMedia) {
-                m_videoPlayer->setPosition(0);
-                m_videoPlayer->play();
-            }
-        });
-    }
-
-    const QUrl source = filePath.isEmpty() ? QUrl() : QUrl::fromLocalFile(filePath);
-    if (m_videoPlayer->source() != source)
-        m_videoPlayer->setSource(source);
-    if (enabled && !source.isEmpty())
-        m_videoPlayer->play();
-    else
-        m_videoPlayer->pause();
-    viewport()->update();
-}
-
 void InstanceView::paintEvent([[maybe_unused]] QPaintEvent* event)
 {
     executeDelayedItemsLayout();
 
     QPainter painter(this->viewport());
-
-    if (!m_videoFrame.isNull() && m_videoPlayer && m_videoPlayer->playbackState() == QMediaPlayer::PlayingState) {
-        const QSize scaled = m_videoFrame.size().scaled(viewport()->size(), Qt::KeepAspectRatioByExpanding);
-        const QRect sourceRect((scaled.width() - viewport()->width()) / 2, (scaled.height() - viewport()->height()) / 2,
-                               viewport()->width(), viewport()->height());
-        painter.drawImage(viewport()->rect(), m_videoFrame.scaled(scaled, Qt::IgnoreAspectRatio, Qt::SmoothTransformation), sourceRect);
-    }
 
     if (m_cat) {
         m_cat->paint(&painter, this->viewport()->rect());

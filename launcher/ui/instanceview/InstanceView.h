@@ -36,16 +36,12 @@
 #pragma once
 
 #include <QCache>
-#include <QImage>
 #include <QLineEdit>
 #include <QListView>
 #include <QScrollBar>
 #include <functional>
 #include "VisualGroup.h"
 #include "ui/themes/CatPainter.h"
-
-class QMediaPlayer;
-class QVideoSink;
 
 struct InstanceViewRoles {
     enum { GroupRole = Qt::UserRole, ProgressValueRole, ProgressMaximumRole };
@@ -83,7 +79,6 @@ class InstanceView : public QAbstractItemView {
 
     int spacing() const { return m_spacing; };
     void setPaintCat(bool visible);
-    void setVideoBackground(bool enabled, const QString& filePath = QString());
 
    public slots:
     virtual void updateGeometries() override;
@@ -135,9 +130,6 @@ class InstanceView : public QAbstractItemView {
     int m_currentCursorColumn = -1;
     mutable QCache<int, QRect> m_geometryCache;
     CatPainter* m_cat = nullptr;
-    QMediaPlayer* m_videoPlayer = nullptr;
-    QVideoSink* m_videoSink = nullptr;
-    QImage m_videoFrame;
 
     // point where the currently active mouse action started in geometry coordinates
     QPoint m_pressedPosition;

@@ -208,7 +208,6 @@ class Application : public QApplication {
     void globalSettingsAboutToOpen();
     void globalSettingsApplied();
     int currentCatChanged(int index);
-    void videoBackgroundChanged(const QString& filePath);
 
     void oauthReplyRecieved(QVariantMap);
 

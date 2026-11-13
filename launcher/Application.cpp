@@ -810,8 +810,6 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
         m_settings->registerSetting("CatOpacity", 100);
         m_settings->registerSetting("CatDarkness", 0);
         m_settings->registerSetting("CatFit", "fit");
-        m_settings->registerSetting("VideoBackground", false);
-        m_settings->registerSetting("VideoBackgroundPath", QString());
 
         m_settings->registerSetting("StatusBarVisible", true);
 

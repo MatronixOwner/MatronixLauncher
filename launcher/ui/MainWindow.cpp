@@ -73,7 +73,6 @@
 #include <QPropertyAnimation>
 #include <QShortcut>
 #include <QStatusBar>
-#include <QStyle>
 #include <QToolBar>
 #include <QToolButton>
 #include <QWidget>
@@ -398,29 +397,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         connect(ui->actionCAT, &QAction::toggled, this, &MainWindow::onCatToggled);
         connect(APPLICATION, &Application::currentCatChanged, this, &MainWindow::onCatChanged);
         setCatBackground(cat_enable);
-
-        const bool videoEnabled = APPLICATION->settings()->get("VideoBackground").toBool();
-        ui->actionVideoBackground->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
-        ui->actionVideoBackground->setChecked(videoEnabled);
-        connect(ui->actionVideoBackground, &QAction::toggled, this, [this](bool enabled) {
-            const QString videoPath = APPLICATION->settings()->get("VideoBackgroundPath").toString();
-            if (enabled && videoPath.isEmpty()) {
-                ui->actionVideoBackground->setChecked(false);
-                QMessageBox::information(this, tr("Video background"), tr("Choose a video in Settings → Appearance first."));
-                return;
-            }
-            APPLICATION->settings()->set("VideoBackground", enabled);
-            view->setVideoBackground(enabled, videoPath);
-        });
-        view->setVideoBackground(videoEnabled, APPLICATION->settings()->get("VideoBackgroundPath").toString());
-        connect(APPLICATION, &Application::videoBackgroundChanged, this, [this](const QString& path) {
-            const bool enabled = APPLICATION->settings()->get("VideoBackground").toBool();
-            if (enabled && path.isEmpty()) {
-                APPLICATION->settings()->set("VideoBackground", false);
-                ui->actionVideoBackground->setChecked(false);
-            }
-            view->setVideoBackground(enabled && !path.isEmpty(), path);
-        });
     }
 
     // Togglable status bar

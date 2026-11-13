@@ -31,7 +31,6 @@
 #include "ui/themes/CustomTheme.h"
 #include "ui/themes/DarkTheme.h"
 #include "ui/themes/MatronixPurpleTheme.h"
-#include "ui/themes/MatronixAccentTheme.h"
 #include "ui/themes/SystemTheme.h"
 
 #include "Application.h"
@@ -140,9 +139,6 @@ void ThemeManager::initializeWidgets()
     auto darkThemeId = addTheme(std::make_unique<DarkTheme>());
     themeDebugLog() << "Loading Built-in Theme:" << darkThemeId;
     themeDebugLog() << "Loading Built-in Theme:" << addTheme(std::make_unique<MatronixPurpleTheme>());
-    themeDebugLog() << "Loading Built-in Theme:" << addTheme(std::make_unique<MatronixAccentTheme>(MatronixAccentTheme::Variant::Aurora));
-    themeDebugLog() << "Loading Built-in Theme:" << addTheme(std::make_unique<MatronixAccentTheme>(MatronixAccentTheme::Variant::Crimson));
-    themeDebugLog() << "Loading Built-in Theme:" << addTheme(std::make_unique<MatronixAccentTheme>(MatronixAccentTheme::Variant::Frost));
     themeDebugLog() << "Loading Built-in Theme:" << addTheme(std::make_unique<BrightTheme>());
 
     themeDebugLog() << "<> Initializing System Widget Themes";
