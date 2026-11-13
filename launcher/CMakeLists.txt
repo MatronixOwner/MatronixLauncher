@@ -889,6 +889,8 @@ SET(LAUNCHER_SOURCES
     ui/themes/DarkTheme.h
     ui/themes/MatronixPurpleTheme.cpp
     ui/themes/MatronixPurpleTheme.h
+    ui/themes/MatronixAccentTheme.cpp
+    ui/themes/MatronixAccentTheme.h
     ui/themes/ITheme.cpp
     ui/themes/ITheme.h
     ui/themes/HintOverrideProxyStyle.cpp
@@ -1314,6 +1316,7 @@ target_link_libraries(Launcher_logic
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::NetworkAuth
     Qt${QT_VERSION_MAJOR}::OpenGL
+    Qt${QT_VERSION_MAJOR}::Multimedia
     ${Launcher_QT_DBUS}
     ${Launcher_QT_LIBS}
 )
