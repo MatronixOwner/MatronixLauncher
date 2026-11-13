@@ -232,7 +232,6 @@ class MainWindow : public QMainWindow {
     void updateStatusCenter();
     void setInstanceActionsEnabled(bool enabled);
     void animateContentChange();
-    void updateSeasonalDecorations();
 
     void runModalTask(Task* task);
     void instanceFromInstanceTask(InstanceTask* task);
@@ -249,9 +248,6 @@ class MainWindow : public QMainWindow {
     QToolButton* newsLabel = nullptr;
     QLabel* m_statusLeft = nullptr;
     QLabel* m_statusCenter = nullptr;
-    QLabel* m_seasonalHat = nullptr;
-    QLabel* m_seasonalSnowman = nullptr;
-    QTimer* m_seasonalDecorationsTimer = nullptr;
     LabeledToolButton* changeIconButton = nullptr;
     LabeledToolButton* renameButton = nullptr;
     QToolButton* helpMenuButton = nullptr;

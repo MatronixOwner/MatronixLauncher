@@ -5,7 +5,7 @@
 
 class MatronixAccentTheme : public FusionTheme {
    public:
-    enum class Variant { Aurora, Crimson, Frost, Christmas };
+    enum class Variant { Aurora, Crimson, Frost };
     explicit MatronixAccentTheme(Variant variant) : m_variant(variant) {}
 
     QString id() override;

@@ -23,13 +23,11 @@ const Colors& colors(MatronixAccentTheme::Variant variant)
 {
     static const Colors aurora{ "aurora", "Aurora", "Midnight blue with flowing teal and violet aurora light.", "#08121e", "#0f1c2b", "#16283b", "#e7f3fb", "#97acbf", "#42d6c5", "#ae95ff", "#153c42", "#2c4558" };
     static const Colors crimson{ "crimson", "Crimson", "Polished graphite with restrained, vivid crimson accents.", "#111013", "#1b191d", "#262227", "#f5edf0", "#afa3aa", "#e84862", "#ff8294", "#3d202a", "#41323a" };
-    static const Colors frost{ "frost", "Frost", "Quiet ice-blue surfaces with crisp, frosted highlights.", "#081321", "#101e2d", "#172a3f", "#eaf6ff", "#a4bad0", "#78cfff", "#c5f0ff", "#1d3b51", "#31516b" };
-    static const Colors christmas{ "christmas", "Christmas", "Evergreen, cranberry, and warm champagne for the winter season.", "#0b1511", "#122019", "#1b2c22", "#f2f5ec", "#a9baaa", "#c84f59", "#e7c77e", "#38262a", "#354c3d" };
+    static const Colors frost{ "frost", "Frost", "Icy midnight blue, translucent panels, and drifting snow.", "#081321", "#101e2d", "#172a3f", "#eaf6ff", "#a4bad0", "#78cfff", "#c5f0ff", "#1d3b51", "#31516b" };
     switch (variant) {
         case MatronixAccentTheme::Variant::Aurora: return aurora;
         case MatronixAccentTheme::Variant::Crimson: return crimson;
         case MatronixAccentTheme::Variant::Frost: return frost;
-        case MatronixAccentTheme::Variant::Christmas: return christmas;
     }
     return aurora;
 }
@@ -42,9 +40,7 @@ QString centralGlow(MatronixAccentTheme::Variant variant)
         case MatronixAccentTheme::Variant::Crimson:
             return QStringLiteral("qradialgradient(cx:0.88, cy:0.08, radius:1.0, fx:0.88, fy:0.08, stop:0 rgba(192, 42, 68, 34), stop:0.5 rgba(48, 29, 37, 18), stop:1 #111013)");
         case MatronixAccentTheme::Variant::Frost:
-            return QStringLiteral("qradialgradient(cx:0.18, cy:0.06, radius:0.95, fx:0.18, fy:0.06, stop:0 rgba(89, 178, 235, 28), stop:0.52 rgba(26, 53, 78, 16), stop:1 #081321)");
-        case MatronixAccentTheme::Variant::Christmas:
-            return QStringLiteral("qradialgradient(cx:0.88, cy:0.02, radius:0.92, fx:0.88, fy:0.02, stop:0 rgba(181, 78, 76, 28), stop:0.5 rgba(31, 58, 41, 18), stop:1 #0b1511)");
+            return QStringLiteral("qradialgradient(cx:0.18, cy:0.06, radius:0.95, fx:0.18, fy:0.06, stop:0 rgba(89, 178, 235, 34), stop:0.52 rgba(26, 53, 78, 20), stop:1 #081321)");
     }
     return QStringLiteral("#08121e");
 }

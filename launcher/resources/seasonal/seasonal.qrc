@@ -1,6 +1,0 @@
-<RCC>
-  <qresource prefix="/seasonal">
-    <file alias="santa-hat.png">santa-hat.png</file>
-    <file alias="snowman.png">snowman.png</file>
-  </qresource>
-</RCC>

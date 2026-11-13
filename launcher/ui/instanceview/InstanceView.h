@@ -152,7 +152,9 @@ class InstanceView : public QAbstractItemView {
     bool m_videoEnabled = false;
     QVector<Snowflake> m_snowflakes;
     QTimer* m_snowTimer = nullptr;
-    bool m_christmasEffectsEnabled = false;
+    bool m_frostEffectsEnabled = false;
+    bool m_auroraEffectsEnabled = false;
+    qreal m_auroraPhase = 0;
 
     // point where the currently active mouse action started in geometry coordinates
     QPoint m_pressedPosition;

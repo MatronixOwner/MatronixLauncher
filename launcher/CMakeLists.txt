@@ -1244,7 +1244,6 @@ qt_add_resources(LAUNCHER_RESOURCES
     resources/flat_white/flat_white.qrc
     resources/documents/documents.qrc
     resources/shaders/shaders.qrc
-    resources/seasonal/seasonal.qrc
     "${CMAKE_CURRENT_BINARY_DIR}/../${Launcher_Branding_LogoQRC}"
 )
 
@@ -1354,33 +1353,6 @@ if(APPLE)
 endif()
 
 add_executable(${Launcher_Name} MACOSX_BUNDLE WIN32 main.cpp ${LAUNCHER_RCS})
-
-# A tiny, standalone Windows executable that unpacks the static winter theme lab
-# to Local AppData and opens it in the user's browser. It has no launcher/game logic.
-if(WIN32)
-    set(WINTER_LAB_SOURCE_DIR "${CMAKE_SOURCE_DIR}/website")
-    file(TO_CMAKE_PATH "${WINTER_LAB_SOURCE_DIR}/winter-lab.html" WINTER_LAB_HTML_PATH)
-    file(TO_CMAKE_PATH "${WINTER_LAB_SOURCE_DIR}/winter-lab.css" WINTER_LAB_CSS_PATH)
-    file(TO_CMAKE_PATH "${WINTER_LAB_SOURCE_DIR}/winter-lab.js" WINTER_LAB_JS_PATH)
-    file(TO_CMAKE_PATH "${WINTER_LAB_SOURCE_DIR}/assets/seasonal/santa-hat.png" WINTER_LAB_HAT_PATH)
-    file(TO_CMAKE_PATH "${WINTER_LAB_SOURCE_DIR}/assets/seasonal/snowman.png" WINTER_LAB_SNOWMAN_PATH)
-    file(TO_CMAKE_PATH "${WINTER_LAB_SOURCE_DIR}/assets/matronixprismlauncher.svg" WINTER_LAB_LOGO_PATH)
-    configure_file(devpreview/winter-lab.rc.in "${CMAKE_CURRENT_BINARY_DIR}/winter-lab.rc" @ONLY)
-
-    add_executable(MatronixWinterThemeLab WIN32
-        devpreview/main.cpp
-        "${CMAKE_CURRENT_BINARY_DIR}/winter-lab.rc"
-    )
-    target_link_libraries(MatronixWinterThemeLab PRIVATE shell32)
-    set_target_properties(MatronixWinterThemeLab PROPERTIES
-        OUTPUT_NAME "MatronixWinterThemeLab"
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/dev-preview"
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/dev-preview"
-        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/dev-preview"
-        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/dev-preview"
-        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/dev-preview"
-    )
-endif()
 
 if(${Launcher_USE_PCH})
     target_precompile_headers(${Launcher_Name} REUSE_FROM Launcher_logic)
@@ -1557,22 +1529,6 @@ if(WIN32 OR (UNIX AND APPLE))
         set(QT_DEPLOY_TOOL_OPTIONS "--no-opengl-sw --no-quick-import --no-system-d3d-compiler --no-system-dxc-compiler --skip-plugin-types generic,networkinformation")
     endif()
 
-    # Qt's dependency scanner doesn't see multimedia backends as linked modules.
-    # Explicitly deploy their plugin category so QMediaPlayer can decode videos in packaged builds.
-    set(QT_DEPLOY_MULTIMEDIA_OPTION "")
-    set(QT_DEPLOY_MULTIMEDIA_EXTRA_MODULES "")
-    if(Qt6_VERSION VERSION_GREATER_EQUAL "6.10")
-        set(QT_DEPLOY_MULTIMEDIA_OPTION "INCLUDE_PLUGIN_TYPES multimedia")
-    else()
-        file(GLOB QT_MULTIMEDIA_PLUGINS "${QT_PLUGINS_DIR}/multimedia/*${CMAKE_SHARED_MODULE_SUFFIX}")
-        # Deployment scripts accept paths, so use matching install-relative paths.
-        set(QT_DEPLOY_MULTIMEDIA_EXTRA_MODULES "")
-        foreach(QT_MULTIMEDIA_PLUGIN IN LISTS QT_MULTIMEDIA_PLUGINS)
-            get_filename_component(QT_MULTIMEDIA_PLUGIN_NAME "${QT_MULTIMEDIA_PLUGIN}" NAME)
-            list(APPEND QT_DEPLOY_MULTIMEDIA_EXTRA_MODULES "\${QT_DEPLOY_PLUGINS_DIR}/multimedia/${QT_MULTIMEDIA_PLUGIN_NAME}")
-        endforeach()
-    endif()
-
     qt_generate_deploy_script(
         TARGET ${Launcher_Name}
         OUTPUT_SCRIPT QT_DEPLOY_SCRIPT
@@ -1586,8 +1542,6 @@ if(WIN32 OR (UNIX AND APPLE))
             NO_OVERWRITE
             NO_TRANSLATIONS
             NO_COMPILER_RUNTIME
-            ${QT_DEPLOY_MULTIMEDIA_OPTION}
-            ADDITIONAL_MODULES ${QT_DEPLOY_MULTIMEDIA_EXTRA_MODULES}
             DEPLOY_TOOL_OPTIONS ${QT_DEPLOY_TOOL_OPTIONS}
         )"
     )

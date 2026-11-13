@@ -19,7 +19,6 @@
 #include "ThemeManager.h"
 
 #include <QApplication>
-#include <QDate>
 #include <QDir>
 #include <QDirIterator>
 #include <QIcon>
@@ -144,7 +143,6 @@ void ThemeManager::initializeWidgets()
     themeDebugLog() << "Loading Built-in Theme:" << addTheme(std::make_unique<MatronixAccentTheme>(MatronixAccentTheme::Variant::Aurora));
     themeDebugLog() << "Loading Built-in Theme:" << addTheme(std::make_unique<MatronixAccentTheme>(MatronixAccentTheme::Variant::Crimson));
     themeDebugLog() << "Loading Built-in Theme:" << addTheme(std::make_unique<MatronixAccentTheme>(MatronixAccentTheme::Variant::Frost));
-    themeDebugLog() << "Loading Built-in Theme:" << addTheme(std::make_unique<MatronixAccentTheme>(MatronixAccentTheme::Variant::Christmas));
     themeDebugLog() << "Loading Built-in Theme:" << addTheme(std::make_unique<BrightTheme>());
 
     themeDebugLog() << "<> Initializing System Widget Themes";
@@ -209,17 +207,9 @@ QList<ITheme*> ThemeManager::getValidApplicationThemes()
     QList<ITheme*> ret;
     ret.reserve(m_themes.size());
     for (auto&& [id, theme] : m_themes) {
-        if (id == QLatin1String("christmas") && !isChristmasThemeAvailable())
-            continue;
         ret.append(theme.get());
     }
     return ret;
-}
-
-bool ThemeManager::isChristmasThemeAvailable()
-{
-    const QDate today = QDate::currentDate();
-    return today.month() == 12 || (today.month() == 1 && today.day() <= 7);
 }
 
 QList<CatPack*> ThemeManager::getValidCatPacks()
@@ -239,8 +229,7 @@ bool ThemeManager::isValidIconTheme(const QString& id)
 
 bool ThemeManager::isValidApplicationTheme(const QString& id)
 {
-    return !id.isEmpty() && m_themes.find(id) != m_themes.end() &&
-           (id != QLatin1String("christmas") || isChristmasThemeAvailable());
+    return !id.isEmpty() && m_themes.find(id) != m_themes.end();
 }
 
 QDir ThemeManager::getIconThemesFolder()
@@ -271,12 +260,7 @@ void ThemeManager::setIconTheme(const QString& name)
 void ThemeManager::setApplicationTheme(const QString& name, bool initial)
 {
     auto systemPalette = qApp->palette();
-    QString availableTheme = name;
-    if (availableTheme == QLatin1String("christmas") && !isChristmasThemeAvailable()) {
-        availableTheme = QStringLiteral("dark");
-        APPLICATION->settings()->set("ApplicationTheme", availableTheme);
-    }
-    auto themeIter = m_themes.find(availableTheme);
+    auto themeIter = m_themes.find(name);
     if (themeIter != m_themes.end()) {
         auto& theme = themeIter->second;
         themeDebugLog() << "applying theme" << theme->name();

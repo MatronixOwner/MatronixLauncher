@@ -174,15 +174,6 @@ jobs:
             exit 1
           fi
 
-      - name: Upload standalone developer theme preview
-        if: ${{ runner.os == 'Windows' }}
-        uses: actions/upload-artifact@v7
-        with:
-          name: MatronixWinterThemeLab-${{ github.sha }}
-          path: build/dev-preview/MatronixWinterThemeLab.exe
-          if-no-files-found: error
-          retention-days: 30
-
       #- name: Run tests
       #  run: |
       #    ctest --preset "$CMAKE_PRESET" --build-config "$BUILD_TYPE"
