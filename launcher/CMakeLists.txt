@@ -1274,7 +1274,7 @@ endif()
 # Add executable
 add_library(Launcher_logic STATIC ${LOGIC_SOURCES} ${LAUNCHER_SOURCES} ${LAUNCHER_RESOURCES})
 if(WIN32)
-    target_link_libraries(Launcher_logic PRIVATE dwmapi)
+    target_link_libraries(Launcher_logic dwmapi)
 endif()
 target_include_directories(Launcher_logic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_definitions(Launcher_logic PUBLIC LAUNCHER_APPLICATION)
