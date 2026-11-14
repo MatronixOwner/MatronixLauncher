@@ -36,7 +36,6 @@
 #include "InstanceView.h"
 
 #include <QAccessible>
-#include <QAudioOutput>
 #include <QFileInfo>
 #include <QMediaPlayer>
 #include <QTimer>
@@ -479,20 +478,29 @@ void InstanceView::setVideoBackground(bool enabled, const QString& filePath)
         connect(m_videoStartTimer, &QTimer::timeout, this, [this] {
             if (!m_videoEnabled)
                 return;
+            const bool hasVideo = m_videoPlayer->hasVideo();
+            const auto status = m_videoPlayer->mediaStatus();
+            const auto position = m_videoPlayer->position();
             m_videoEnabled = false;
             m_videoPlayer->stop();
             viewport()->update();
-            emit videoBackgroundError(tr("No video frames were received. The file may use an unsupported codec or contain no video track."));
+            emit videoBackgroundError(
+                tr("The video background could not display a frame. Try another MP4 encoded with H.264.\n\n"
+                   "Diagnostic information: video track %1, player status %2, position %3 ms.")
+                    .arg(hasVideo ? tr("detected") : tr("not detected"))
+                    .arg(static_cast<int>(status))
+                    .arg(position));
         });
         m_videoPlayer = new QMediaPlayer(this);
-        auto* audioOutput = new QAudioOutput(m_videoPlayer);
-        audioOutput->setMuted(true);
-        m_videoPlayer->setAudioOutput(audioOutput);
+        // A background must be silent. Leaving audioOutput unset avoids opening
+        // an audio device and allows playback even when Windows has none.
         m_videoSink = new QVideoSink(m_videoPlayer);
         m_videoPlayer->setVideoSink(m_videoSink);
         connect(m_videoSink, &QVideoSink::videoFrameChanged, this, [this](const QVideoFrame& frame) {
+            if (!m_videoEnabled)
+                return;
             const QImage image = frame.toImage();
-            if (m_videoEnabled && !image.isNull()) {
+            if (!image.isNull()) {
                 m_videoStartTimer->stop();
                 m_videoFrame = image;
                 viewport()->update();
