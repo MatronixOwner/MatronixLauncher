@@ -212,10 +212,12 @@ void AppearanceWidget::retranslateUi()
 void AppearanceWidget::applyIconTheme(int index)
 {
     auto settings = APPLICATION->settings();
-    auto originalIconTheme = settings->get("IconTheme").toString();
+    const auto iconSetting = settings->get("ApplicationTheme").toString() == QLatin1String("matronix-frost")
+                                 ? "FrostIconTheme" : "IconTheme";
+    auto originalIconTheme = settings->get(iconSetting).toString();
     auto newIconTheme = m_ui->iconsComboBox->itemData(index).toString();
     if (originalIconTheme != newIconTheme) {
-        settings->set("IconTheme", newIconTheme);
+        settings->set(iconSetting, newIconTheme);
         APPLICATION->themeManager()->applyCurrentlySelectedTheme();
     }
 }
@@ -228,6 +230,13 @@ void AppearanceWidget::applyWidgetTheme(int index)
     if (originalAppTheme != newAppTheme) {
         settings->set("ApplicationTheme", newAppTheme);
         APPLICATION->themeManager()->applyCurrentlySelectedTheme();
+        const auto iconSetting = newAppTheme == QLatin1String("matronix-frost") ? "FrostIconTheme" : "IconTheme";
+        const int iconIndex = m_ui->iconsComboBox->findData(settings->get(iconSetting).toString());
+        if (iconIndex >= 0) {
+            m_ui->iconsComboBox->blockSignals(true);
+            m_ui->iconsComboBox->setCurrentIndex(iconIndex);
+            m_ui->iconsComboBox->blockSignals(false);
+        }
     }
 
     updateConsolePreview();
@@ -260,7 +269,9 @@ void AppearanceWidget::loadThemeSettings()
 
     SettingsObject* settings = APPLICATION->settings();
 
-    const QString currentIconTheme = settings->get("IconTheme").toString();
+    const auto iconSetting = settings->get("ApplicationTheme").toString() == QLatin1String("matronix-frost")
+                                 ? "FrostIconTheme" : "IconTheme";
+    const QString currentIconTheme = settings->get(iconSetting).toString();
     const auto iconThemes = APPLICATION->themeManager()->getValidIconThemes();
 
     for (int i = 0; i < iconThemes.count(); ++i) {

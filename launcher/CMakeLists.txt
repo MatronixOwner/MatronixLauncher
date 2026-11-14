@@ -1244,6 +1244,7 @@ qt_add_resources(LAUNCHER_RESOURCES
     resources/pe_light/pe_light.qrc
     resources/pe_colored/pe_colored.qrc
     resources/pe_blue/pe_blue.qrc
+    resources/matronix_frost/matronix_frost.qrc
     resources/breeze_dark/breeze_dark.qrc
     resources/breeze_light/breeze_light.qrc
     resources/OSX/OSX.qrc

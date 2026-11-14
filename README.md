@@ -20,7 +20,7 @@ MatronixPrismLauncher is an independent Minecraft launcher project based on the 
 
 - **Manage Minecraft instances** and launch vanilla or mod-loader profiles using the upstream launcher foundation.
 - **Discover and manage mods through Modrinth.** CurseForge browsing, downloads, and automatic updates are disabled; no upstream CurseForge API key is reused.
-- **Make the launcher yours** with themes, icons, original cat backgrounds, and user-imported image packs. Matronix Frost adds icy blue colors and subtle falling snow.
+- **Make the launcher yours** with themes, icons, original cat backgrounds, and user-imported image packs. Matronix Frost adds muted icy blue colors, subtle falling snow, and its own icon set. Frost icons are adapted from [Lucide](https://lucide.dev/) (ISC; see `launcher/resources/matronix_frost/LICENSE`).
 - **Use builds for your platform.** CI packages Windows installers and Linux AppImage/portable archives. The Windows installer is currently unsigned.
 - **Configure service endpoints and mirrors.** Third-party account, Minecraft, and mod services may be unavailable or restricted depending on network and region; no launcher can guarantee access everywhere.
 

@@ -263,6 +263,10 @@ void ThemeManager::setApplicationTheme(const QString& name, bool initial)
         auto& theme = themeIter->second;
         themeDebugLog() << "applying theme" << theme->name();
         theme->apply(initial);
+        // Frost keeps its own icon choice; other themes retain the user's normal set.
+        auto* settings = APPLICATION->settings();
+        const auto iconSetting = name == QLatin1String("matronix-frost") ? "FrostIconTheme" : "IconTheme";
+        setIconTheme(settings->get(iconSetting).toString());
         setTitlebarColorOfAllWindowsOnMac(qApp->palette().window().color());
 
         m_logColors = theme->logColorScheme();
@@ -274,8 +278,6 @@ void ThemeManager::setApplicationTheme(const QString& name, bool initial)
 void ThemeManager::applyCurrentlySelectedTheme(bool initial)
 {
     auto settings = APPLICATION->settings();
-    setIconTheme(settings->get("IconTheme").toString());
-    themeDebugLog() << "<> Icon theme set.";
     auto applicationTheme = settings->get("ApplicationTheme").toString();
     if (applicationTheme.isEmpty()) {
         applicationTheme = QStringLiteral("dark");

@@ -600,13 +600,13 @@ void InstanceView::paintEvent([[maybe_unused]] QPaintEvent* event)
         painter.save();
         painter.setRenderHint(QPainter::Antialiasing);
         // Fine icy highlights stay subtle and never cover the instance controls.
-        painter.setPen(QPen(QColor(231, 250, 255, 115), 1));
+        painter.setPen(QPen(QColor(158, 210, 230, 85), 1));
         painter.drawLine(QPointF(0, 1), QPointF(viewport()->width(), 1));
         for (const auto& flake : m_frostFlakes) {
             const QPointF point(flake.x * viewport()->width() + qSin(flake.phase) * 5.0,
                                 flake.y * viewport()->height());
-            painter.setPen(QPen(QColor(70, 151, 188, 90), 0.7));
-            painter.setBrush(QColor(245, 253, 255, 145));
+            painter.setPen(QPen(QColor(70, 151, 188, 75), 0.7));
+            painter.setBrush(QColor(197, 231, 243, 145));
             painter.drawEllipse(point, flake.radius, flake.radius);
         }
         painter.restore();
