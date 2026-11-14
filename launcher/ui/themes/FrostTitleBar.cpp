@@ -11,7 +11,7 @@ void updateFrostTitleBar(QWidget* window, bool enabled)
 {
 #ifdef Q_OS_WIN
     // Windows 11 supports explicit caption colors; older versions ignore them.
-    const COLORREF caption = enabled ? RGB(31, 58, 75) : 0xffffffffu;
+    const COLORREF caption = enabled ? RGB(47, 80, 98) : 0xffffffffu;
     const COLORREF text = enabled ? RGB(220, 236, 244) : 0xffffffffu;
     const HWND handle = reinterpret_cast<HWND>(window->winId());
     DwmSetWindowAttribute(handle, static_cast<DWMWINDOWATTRIBUTE>(35), &caption, sizeof(caption));
