@@ -1,0 +1,83 @@
+name: Publish MatronixPrismLauncher preview builds
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  build_release:
+    name: Build Windows and Linux packages
+    uses: ./.github/workflows/build.yml
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+    with:
+      build-type: Release
+
+  create_release:
+    needs: build_release
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release version
+        uses: actions/checkout@v6
+
+      - name: Read release version
+        shell: bash
+        run: echo "VERSION=$(head -n 1 .release-preview)" >> "$GITHUB_ENV"
+
+      - name: Download Windows installer artifact
+        uses: actions/download-artifact@v8
+        with:
+          pattern: MatronixPrismLauncher-Windows-MSVC-Setup-*
+          path: dist/windows
+          merge-multiple: true
+
+      - name: Download Linux AppImage artifact
+        uses: actions/download-artifact@v8
+        with:
+          pattern: MatronixPrismLauncher-Linux-*-Release-x86_64.AppImage
+          path: dist/linux/appimage
+          merge-multiple: true
+
+      - name: Download Linux portable artifact
+        uses: actions/download-artifact@v8
+        with:
+          pattern: MatronixPrismLauncher-Linux-Qt6-Portable-*-Release
+          path: dist/linux/portable
+          merge-multiple: true
+
+      - name: Prepare release assets
+        shell: bash
+        run: |
+          cp dist/windows/MatronixPrismLauncher-Setup.exe .
+          cp dist/linux/appimage/MatronixPrismLauncher-Linux-*-Release-x86_64.AppImage \
+            MatronixPrismLauncher-Linux-x86_64.AppImage
+          cp dist/linux/portable/MatronixPrismLauncher-portable.tar.gz \
+            MatronixPrismLauncher-Linux-portable.tar.gz
+
+      - name: Publish public preview release
+        uses: softprops/action-gh-release@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ env.VERSION }}
+          target_commitish: ${{ github.sha }}
+          name: MatronixPrismLauncher ${{ env.VERSION }}
+          body: |
+            Preview build of MatronixPrismLauncher.
+
+            - Choose the new Matronix Purple theme with a subtle violet gradient, alongside Matronix Black.
+            - Calm, short fades accompany theme changes and instance selection.
+            - Mark instances as favorites, search by name, ID, or group, and sort by name, recency, or playtime.
+            - Existing groups, instance copying, Modrinth-only mod management, and cat-background customization remain available.
+            - Linux builds are provided as an AppImage and a portable tarball; the AppImage uses XDG desktop portals for desktop integration, including KDE Plasma.
+            - The Windows installer is unsigned and may trigger a Windows SmartScreen warning.
+          draft: false
+          prerelease: true
+          files: |
+            MatronixPrismLauncher-Setup.exe
+            MatronixPrismLauncher-Linux-x86_64.AppImage
+            MatronixPrismLauncher-Linux-portable.tar.gz
