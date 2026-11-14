@@ -63,11 +63,19 @@ runs:
         $sample = Join-Path $env:RUNNER_TEMP 'video-background-test.mp4'
         Copy-Item "build/${{ inputs.build-type }}/VideoBackgroundSmoke.exe" $testExe
         Invoke-WebRequest 'https://github.com/qt/qtmultimedia/raw/refs/heads/6.10/tests/auto/integration/qmediaplayerbackend/testdata/3colors_with_sound_1s.mp4' -OutFile $sample
-        $env:QT_QPA_PLATFORM = 'offscreen'
+        $env:QT_QPA_PLATFORM = 'windows'
         $env:QT_PLUGIN_PATH = ''
+        $stdout = Join-Path $env:RUNNER_TEMP 'video-smoke-stdout.txt'
+        $stderr = Join-Path $env:RUNNER_TEMP 'video-smoke-stderr.txt'
         try {
-          & $testExe $sample
-          if ($LASTEXITCODE -ne 0) { throw "Video playback smoke test failed: $LASTEXITCODE" }
+          $process = Start-Process -FilePath $testExe -ArgumentList ('"' + $sample + '"') -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+          if (-not $process.WaitForExit(60000)) {
+            Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+            throw 'Video playback smoke test timed out'
+          }
+          Get-Content $stdout -ErrorAction SilentlyContinue | Write-Output
+          Get-Content $stderr -ErrorAction SilentlyContinue | Write-Output
+          if ($process.ExitCode -ne 0) { throw "Video playback smoke test failed: $($process.ExitCode)" }
         } finally {
           Remove-Item $testExe -ErrorAction SilentlyContinue
         }

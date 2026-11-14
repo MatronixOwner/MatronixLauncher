@@ -42,7 +42,10 @@ int main(int argc, char** argv)
         std::fputs("No usable video frame received\n", stderr);
         app.exit(1);
     });
-    player.setSource(QUrl::fromLocalFile(QString::fromLocal8Bit(argv[1])));
-    player.play();
+    const QUrl source = QUrl::fromLocalFile(QString::fromLocal8Bit(argv[1]));
+    QTimer::singleShot(0, &app, [&] {
+        player.setSource(source);
+        player.play();
+    });
     return app.exec();
 }
