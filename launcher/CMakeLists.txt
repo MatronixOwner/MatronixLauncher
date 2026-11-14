@@ -1,5 +1,11 @@
 project(application)
 
+# Exercise the same packaged multimedia backend used for video backgrounds.
+if(WIN32)
+    add_executable(VideoBackgroundSmoke ../tests/VideoBackgroundSmoke.cpp)
+    target_link_libraries(VideoBackgroundSmoke PRIVATE Qt6::Widgets Qt6::Multimedia)
+endif()
+
 ################################ FILES ################################
 
 ######## Sources and headers ########

@@ -45,6 +45,7 @@
 #include "ui/themes/CatPainter.h"
 
 class QMediaPlayer;
+class QTimer;
 class QVideoSink;
 
 struct InstanceViewRoles {
@@ -138,6 +139,7 @@ class InstanceView : public QAbstractItemView {
     CatPainter* m_cat = nullptr;
     QMediaPlayer* m_videoPlayer = nullptr;
     QVideoSink* m_videoSink = nullptr;
+    QTimer* m_videoStartTimer = nullptr;
     QImage m_videoFrame;
     bool m_videoEnabled = false;
 

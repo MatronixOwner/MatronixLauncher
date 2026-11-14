@@ -55,6 +55,23 @@ runs:
 
         Get-ChildItem ${{ env.INSTALL_DIR }} -Recurse | ForEach FullName | Resolve-Path -Relative | %{ $_.TrimStart('.\') } | %{ $_.TrimStart('${{ env.INSTALL_DIR }}') } | %{ $_.TrimStart('\') } | Out-File -FilePath ${{ env.INSTALL_DIR }}/manifest.txt
 
+    - name: Test packaged video playback
+      if: ${{ inputs.msystem == '' }}
+      shell: pwsh
+      run: |
+        $testExe = Join-Path $env:GITHUB_WORKSPACE 'install/VideoBackgroundSmoke.exe'
+        $sample = Join-Path $env:RUNNER_TEMP 'video-background-test.mp4'
+        Copy-Item "build/${{ inputs.build-type }}/VideoBackgroundSmoke.exe" $testExe
+        Invoke-WebRequest 'https://github.com/qt/qtmultimedia/raw/refs/heads/6.10/tests/auto/integration/qmediaplayerbackend/testdata/3colors_with_sound_1s.mp4' -OutFile $sample
+        $env:QT_QPA_PLATFORM = 'offscreen'
+        $env:QT_PLUGIN_PATH = ''
+        try {
+          & $testExe $sample
+          if ($LASTEXITCODE -ne 0) { throw "Video playback smoke test failed: $LASTEXITCODE" }
+        } finally {
+          Remove-Item $testExe -ErrorAction SilentlyContinue
+        }
+
     - name: Emit warning for unsigned builds
       id: unsigned_warning
       if: ${{ env.CI_HAS_ACCESS_TO_AZURE == '' || inputs.azure-client-id == '' }}

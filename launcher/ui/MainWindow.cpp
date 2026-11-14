@@ -407,6 +407,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
             if (ui->actionVideoBackground->isChecked())
                 ui->actionVideoBackground->setChecked(false);
             statusBar()->showMessage(tr("Video background: %1").arg(message), 12000);
+            auto* warning = new QMessageBox(QMessageBox::Warning, tr("Video background"), message, QMessageBox::Ok, this);
+            warning->setAttribute(Qt::WA_DeleteOnClose);
+            warning->open();
         });
         connect(ui->actionVideoBackground, &QAction::toggled, this, [this](bool enabled) {
             const QString videoPath = APPLICATION->settings()->get("VideoBackgroundPath").toString();

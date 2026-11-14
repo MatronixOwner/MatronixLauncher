@@ -39,6 +39,7 @@
 #include <QAudioOutput>
 #include <QFileInfo>
 #include <QMediaPlayer>
+#include <QTimer>
 #include <QUrl>
 #include <QVideoFrame>
 #include <QVideoSink>
@@ -467,6 +468,22 @@ void InstanceView::setVideoBackground(bool enabled, const QString& filePath)
         return;
     }
     if (!m_videoPlayer) {
+#ifdef Q_OS_WIN
+        // Frames are copied to a QImage for painting. Some Windows graphics drivers
+        // cannot map hardware-decoded frames; use software decoding by default.
+        if (!qEnvironmentVariableIsSet("QT_FFMPEG_DECODING_HW_DEVICE_TYPES"))
+            qputenv("QT_FFMPEG_DECODING_HW_DEVICE_TYPES", ",");
+#endif
+        m_videoStartTimer = new QTimer(this);
+        m_videoStartTimer->setSingleShot(true);
+        connect(m_videoStartTimer, &QTimer::timeout, this, [this] {
+            if (!m_videoEnabled)
+                return;
+            m_videoEnabled = false;
+            m_videoPlayer->stop();
+            viewport()->update();
+            emit videoBackgroundError(tr("No video frames were received. The file may use an unsupported codec or contain no video track."));
+        });
         m_videoPlayer = new QMediaPlayer(this);
         auto* audioOutput = new QAudioOutput(m_videoPlayer);
         audioOutput->setMuted(true);
@@ -475,7 +492,8 @@ void InstanceView::setVideoBackground(bool enabled, const QString& filePath)
         m_videoPlayer->setVideoSink(m_videoSink);
         connect(m_videoSink, &QVideoSink::videoFrameChanged, this, [this](const QVideoFrame& frame) {
             const QImage image = frame.toImage();
-            if (!image.isNull()) {
+            if (m_videoEnabled && !image.isNull()) {
+                m_videoStartTimer->stop();
                 m_videoFrame = image;
                 viewport()->update();
             }
@@ -483,13 +501,17 @@ void InstanceView::setVideoBackground(bool enabled, const QString& filePath)
         m_videoPlayer->setLoops(QMediaPlayer::Infinite);
         connect(m_videoPlayer, &QMediaPlayer::errorOccurred, this,
                 [this](QMediaPlayer::Error, const QString& errorString) {
+                    if (!m_videoEnabled)
+                        return;
                     m_videoEnabled = false;
+                    m_videoStartTimer->stop();
                     viewport()->update();
                     emit videoBackgroundError(errorString.isEmpty() ? tr("The video could not be decoded.") : errorString);
                 });
     }
 
     if (!enabled) {
+        m_videoStartTimer->stop();
         m_videoPlayer->pause();
         viewport()->update();
         return;
@@ -504,6 +526,7 @@ void InstanceView::setVideoBackground(bool enabled, const QString& filePath)
 
     const QUrl source = QUrl::fromLocalFile(videoFile.absoluteFilePath());
     m_videoEnabled = true;
+    m_videoStartTimer->start(20000);
     if (m_videoPlayer->source() != source) {
         m_videoFrame = QImage();
         m_videoPlayer->setSource(source);
