@@ -190,6 +190,37 @@ runs:
           throw
         }
 
+    - name: Test video playback from the installer
+      if: ${{ inputs.msystem == '' }}
+      shell: pwsh
+      run: |
+        # Test the actual NSIS payload, not only the pre-installer staging folder.
+        $extracted = Join-Path $env:RUNNER_TEMP 'video-installer-test'
+        $installer = Join-Path $env:GITHUB_WORKSPACE 'MatronixPrismLauncher-Setup.exe'
+        & 7z x $installer "-o$extracted" -y | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw "Could not extract installer: $LASTEXITCODE" }
+        $qtDll = Get-ChildItem $extracted -Filter 'Qt6Multimedia.dll' -Recurse | Select-Object -First 1
+        if (-not $qtDll) { throw 'Qt6Multimedia.dll missing from installer' }
+        $installed = $qtDll.DirectoryName
+        if (-not (Test-Path (Join-Path $installed 'multimedia/ffmpegmediaplugin.dll'))) {
+          throw 'FFmpeg multimedia plugin missing from installer'
+        }
+        $testExe = Join-Path $installed 'VideoBackgroundSmoke.exe'
+        $sample = Join-Path $env:RUNNER_TEMP 'video-background-test.mp4'
+        Copy-Item "build/${{ inputs.build-type }}/VideoBackgroundSmoke.exe" $testExe
+        $env:QT_QPA_PLATFORM = 'windows'
+        $env:QT_PLUGIN_PATH = ''
+        $stdout = Join-Path $env:RUNNER_TEMP 'video-installer-stdout.txt'
+        $stderr = Join-Path $env:RUNNER_TEMP 'video-installer-stderr.txt'
+        $process = Start-Process -FilePath $testExe -ArgumentList ('"' + $sample + '"') -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+        if (-not $process.WaitForExit(60000)) {
+          Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+          throw 'Installer video playback test timed out'
+        }
+        Get-Content $stdout -ErrorAction SilentlyContinue | Write-Output
+        Get-Content $stderr -ErrorAction SilentlyContinue | Write-Output
+        if ($process.ExitCode -ne 0) { throw "Installer video playback test failed: $($process.ExitCode)" }
+
     - name: Sign installer
       id: sign_installer
       if: ${{ env.CI_HAS_ACCESS_TO_AZURE != '' && inputs.azure-client-id != '' }}

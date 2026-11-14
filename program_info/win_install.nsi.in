@@ -384,6 +384,7 @@ Section "@Launcher_DisplayName@"
   File *.dll
   File /r "iconengines"
   File /r "imageformats"
+  File /r "multimedia"
   File /r "jars"
   File /r "platforms"
   File /r "styles"
@@ -480,6 +481,7 @@ Section "Uninstall"
 
   RMDir /r $INSTDIR\iconengines
   RMDir /r $INSTDIR\imageformats
+  RMDir /r $INSTDIR\multimedia
   RMDir /r $INSTDIR\jars
   RMDir /r $INSTDIR\platforms
   RMDir /r $INSTDIR\styles
