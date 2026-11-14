@@ -38,6 +38,7 @@
 #include <QAccessible>
 #include <QFileInfo>
 #include <QMediaPlayer>
+#include <QRandomGenerator>
 #include <QTimer>
 #include <QUrl>
 #include <QVideoFrame>
@@ -57,6 +58,7 @@
 #include "VisualGroup.h"
 #include "ui/themes/CatPainter.h"
 #include "ui/themes/ThemeManager.h"
+#include "settings/Setting.h"
 
 #include <Application.h>
 #include <InstanceList.h>
@@ -79,6 +81,39 @@ InstanceView::InstanceView(QWidget* parent) : QAbstractItemView(parent)
     setAcceptDrops(true);
     setAutoScroll(true);
     setPaintCat(APPLICATION->settings()->get("TheCat").toBool());
+    for (int i = 0; i < 28; ++i) {
+        auto* random = QRandomGenerator::global();
+        m_frostFlakes.append({random->generateDouble(), random->generateDouble(),
+                              0.001 + random->generateDouble() * 0.0025,
+                              1.0 + random->generateDouble() * 1.7, random->generateDouble() * 6.28});
+    }
+    m_frostTimer = new QTimer(this);
+    m_frostTimer->setInterval(70);
+    connect(m_frostTimer, &QTimer::timeout, this, [this] {
+        if (!isVisible())
+            return;
+        for (auto& flake : m_frostFlakes) {
+            flake.y += flake.speed;
+            flake.phase += 0.02;
+            if (flake.y > 1.02) {
+                flake.y = -0.02;
+                flake.x = QRandomGenerator::global()->generateDouble();
+            }
+        }
+        viewport()->update();
+    });
+    const auto updateFrost = [this](const QString& id) {
+        m_frostEnabled = id == QLatin1String("matronix-frost");
+        if (m_frostEnabled)
+            m_frostTimer->start();
+        else
+            m_frostTimer->stop();
+        viewport()->update();
+    };
+    const auto themeSetting = APPLICATION->settings()->getSetting("ApplicationTheme");
+    connect(themeSetting.get(), &Setting::SettingChanged, this,
+            [updateFrost](const Setting&, const QVariant& value) { updateFrost(value.toString()); });
+    updateFrost(APPLICATION->settings()->get("ApplicationTheme").toString());
     connect(verticalScrollBar(), &QScrollBar::valueChanged, viewport(), QOverload<>::of(&QWidget::update));
     connect(horizontalScrollBar(), &QScrollBar::valueChanged, viewport(), QOverload<>::of(&QWidget::update));
 }
@@ -559,6 +594,22 @@ void InstanceView::paintEvent([[maybe_unused]] QPaintEvent* event)
         const QRectF target((viewport()->width() - size.width()) / 2, (viewport()->height() - size.height()) / 2,
                             size.width(), size.height());
         painter.drawImage(target, m_videoFrame);
+    }
+
+    if (m_frostEnabled) {
+        painter.save();
+        painter.setRenderHint(QPainter::Antialiasing);
+        // Fine icy highlights stay subtle and never cover the instance controls.
+        painter.setPen(QPen(QColor(231, 250, 255, 115), 1));
+        painter.drawLine(QPointF(0, 1), QPointF(viewport()->width(), 1));
+        for (const auto& flake : m_frostFlakes) {
+            const QPointF point(flake.x * viewport()->width() + qSin(flake.phase) * 5.0,
+                                flake.y * viewport()->height());
+            painter.setPen(QPen(QColor(70, 151, 188, 90), 0.7));
+            painter.setBrush(QColor(245, 253, 255, 145));
+            painter.drawEllipse(point, flake.radius, flake.radius);
+        }
+        painter.restore();
     }
 
     QStyleOptionViewItem option;

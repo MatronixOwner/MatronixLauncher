@@ -74,11 +74,17 @@
 #include <QShortcut>
 #include <QStatusBar>
 #include <QStyle>
+#include <QTimer>
 #include <QToolBar>
 #include <QToolButton>
 #include <QWidget>
 #include <QWidgetAction>
 #include <memory>
+
+#ifdef Q_OS_WIN
+#include <qt_windows.h>
+#include <dwmapi.h>
+#endif
 
 #include <BaseInstance.h>
 #include <BuildConfig.h>
@@ -140,6 +146,21 @@
 #include "MMCTime.h"
 
 namespace {
+void updateFrostTitleBar(QWidget* window, bool enabled)
+{
+#ifdef Q_OS_WIN
+    // Windows 11 supports explicit caption colors. Older versions simply ignore them.
+    const COLORREF caption = enabled ? RGB(164, 215, 237) : 0xffffffffu;
+    const COLORREF text = enabled ? RGB(24, 56, 78) : 0xffffffffu;
+    const HWND handle = reinterpret_cast<HWND>(window->winId());
+    DwmSetWindowAttribute(handle, static_cast<DWMWINDOWATTRIBUTE>(35), &caption, sizeof(caption));
+    DwmSetWindowAttribute(handle, static_cast<DWMWINDOWATTRIBUTE>(36), &text, sizeof(text));
+#else
+    Q_UNUSED(window);
+    Q_UNUSED(enabled);
+#endif
+}
+
 QString profileInUseFilter(const QString& profile, bool used)
 {
     if (used) {
@@ -292,8 +313,13 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     updateThemeMenu();
     const auto applicationThemeSetting = APPLICATION->settings()->getSetting("ApplicationTheme");
-    connect(applicationThemeSetting.get(), &Setting::SettingChanged, this,
-            [this](const Setting&, const QVariant&) { animateContentChange(); });
+    connect(applicationThemeSetting.get(), &Setting::SettingChanged, this, [this](const Setting&, const QVariant& value) {
+        animateContentChange();
+        updateFrostTitleBar(this, value.toString() == QLatin1String("matronix-frost"));
+    });
+    QTimer::singleShot(0, this, [this] {
+        updateFrostTitleBar(this, APPLICATION->settings()->get("ApplicationTheme").toString() == QLatin1String("matronix-frost"));
+    });
     updateMainToolBar();
     // OSX magic.
     setUnifiedTitleAndToolBarOnMac(true);

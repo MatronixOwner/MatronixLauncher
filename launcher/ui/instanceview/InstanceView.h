@@ -142,6 +142,16 @@ class InstanceView : public QAbstractItemView {
     QTimer* m_videoStartTimer = nullptr;
     QImage m_videoFrame;
     bool m_videoEnabled = false;
+    struct FrostFlake {
+        qreal x = 0;
+        qreal y = 0;
+        qreal speed = 0;
+        qreal radius = 0;
+        qreal phase = 0;
+    };
+    QList<FrostFlake> m_frostFlakes;
+    QTimer* m_frostTimer = nullptr;
+    bool m_frostEnabled = false;
 
     // point where the currently active mouse action started in geometry coordinates
     QPoint m_pressedPosition;
