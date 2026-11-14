@@ -897,6 +897,8 @@ SET(LAUNCHER_SOURCES
     ui/themes/MatronixPurpleTheme.h
     ui/themes/MatronixFrostTheme.cpp
     ui/themes/MatronixFrostTheme.h
+    ui/themes/FrostTitleBar.cpp
+    ui/themes/FrostTitleBar.h
     ui/themes/ITheme.cpp
     ui/themes/ITheme.h
     ui/themes/HintOverrideProxyStyle.cpp

@@ -81,10 +81,6 @@
 #include <QWidgetAction>
 #include <memory>
 
-#ifdef Q_OS_WIN
-#include <qt_windows.h>
-#include <dwmapi.h>
-#endif
 
 #include <BaseInstance.h>
 #include <BuildConfig.h>
@@ -121,6 +117,7 @@
 #include "ui/instanceview/InstanceDelegate.h"
 #include "ui/instanceview/InstanceProxyModel.h"
 #include "ui/instanceview/InstanceView.h"
+#include "ui/themes/FrostTitleBar.h"
 #include "ui/themes/ITheme.h"
 #include "ui/themes/ThemeManager.h"
 #include "ui/widgets/LabeledToolButton.h"
@@ -146,21 +143,6 @@
 #include "MMCTime.h"
 
 namespace {
-void updateFrostTitleBar(QWidget* window, bool enabled)
-{
-#ifdef Q_OS_WIN
-    // Windows 11 supports explicit caption colors. Older versions simply ignore them.
-    const COLORREF caption = enabled ? RGB(164, 215, 237) : 0xffffffffu;
-    const COLORREF text = enabled ? RGB(24, 56, 78) : 0xffffffffu;
-    const HWND handle = reinterpret_cast<HWND>(window->winId());
-    DwmSetWindowAttribute(handle, static_cast<DWMWINDOWATTRIBUTE>(35), &caption, sizeof(caption));
-    DwmSetWindowAttribute(handle, static_cast<DWMWINDOWATTRIBUTE>(36), &text, sizeof(text));
-#else
-    Q_UNUSED(window);
-    Q_UNUSED(enabled);
-#endif
-}
-
 QString profileInUseFilter(const QString& profile, bool used)
 {
     if (used) {
