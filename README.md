@@ -28,6 +28,10 @@ MatronixPrismLauncher is an independent Minecraft launcher project based on the 
 
 In **Settings → Appearance**, choose a local video and apply the settings. Press the video button next to the cat to start it. It plays silently in a loop behind the instance list; the button shows a stop icon when the video is on and a play icon when it is off. When both backgrounds are enabled, the video covers the cat background. Playback depends on the video codecs available on your system.
 
+## Home screen customization
+
+In **Settings → Appearance**, select a background image and choose its fit, opacity, and dimming. Clear the image to return to the cat background. When enabled, video is shown on top of the image. The clock and total-playtime widgets can be enabled independently; there is no greeting widget. Interface animations and Frost snowfall can also be turned off.
+
 ## Downloads
 
 Get published builds from the [GitHub Releases page](https://github.com/MatronixOwner/MatronixLauncher/releases). Preview releases are produced by the [`matronix-preview-release` workflow](.github/workflows/matronix-preview-release.yml). Check each release's notes for available platforms and installation guidance.

@@ -41,10 +41,14 @@
 
 #include <QDialogButtonBox>
 #include <QGridLayout>
+#include <QGraphicsOpacityEffect>
+#include <QPropertyAnimation>
+#include <QEasingCurve>
 #include <QLabel>
 #include <QLineEdit>
 #include <QListView>
 #include <QPushButton>
+#include <QScrollArea>
 #include <QSortFilterProxyModel>
 #include <QStackedLayout>
 #include <QStyledItemDelegate>
@@ -89,7 +93,15 @@ PageContainer::PageContainer(BasePageProvider* pageProvider, QString defaultId, 
     for (auto* page : pages) {
         auto* widget = dynamic_cast<QWidget*>(page);
         widget->setParent(this);
-        page->stackIndex = m_pageStack->addWidget(widget);
+        if (page->id() == QLatin1String("appearance-settings")) {
+            auto* scroll = new QScrollArea(this);
+            scroll->setWidgetResizable(true);
+            scroll->setFrameShape(QFrame::NoFrame);
+            scroll->setWidget(widget);
+            page->stackIndex = m_pageStack->addWidget(scroll);
+        } else {
+            page->stackIndex = m_pageStack->addWidget(widget);
+        }
         page->listIndex = counter;
         page->setParentContainer(this);
         counter++;
@@ -233,6 +245,23 @@ void PageContainer::showPage(int row)
         m_pageStack->setCurrentIndex(m_currentPage->stackIndex);
         m_header->setText(m_currentPage->displayName());
         m_currentPage->opened();
+        if (isVisible() && APPLICATION->settings()->get("AnimationsEnabled").toBool()) {
+            auto* effect = qobject_cast<QGraphicsOpacityEffect*>(m_header->graphicsEffect());
+            if (!effect) {
+                effect = new QGraphicsOpacityEffect(m_header);
+                m_header->setGraphicsEffect(effect);
+            }
+            for (auto* previous : effect->findChildren<QPropertyAnimation*>()) {
+                previous->stop();
+                previous->deleteLater();
+            }
+            auto* animation = new QPropertyAnimation(effect, "opacity", effect);
+            animation->setDuration(170);
+            animation->setStartValue(0.45);
+            animation->setEndValue(1.0);
+            animation->setEasingCurve(QEasingCurve::OutCubic);
+            animation->start(QAbstractAnimation::DeleteWhenStopped);
+        }
     } else {
         m_pageStack->setCurrentIndex(0);
         m_header->setText(QString());

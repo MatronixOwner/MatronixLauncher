@@ -39,6 +39,15 @@
 
 #include <DesktopServices.h>
 #include <QGraphicsOpacityEffect>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QFormLayout>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QSpinBox>
 #include <QDir>
 #include <QFile>
 #include <QFileDialog>
@@ -57,6 +66,8 @@ AppearanceWidget::AppearanceWidget(bool themesOnly, QWidget* parent)
     : QWidget(parent), m_ui(new Ui::AppearanceWidget), m_themesOnly(themesOnly)
 {
     m_ui->setupUi(this);
+    if (!themesOnly)
+        setupCustomization();
 
     m_ui->catPreview->setGraphicsEffect(new QGraphicsOpacityEffect(this));
 
@@ -152,6 +163,61 @@ AppearanceWidget::AppearanceWidget(bool themesOnly, QWidget* parent)
     connect(m_ui->reloadThemesButton, &QPushButton::pressed, this, &AppearanceWidget::loadThemeSettings);
 }
 
+void AppearanceWidget::setupCustomization()
+{
+    auto* box = new QGroupBox(tr("Background and home widgets"), this);
+    auto* form = new QFormLayout(box);
+    auto* imageRow = new QHBoxLayout();
+    m_imagePath = new QLineEdit(box);
+    m_imagePath->setReadOnly(true);
+    m_imagePath->setPlaceholderText(tr("No image selected"));
+    auto* chooseImage = new QPushButton(tr("Choose image…"), box);
+    auto* clearImage = new QPushButton(tr("Clear"), box);
+    imageRow->addWidget(m_imagePath, 1);
+    imageRow->addWidget(chooseImage);
+    imageRow->addWidget(clearImage);
+    form->addRow(tr("Background image:"), imageRow);
+    connect(chooseImage, &QPushButton::clicked, this, [this] {
+        QStringList patterns;
+        for (const auto& format : QImageReader::supportedImageFormats())
+            patterns << QStringLiteral("*.%1").arg(QString::fromLatin1(format));
+        const QString path = QFileDialog::getOpenFileName(this, tr("Choose a background image"), m_imagePath->text(),
+                                                          tr("Images (%1)").arg(patterns.join(QLatin1Char(' '))));
+        if (path.isEmpty())
+            return;
+        QImageReader reader(path);
+        if (!reader.canRead()) {
+            QMessageBox::warning(this, tr("Unsupported image"), tr("The selected file is not a readable image."));
+            return;
+        }
+        m_imagePath->setText(QFileInfo(path).absoluteFilePath());
+    });
+    connect(clearImage, &QPushButton::clicked, m_imagePath, &QLineEdit::clear);
+    m_imageFit = new QComboBox(box);
+    m_imageFit->addItem(tr("Fill (crop)"), QStringLiteral("cover"));
+    m_imageFit->addItem(tr("Fit (show whole image)"), QStringLiteral("contain"));
+    m_imageFit->addItem(tr("Stretch"), QStringLiteral("stretch"));
+    form->addRow(tr("Image size:"), m_imageFit);
+    m_imageOpacity = new QSpinBox(box);
+    m_imageOpacity->setRange(0, 100);
+    m_imageOpacity->setSuffix(QStringLiteral("%"));
+    form->addRow(tr("Image opacity:"), m_imageOpacity);
+    m_imageDarkness = new QSpinBox(box);
+    m_imageDarkness->setRange(0, 80);
+    m_imageDarkness->setSuffix(QStringLiteral("%"));
+    form->addRow(tr("Image dimming:"), m_imageDarkness);
+    auto* hint = new QLabel(tr("Video is shown over the image. Clear the image to show the cat background."), box);
+    hint->setWordWrap(true);
+    form->addRow(hint);
+    m_clockWidget = new QCheckBox(tr("Show clock on the home screen"), box);
+    m_playtimeWidget = new QCheckBox(tr("Show total playtime on the home screen"), box);
+    m_animationsEnabled = new QCheckBox(tr("Enable interface animations and Frost snowfall"), box);
+    form->addRow(m_clockWidget);
+    form->addRow(m_playtimeWidget);
+    form->addRow(m_animationsEnabled);
+    m_ui->verticalLayout->insertWidget(1, box);
+}
+
 AppearanceWidget::~AppearanceWidget()
 {
     delete m_ui;
@@ -169,6 +235,13 @@ void AppearanceWidget::applySettings()
     settings->set("CatFit", catFit == 0 ? "fit" : catFit == 1 ? "fill" : "strech");
     settings->set("CatButtonVisible", !m_ui->hideCatButtonCheckBox->isChecked());
     if (!m_themesOnly) {
+        settings->set("ImageBackgroundPath", m_imagePath->text());
+        settings->set("ImageBackgroundFit", m_imageFit->currentData().toString());
+        settings->set("ImageBackgroundOpacity", m_imageOpacity->value());
+        settings->set("ImageBackgroundDarkness", m_imageDarkness->value());
+        settings->set("HomeClockWidget", m_clockWidget->isChecked());
+        settings->set("HomePlaytimeWidget", m_playtimeWidget->isChecked());
+        settings->set("AnimationsEnabled", m_animationsEnabled->isChecked());
         const QString videoPath = m_ui->videoBackgroundPath->text();
         const QString previousPath = settings->get("VideoBackgroundPath").toString();
         settings->set("VideoBackgroundPath", videoPath);
@@ -202,6 +275,14 @@ void AppearanceWidget::loadSettings()
     m_ui->catFitComboBox->setCurrentIndex(catFit == "fit" ? 0 : catFit == "fill" ? 1 : 2);
     m_ui->hideCatButtonCheckBox->setChecked(!settings->get("CatButtonVisible").toBool());
     m_ui->videoBackgroundPath->setText(settings->get("VideoBackgroundPath").toString());
+    m_imagePath->setText(settings->get("ImageBackgroundPath").toString());
+    const int fitIndex = m_imageFit->findData(settings->get("ImageBackgroundFit").toString());
+    m_imageFit->setCurrentIndex(fitIndex >= 0 ? fitIndex : 0);
+    m_imageOpacity->setValue(settings->get("ImageBackgroundOpacity").toInt());
+    m_imageDarkness->setValue(settings->get("ImageBackgroundDarkness").toInt());
+    m_clockWidget->setChecked(settings->get("HomeClockWidget").toBool());
+    m_playtimeWidget->setChecked(settings->get("HomePlaytimeWidget").toBool());
+    m_animationsEnabled->setChecked(settings->get("AnimationsEnabled").toBool());
 }
 
 void AppearanceWidget::retranslateUi()

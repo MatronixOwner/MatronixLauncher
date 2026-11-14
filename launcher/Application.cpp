@@ -813,6 +813,13 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
         m_settings->registerSetting("CatFit", "fit");
         m_settings->registerSetting("VideoBackground", false);
         m_settings->registerSetting("VideoBackgroundPath", QString());
+        m_settings->registerSetting("ImageBackgroundPath", QString());
+        m_settings->registerSetting("ImageBackgroundFit", QStringLiteral("cover"));
+        m_settings->registerSetting("ImageBackgroundOpacity", 100);
+        m_settings->registerSetting("ImageBackgroundDarkness", 0);
+        m_settings->registerSetting("HomeClockWidget", false);
+        m_settings->registerSetting("HomePlaytimeWidget", false);
+        m_settings->registerSetting("AnimationsEnabled", true);
 
         m_settings->registerSetting("StatusBarVisible", true);
 

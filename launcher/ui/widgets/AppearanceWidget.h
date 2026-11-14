@@ -24,6 +24,10 @@
 #include <translations/TranslationsModel.h>
 #include <QTextCursor>
 
+class QCheckBox;
+class QComboBox;
+class QLineEdit;
+class QSpinBox;
 class QTextCharFormat;
 class SettingsObject;
 
@@ -49,10 +53,18 @@ class AppearanceWidget : public QWidget {
     void applyCatTheme(int index);
     void loadThemeSettings();
 
+    void setupCustomization();
     void updateConsolePreview();
     void updateCatPreview();
 
     Ui::AppearanceWidget* m_ui;
     QTextCharFormat m_defaultFormat;
     bool m_themesOnly;
+    QLineEdit* m_imagePath = nullptr;
+    QComboBox* m_imageFit = nullptr;
+    QSpinBox* m_imageOpacity = nullptr;
+    QSpinBox* m_imageDarkness = nullptr;
+    QCheckBox* m_clockWidget = nullptr;
+    QCheckBox* m_playtimeWidget = nullptr;
+    QCheckBox* m_animationsEnabled = nullptr;
 };

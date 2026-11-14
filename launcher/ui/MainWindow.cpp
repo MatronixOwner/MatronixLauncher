@@ -46,6 +46,10 @@
 #include "ui_MainWindow.h"
 
 #include <QDir>
+#include <QLocale>
+#include <QTime>
+#include <QVBoxLayout>
+#include <QFrame>
 #include <QFileInfo>
 #include <QUrl>
 #include <QUrlQuery>
@@ -395,7 +399,30 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         view->setSourceOfGroupCollapseStatus(
             [](const QString& groupName) -> bool { return APPLICATION->instances()->isGroupCollapsed(groupName); });
         connect(view, &InstanceView::groupStateChanged, APPLICATION->instances(), &InstanceList::on_GroupStateChanged);
-        ui->horizontalLayout->addWidget(view);
+        auto* homeLayout = new QVBoxLayout();
+        homeLayout->setContentsMargins(0, 0, 0, 0);
+        homeLayout->setSpacing(0);
+        auto* widgetsPanel = new QFrame(ui->centralWidget);
+        widgetsPanel->setFrameShape(QFrame::StyledPanel);
+        auto* widgetsLayout = new QHBoxLayout(widgetsPanel);
+        widgetsLayout->setContentsMargins(12, 6, 12, 6);
+        widgetsLayout->setSpacing(18);
+        m_homeWidgets = widgetsPanel;
+        m_homeClock = new QLabel(widgetsPanel);
+        m_homePlaytime = new QLabel(widgetsPanel);
+        widgetsLayout->addWidget(m_homeClock);
+        widgetsLayout->addWidget(m_homePlaytime);
+        widgetsLayout->addStretch();
+        homeLayout->addWidget(widgetsPanel);
+        homeLayout->addWidget(view, 1);
+        ui->horizontalLayout->addLayout(homeLayout);
+        auto* homeTimer = new QTimer(this);
+        homeTimer->setInterval(30000);
+        connect(homeTimer, &QTimer::timeout, this, &MainWindow::updateHomeWidgets);
+        homeTimer->start();
+        connect(APPLICATION->instances(), &QAbstractItemModel::dataChanged, this,
+                [this] { updateHomeWidgets(); });
+        updateHomeWidgets();
     }
     // The cat background
     {
@@ -713,8 +740,36 @@ void MainWindow::updateMainToolBar()
     ui->actionCAT->setVisible(APPLICATION->settings()->get("CatButtonVisible").toBool());
 }
 
+void MainWindow::updateHomeWidgets()
+{
+    if (!m_homeWidgets)
+        return;
+    const bool showClock = APPLICATION->settings()->get("HomeClockWidget").toBool();
+    const bool showPlaytime = APPLICATION->settings()->get("HomePlaytimeWidget").toBool();
+    m_homeClock->setVisible(showClock);
+    m_homePlaytime->setVisible(showPlaytime);
+    m_homeWidgets->setVisible(showClock || showPlaytime);
+    if (showClock)
+        m_homeClock->setText(tr("Time: %1").arg(QLocale().toString(QTime::currentTime(), QLocale::ShortFormat)));
+    if (showPlaytime) {
+        const int seconds = APPLICATION->instances()->getTotalPlayTime();
+        m_homePlaytime->setText(tr("Total playtime: %1")
+            .arg(Time::prettifyDuration(seconds, APPLICATION->settings()->get("ShowGameTimeWithoutDays").toBool())));
+    }
+}
+
 void MainWindow::animateContentChange()
 {
+    if (!APPLICATION->settings()->get("AnimationsEnabled").toBool()) {
+        if (m_contentAnimation) {
+            m_contentAnimation->stop();
+            m_contentAnimation->deleteLater();
+            m_contentAnimation = nullptr;
+        }
+        if (auto* effect = qobject_cast<QGraphicsOpacityEffect*>(ui->centralWidget->graphicsEffect()))
+            effect->setOpacity(1.0);
+        return;
+    }
     auto* effect = qobject_cast<QGraphicsOpacityEffect*>(ui->centralWidget->graphicsEffect());
     if (!effect) {
         effect = new QGraphicsOpacityEffect(ui->centralWidget);
@@ -1454,6 +1509,9 @@ void MainWindow::on_actionSettings_triggered()
 
 void MainWindow::globalSettingsClosed()
 {
+    view->reloadImageBackground();
+    updateHomeWidgets();
+    animateContentChange();
     // FIXME: quick HACK to make this work. improve, optimize.
     APPLICATION->instances()->loadList();
     proxymodel->invalidate();

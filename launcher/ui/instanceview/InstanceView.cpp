@@ -36,7 +36,9 @@
 #include "InstanceView.h"
 
 #include <QAccessible>
+#include <QDebug>
 #include <QFileInfo>
+#include <QImageReader>
 #include <QMediaPlayer>
 #include <QRandomGenerator>
 #include <QTimer>
@@ -81,6 +83,7 @@ InstanceView::InstanceView(QWidget* parent) : QAbstractItemView(parent)
     setAcceptDrops(true);
     setAutoScroll(true);
     setPaintCat(APPLICATION->settings()->get("TheCat").toBool());
+    reloadImageBackground();
     for (int i = 0; i < 28; ++i) {
         auto* random = QRandomGenerator::global();
         m_frostFlakes.append({random->generateDouble(), random->generateDouble(),
@@ -102,18 +105,27 @@ InstanceView::InstanceView(QWidget* parent) : QAbstractItemView(parent)
         }
         viewport()->update();
     });
-    const auto updateFrost = [this](const QString& id) {
-        m_frostEnabled = id == QLatin1String("matronix-frost");
+    const auto updateFrost = [this] {
+        m_frostEnabled = m_frostThemeSelected && m_animationsEnabled;
         if (m_frostEnabled)
             m_frostTimer->start();
         else
             m_frostTimer->stop();
         viewport()->update();
     };
+    m_frostThemeSelected = APPLICATION->settings()->get("ApplicationTheme").toString() == QLatin1String("matronix-frost");
+    m_animationsEnabled = APPLICATION->settings()->get("AnimationsEnabled").toBool();
     const auto themeSetting = APPLICATION->settings()->getSetting("ApplicationTheme");
-    connect(themeSetting.get(), &Setting::SettingChanged, this,
-            [updateFrost](const Setting&, const QVariant& value) { updateFrost(value.toString()); });
-    updateFrost(APPLICATION->settings()->get("ApplicationTheme").toString());
+    connect(themeSetting.get(), &Setting::SettingChanged, this, [this, updateFrost](const Setting&, const QVariant& value) {
+        m_frostThemeSelected = value.toString() == QLatin1String("matronix-frost");
+        updateFrost();
+    });
+    const auto animationsSetting = APPLICATION->settings()->getSetting("AnimationsEnabled");
+    connect(animationsSetting.get(), &Setting::SettingChanged, this, [this, updateFrost](const Setting&, const QVariant& value) {
+        m_animationsEnabled = value.toBool();
+        updateFrost();
+    });
+    updateFrost();
     connect(verticalScrollBar(), &QScrollBar::valueChanged, viewport(), QOverload<>::of(&QWidget::update));
     connect(horizontalScrollBar(), &QScrollBar::valueChanged, viewport(), QOverload<>::of(&QWidget::update));
 }
@@ -494,6 +506,20 @@ void InstanceView::setPaintCat(bool visible)
     }
 }
 
+void InstanceView::reloadImageBackground()
+{
+    const QString path = APPLICATION->settings()->get("ImageBackgroundPath").toString();
+    m_backgroundImage = QImage();
+    if (!path.isEmpty()) {
+        QImageReader reader(path);
+        reader.setAutoTransform(true);
+        m_backgroundImage = reader.read();
+        if (m_backgroundImage.isNull())
+            qWarning() << "Cannot read background image:" << reader.errorString();
+    }
+    viewport()->update();
+}
+
 void InstanceView::setVideoBackground(bool enabled, const QString& filePath)
 {
     m_videoEnabled = false;
@@ -587,6 +613,25 @@ void InstanceView::paintEvent([[maybe_unused]] QPaintEvent* event)
 
     if (m_cat) {
         m_cat->paint(&painter, this->viewport()->rect());
+    }
+
+    if (!m_backgroundImage.isNull()) {
+        const QString fit = APPLICATION->settings()->get("ImageBackgroundFit").toString();
+        QRectF target = viewport()->rect();
+        if (fit != QLatin1String("stretch")) {
+            const auto aspect = fit == QLatin1String("contain") ? Qt::KeepAspectRatio : Qt::KeepAspectRatioByExpanding;
+            const QSizeF size = QSizeF(m_backgroundImage.size()).scaled(viewport()->size(), aspect);
+            target = QRectF((viewport()->width() - size.width()) / 2, (viewport()->height() - size.height()) / 2,
+                            size.width(), size.height());
+        }
+        painter.save();
+        painter.setRenderHint(QPainter::SmoothPixmapTransform);
+        painter.setOpacity(qBound(0, APPLICATION->settings()->get("ImageBackgroundOpacity").toInt(), 100) / 100.0);
+        painter.drawImage(target, m_backgroundImage);
+        painter.restore();
+        const int darkness = qBound(0, APPLICATION->settings()->get("ImageBackgroundDarkness").toInt(), 80);
+        if (darkness > 0)
+            painter.fillRect(viewport()->rect(), QColor(0, 0, 0, darkness * 255 / 100));
     }
 
     if (m_videoEnabled && !m_videoFrame.isNull()) {

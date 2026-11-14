@@ -85,6 +85,7 @@ class InstanceView : public QAbstractItemView {
     int spacing() const { return m_spacing; };
     void setPaintCat(bool visible);
     void setVideoBackground(bool enabled, const QString& filePath = QString());
+    void reloadImageBackground();
 
    public slots:
     virtual void updateGeometries() override;
@@ -141,6 +142,7 @@ class InstanceView : public QAbstractItemView {
     QVideoSink* m_videoSink = nullptr;
     QTimer* m_videoStartTimer = nullptr;
     QImage m_videoFrame;
+    QImage m_backgroundImage;
     bool m_videoEnabled = false;
     struct FrostFlake {
         qreal x = 0;
@@ -152,6 +154,8 @@ class InstanceView : public QAbstractItemView {
     QList<FrostFlake> m_frostFlakes;
     QTimer* m_frostTimer = nullptr;
     bool m_frostEnabled = false;
+    bool m_frostThemeSelected = false;
+    bool m_animationsEnabled = true;
 
     // point where the currently active mouse action started in geometry coordinates
     QPoint m_pressedPosition;

@@ -232,6 +232,7 @@ class MainWindow : public QMainWindow {
     void updateStatusCenter();
     void setInstanceActionsEnabled(bool enabled);
     void animateContentChange();
+    void updateHomeWidgets();
 
     void runModalTask(Task* task);
     void instanceFromInstanceTask(InstanceTask* task);
@@ -248,6 +249,9 @@ class MainWindow : public QMainWindow {
     QToolButton* newsLabel = nullptr;
     QLabel* m_statusLeft = nullptr;
     QLabel* m_statusCenter = nullptr;
+    QWidget* m_homeWidgets = nullptr;
+    QLabel* m_homeClock = nullptr;
+    QLabel* m_homePlaytime = nullptr;
     LabeledToolButton* changeIconButton = nullptr;
     LabeledToolButton* renameButton = nullptr;
     QToolButton* helpMenuButton = nullptr;
