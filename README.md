@@ -26,7 +26,7 @@ MatronixPrismLauncher is an independent Minecraft launcher project based on the 
 
 ## Video backgrounds
 
-In **Settings → Appearance**, choose a local video and apply the settings. It plays silently in a loop behind the instance list; use the video button on the toolbar to turn it on or off. When both backgrounds are enabled, the video covers the cat background. Playback depends on the video codecs available on your system.
+In **Settings → Appearance**, choose a local video and apply the settings. Press the video button next to the cat to start it. It plays silently in a loop behind the instance list; the button shows a stop icon when the video is on and a play icon when it is off. When both backgrounds are enabled, the video covers the cat background. Playback depends on the video codecs available on your system.
 
 ## Downloads
 

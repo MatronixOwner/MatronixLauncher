@@ -400,8 +400,14 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         setCatBackground(cat_enable);
 
         const bool videoEnabled = APPLICATION->settings()->get("VideoBackground").toBool();
-        ui->actionVideoBackground->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+        auto updateVideoButton = [this](bool enabled) {
+            ui->actionVideoBackground->setIcon(style()->standardIcon(enabled ? QStyle::SP_MediaStop : QStyle::SP_MediaPlay));
+            ui->actionVideoBackground->setText(enabled ? tr("Turn video background off") : tr("Turn video background on"));
+            ui->actionVideoBackground->setToolTip(enabled ? tr("Video background is on. Click to turn it off.")
+                                                         : tr("Video background is off. Click to turn it on."));
+        };
         ui->actionVideoBackground->setChecked(videoEnabled);
+        updateVideoButton(videoEnabled);
         connect(view, &InstanceView::videoBackgroundError, this, [this](const QString& message) {
             APPLICATION->settings()->set("VideoBackground", false);
             if (ui->actionVideoBackground->isChecked())
@@ -411,7 +417,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
             warning->setAttribute(Qt::WA_DeleteOnClose);
             warning->open();
         });
-        connect(ui->actionVideoBackground, &QAction::toggled, this, [this](bool enabled) {
+        connect(ui->actionVideoBackground, &QAction::toggled, this, [this, updateVideoButton](bool enabled) {
+            updateVideoButton(enabled);
             const QString videoPath = APPLICATION->settings()->get("VideoBackgroundPath").toString();
             if (enabled && videoPath.isEmpty()) {
                 ui->actionVideoBackground->setChecked(false);
@@ -427,10 +434,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
                 ui->actionVideoBackground->setChecked(false);
                 APPLICATION->settings()->set("VideoBackground", false);
                 view->setVideoBackground(false);
-            } else if (!ui->actionVideoBackground->isChecked()) {
-                ui->actionVideoBackground->setChecked(true);
-            } else {
+            } else if (ui->actionVideoBackground->isChecked()) {
                 view->setVideoBackground(true, path);
+            } else {
+                statusBar()->showMessage(tr("Video selected. Press the video button next to the cat to turn it on."), 10000);
             }
         });
     }
