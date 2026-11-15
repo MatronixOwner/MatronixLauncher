@@ -68,6 +68,8 @@ class ModFolderPage : public ExternalResourcesPage {
 
     void downloadMods();
     void checkCompatibility();
+    void autoFix();
+    void optimizeMods();
     void downloadDialogFinished(int result);
     void updateMods(bool includeDeps = false);
     void deleteModMetadata();

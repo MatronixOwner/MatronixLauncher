@@ -44,16 +44,28 @@
 
 #include <QAbstractItemModel>
 #include <QAction>
+#include <QCryptographicHash>
 #include <QEvent>
+#include <QFile>
 #include <QKeyEvent>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QMenu>
 #include <QMessageBox>
 #include <QSet>
 #include <QSortFilterProxyModel>
+#include <QUrlQuery>
 #include <algorithm>
 #include <memory>
 
 #include "Application.h"
+#include "BuildConfig.h"
+#include "Json.h"
+#include "ResourceDownloadTask.h"
+#include "modplatform/modrinth/ModrinthAPI.h"
+#include "net/ApiDownload.h"
+#include "net/NetJob.h"
 
 #include "ui/dialogs/CustomMessageBox.h"
 #include "ui/dialogs/ResourceDownloadDialog.h"
@@ -82,6 +94,16 @@ ModFolderPage::ModFolderPage(BaseInstance* inst, ModFolderModel* model, QWidget*
     compatibility->setToolTip(tr("Check enabled mods using locally available metadata; no files will be changed."));
     ui->actionsToolbar->insertActionBefore(ui->actionAddItem, compatibility);
     connect(compatibility, &QAction::triggered, this, &ModFolderPage::checkCompatibility);
+
+    auto* fix = new QAction(tr("Auto-fix"), this);
+    fix->setToolTip(tr("Inspect the instance and review safe fixes before applying them."));
+    ui->actionsToolbar->insertActionBefore(ui->actionAddItem, fix);
+    connect(fix, &QAction::triggered, this, &ModFolderPage::autoFix);
+
+    auto* optimize = new QAction(tr("Optimization"), this);
+    optimize->setToolTip(tr("Find a compatible optimization mod on Modrinth and review it before installation."));
+    ui->actionsToolbar->insertActionBefore(ui->actionAddItem, optimize);
+    connect(optimize, &QAction::triggered, this, &ModFolderPage::optimizeMods);
 
     ui->actionUpdateItem->setToolTip(tr("Try to check or update all selected mods (all mods if none are selected)"));
     connect(ui->actionUpdateItem, &QAction::triggered, this, &ModFolderPage::updateMods);
@@ -184,12 +206,19 @@ void ModFolderPage::checkCompatibility()
     const auto supportedLoaders = profile->getSupportedModLoaders();
     const auto mods = m_model->allMods();
     QSet<QString> enabledIds;
+    QSet<QString> duplicateIds;
     for (auto* mod : mods) {
-        if (mod->enabled() && !mod->mod_id().isEmpty())
-            enabledIds.insert(mod->mod_id().toLower());
+        if (mod->enabled() && !mod->mod_id().isEmpty()) {
+            const auto id = mod->mod_id().toLower();
+            if (enabledIds.contains(id))
+                duplicateIds.insert(id);
+            enabledIds.insert(id);
+        }
     }
 
     QStringList warnings;
+    for (const auto& id : duplicateIds)
+        warnings << tr("Multiple enabled mods declare the same ID: %1.").arg(id);
     int unknownVersions = 0;
     int unknownLoaders = 0;
     for (auto* mod : mods) {
@@ -213,6 +242,27 @@ void ModFolderPage::checkCompatibility()
                 warnings << tr("%1: required mod '%2' was not found among enabled mod IDs.").arg(mod->name(), dependency);
             }
         }
+        if (metadata) {
+            for (const auto& dependency : metadata->dependencies) {
+                if (dependency.addonId.toString().isEmpty())
+                    continue;
+                bool found = false;
+                for (auto* other : mods) {
+                    const auto otherMeta = other->metadata();
+                    if (other->enabled() && otherMeta && otherMeta->provider == metadata->provider &&
+                        otherMeta->project_id == dependency.addonId) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found && dependency.type == ModPlatform::DependencyType::REQUIRED)
+                    warnings << tr("%1: required project %2 was not found in enabled indexed mods; it may be embedded or unindexed.")
+                                    .arg(mod->name(), dependency.addonId.toString());
+                if (found && dependency.type == ModPlatform::DependencyType::INCOMPATIBLE)
+                    warnings << tr("%1: project %2 is listed as incompatible and appears to be enabled.")
+                                    .arg(mod->name(), dependency.addonId.toString());
+            }
+        }
     }
 
     QMessageBox box(this);
@@ -223,9 +273,200 @@ void ModFolderPage::checkCompatibility()
     warnings << tr("Minecraft version metadata unavailable for %1 enabled mods; loader metadata unavailable for %2.")
                     .arg(unknownVersions).arg(unknownLoaders);
     warnings << tr("This offline check is incomplete: metadata may be missing or outdated, embedded dependencies may not be detected, "
-                   "and dependency version constraints and conflicts are not checked. No files were changed.");
+                   "and dependency version constraints and unindexed conflicts are not checked. No files were changed.");
     box.setDetailedText(warnings.join('\n'));
     box.exec();
+}
+
+namespace {
+QByteArray fileDigest(const QString& path)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly))
+        return {};
+    QCryptographicHash hash(QCryptographicHash::Sha256);
+    return hash.addData(&file) ? hash.result() : QByteArray{};
+}
+}
+
+void ModFolderPage::autoFix()
+{
+    if (!m_instance || m_instance->typeName() != "Minecraft" || m_instance->isRunning()) {
+        QMessageBox::warning(this, tr("Auto-fix"), tr("Close the game before checking and fixing a Minecraft instance."));
+        return;
+    }
+
+    // Only disable byte-identical duplicates; never infer which different version to keep.
+    QHash<QByteArray, QString> originals;
+    QList<QPair<QString, QString>> duplicates;
+    for (auto* mod : m_model->allMods()) {
+        const auto info = mod->fileinfo();
+        if (!mod->enabled() || !info.isFile() || info.isSymLink())
+            continue;
+        const auto digest = fileDigest(info.absoluteFilePath());
+        if (digest.isEmpty())
+            continue;
+        if (originals.contains(digest))
+            duplicates.append({ originals.value(digest), info.absoluteFilePath() });
+        else
+            originals.insert(digest, info.absoluteFilePath());
+    }
+
+    QStringList problems;
+    for (const auto& pair : duplicates)
+        problems << tr("Identical enabled files: %1 and %2").arg(QFileInfo(pair.first).fileName(), QFileInfo(pair.second).fileName());
+    if (problems.isEmpty()) {
+        QMessageBox::information(this, tr("Auto-fix: inspection"),
+                                 tr("No byte-identical enabled mod files were found. Other problems may require manual repair. "
+                                    "Use the compatibility check to see additional warnings. No files were changed."));
+        return;
+    }
+    QMessageBox report(this);
+    report.setWindowTitle(tr("Auto-fix: inspection"));
+    report.setIcon(QMessageBox::Warning);
+    report.setText(tr("Found %1 duplicate file(s). Other problems may require manual repair.").arg(problems.size()));
+    report.setDetailedText(problems.join('\n'));
+    report.exec();
+
+    QStringList changes;
+    for (const auto& pair : duplicates)
+        changes << tr("Disable %1 (keep %2)").arg(QFileInfo(pair.second).fileName(), QFileInfo(pair.first).fileName());
+    if (QMessageBox::question(this, tr("Confirm auto-fix"),
+                              tr("The following files will be renamed with a .disabled suffix; no files will be deleted:\n\n%1\n\nApply these changes?")
+                                  .arg(changes.join('\n')),
+                              QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
+        return;
+
+    if (m_instance->isRunning()) {
+        QMessageBox::warning(this, tr("Auto-fix"), tr("The game started; no changes were made."));
+        return;
+    }
+    // Revalidate after the confirmation dialog: the directory may have changed.
+    QModelIndexList toDisable;
+    const auto current = m_model->allMods();
+    for (const auto& pair : duplicates) {
+        const auto first = fileDigest(pair.first);
+        if (first.isEmpty() || first != fileDigest(pair.second) || QFileInfo::exists(pair.second + ".disabled"))
+            continue;
+        for (int row = 0; row < current.size(); ++row) {
+            auto* mod = current.at(row);
+            if (mod->enabled() && !mod->fileinfo().isSymLink() && mod->fileinfo().absoluteFilePath() == pair.second) {
+                toDisable << m_model->index(row, 0);
+                break;
+            }
+        }
+    }
+    if (toDisable.isEmpty()) {
+        QMessageBox::warning(this, tr("Auto-fix"), tr("Files changed during inspection; no fixes were applied. Check again."));
+        return;
+    }
+    const bool success = m_model->ResourceFolderModel::setResourceEnabled(toDisable, EnableAction::DISABLE);
+    m_model->update();
+    QMessageBox::information(this, tr("Auto-fix"), success && toDisable.size() == duplicates.size()
+        ? tr("The selected duplicate files were disabled. Other problems still need to be checked manually.")
+        : tr("Some fixes were skipped or failed because files changed or could not be renamed. Check the mod list."));
+}
+
+void ModFolderPage::optimizeMods()
+{
+    if (!m_instance || m_instance->typeName() != "Minecraft" || m_instance->isRunning()) {
+        QMessageBox::warning(this, tr("Optimization"), tr("Close the game before installing optimization mods."));
+        return;
+    }
+    auto* profile = static_cast<MinecraftInstance*>(m_instance)->getPackProfile();
+    auto minecraft = profile ? profile->getComponent("net.minecraft") : nullptr;
+    const auto loaders = profile ? profile->getModLoaders() : std::nullopt;
+    if (!minecraft || !loaders || !ModPlatform::hasSingleModLoaderSelected(*loaders)) {
+        QMessageBox::warning(this, tr("Optimization"), tr("Exactly one supported mod loader and a Minecraft version are required."));
+        return;
+    }
+    // Unknown local mods cannot be reliably checked for conflicts. Fail closed rather than guess.
+    if (!m_model->allMods().isEmpty()) {
+        QMessageBox::information(this, tr("Optimization"),
+                                 tr("Automatic selection is currently limited to an empty mods folder. "
+                                    "Existing mods, including disabled ones, cannot yet be checked reliably for conflicts; nothing was installed."));
+        return;
+    }
+    QString slug;
+    if (*loaders == ModPlatform::Fabric || *loaders == ModPlatform::Quilt)
+        slug = "sodium";
+    else if (*loaders == ModPlatform::Forge || *loaders == ModPlatform::NeoForge)
+        slug = "embeddium";
+    else {
+        QMessageBox::information(this, tr("Optimization"), tr("No conservative optimization recommendation is available for this loader."));
+        return;
+    }
+    const QString game = minecraft->getVersion();
+    const QString loader = ModPlatform::getModLoaderAsString(ModPlatform::modLoaderTypesToList(*loaders).first());
+    QUrl versionUrl(BuildConfig.MODRINTH_PROD_URL + "/project/" + slug + "/version");
+    QUrlQuery query;
+    query.addQueryItem("game_versions", QString::fromUtf8(QJsonDocument(QJsonArray{ game }).toJson(QJsonDocument::Compact)));
+    query.addQueryItem("loaders", QString::fromUtf8(QJsonDocument(QJsonArray{ loader }).toJson(QJsonDocument::Compact)));
+    versionUrl.setQuery(query);
+    auto job = makeShared<NetJob>(tr("Finding optimization mods"), APPLICATION->network());
+    auto [projectAction, projectData] = Net::ApiDownload::makeByteArray(QUrl(BuildConfig.MODRINTH_PROD_URL + "/project/" + slug));
+    auto [versionAction, versionData] = Net::ApiDownload::makeByteArray(versionUrl);
+    job->addNetAction(projectAction);
+    job->addNetAction(versionAction);
+    ProgressDialog progress(this);
+    progress.setSkipButton(true, tr("Abort"));
+    if (progress.execWithTask(job.get()) != QDialog::Accepted || !job->wasSuccessful()) {
+        QMessageBox::warning(this, tr("Optimization"), tr("Could not retrieve recommendations from Modrinth. No files were changed."));
+        return;
+    }
+    QJsonParseError projectError{}, versionError{};
+    auto project = QJsonDocument::fromJson(*projectData, &projectError);
+    auto versions = QJsonDocument::fromJson(*versionData, &versionError);
+    if (projectError.error != QJsonParseError::NoError || versionError.error != QJsonParseError::NoError || !project.isObject() || !versions.isArray()) {
+        QMessageBox::warning(this, tr("Optimization"), tr("Modrinth returned invalid data. No files were changed."));
+        return;
+    }
+    auto pack = std::make_shared<ModPlatform::IndexedPack>();
+    ModPlatform::IndexedVersion selected;
+    try {
+        auto obj = project.object();
+        Modrinth::loadIndexedPack(*pack, obj);
+        for (const auto& entry : versions.array()) {
+            if (!entry.isObject())
+                continue;
+            auto versionObj = entry.toObject();
+            auto candidate = Modrinth::loadIndexedPackVersion(versionObj);
+            bool unresolved = false;
+            for (const auto& dep : candidate.dependencies) {
+                if (dep.type == ModPlatform::DependencyType::REQUIRED || dep.type == ModPlatform::DependencyType::UNKNOWN)
+                    unresolved = true;
+            }
+            if (!unresolved && candidate.addonId == pack->addonId && candidate.mcVersion.contains(game) &&
+                (candidate.loaders & *loaders) && !candidate.hash.isEmpty() && !candidate.downloadUrl.isEmpty() &&
+                !candidate.fileName.isEmpty() && QFileInfo(candidate.fileName).fileName() == candidate.fileName) {
+                selected = candidate;
+                break;
+            }
+        }
+    } catch (const Json::JsonException&) {
+        QMessageBox::warning(this, tr("Optimization"), tr("Modrinth returned incomplete data. No files were changed."));
+        return;
+    }
+    if (selected.fileName.isEmpty()) {
+        QMessageBox::information(this, tr("Optimization"), tr("No compatible self-contained recommendation was found for Minecraft %1 and %2. No files were changed.").arg(game, loader));
+        return;
+    }
+    const QString message = tr("Recommended Modrinth mod for Minecraft %1 / %2:\n\n%3 — %4\nFile: %5\n\n"
+                               "Only this file will be installed. Compatibility data can be incomplete; keep a backup of your instance. Install it?")
+                                .arg(game, loader, pack->name, selected.version, selected.fileName);
+    if (QMessageBox::question(this, tr("Confirm optimization"), message, QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
+        return;
+    if (m_instance->isRunning() || !m_model->allMods().isEmpty() || QFileInfo::exists(m_model->dir().absoluteFilePath(selected.fileName)) ||
+        !profile->getComponent("net.minecraft") || profile->getComponent("net.minecraft")->getVersion() != game || profile->getModLoaders() != loaders) {
+        QMessageBox::warning(this, tr("Optimization"), tr("The instance changed during review. Nothing was installed; please check again."));
+        return;
+    }
+    auto task = makeShared<ResourceDownloadTask>(pack, selected, m_model, true, "optimization");
+    ProgressDialog download(this);
+    download.setSkipButton(true, tr("Abort"));
+    if (download.execWithTask(task.get()) != QDialog::Accepted || !task->wasSuccessful())
+        QMessageBox::warning(this, tr("Optimization"), tr("The download failed or was cancelled. Check the mods folder before retrying."));
+    m_model->update();
 }
 
 void ModFolderPage::downloadMods()
