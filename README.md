@@ -38,7 +38,7 @@ In **Edit Instance → Mods**, **Check Compatibility** reports potential Minecra
 
 **Auto-fix** first shows compatibility findings, then looks for byte-identical enabled files. After a separate confirmation it disables the duplicates by renaming them; it never deletes them. Other problems require manual attention. Do not run it while the game is running.
 
-**Optimization** currently works only with an empty mods folder: it asks Modrinth for a compatible, self-contained Sodium (Fabric/Quilt) or Embeddium (Forge/NeoForge) version and shows the exact file before installing it. It does not install anything without confirmation. If existing files, unavailable metadata, required dependencies or an unsupported loader prevent a safe recommendation, it declines rather than guessing. These checks cannot guarantee that all incompatibilities have been found; back up your instance first.
+**Optimization** asks Modrinth for a compatible Sodium (Fabric/Quilt) or Embeddium (Forge/NeoForge) version and shows the exact file before installing it. With existing mods it verifies their Modrinth metadata and checks declared dependencies and incompatibilities in both directions. It does not install anything without confirmation. If files cannot be identified and verified, required dependencies are missing, or the loader is unsupported, it declines rather than guessing. These checks cannot guarantee that all incompatibilities have been found; back up your instance first.
 
 ## Downloads
 
