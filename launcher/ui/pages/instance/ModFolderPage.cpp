@@ -287,12 +287,31 @@ QByteArray fileDigest(const QString& path)
     QCryptographicHash hash(QCryptographicHash::Sha256);
     return hash.addData(&file) ? hash.result() : QByteArray{};
 }
+
+bool hasModFolderContents(ModFolderModel* model)
+{
+    if (!model->allMods().isEmpty())
+        return true;
+    const auto entries = model->dir().entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
+    for (const auto& entry : entries) {
+        if (entry.fileName() != ".index")
+            return true;
+    }
+    return false;
+}
 }
 
 void ModFolderPage::autoFix()
 {
     if (!m_instance || m_instance->typeName() != "Minecraft" || m_instance->isRunning()) {
         QMessageBox::warning(this, tr("Auto-fix"), tr("Close the game before checking and fixing a Minecraft instance."));
+        return;
+    }
+
+    // Report available compatibility findings before proposing any changes.
+    checkCompatibility();
+    if (m_instance->isRunning()) {
+        QMessageBox::warning(this, tr("Auto-fix"), tr("The game started; no changes were made."));
         return;
     }
 
@@ -345,8 +364,15 @@ void ModFolderPage::autoFix()
     QModelIndexList toDisable;
     const auto current = m_model->allMods();
     for (const auto& pair : duplicates) {
+        bool originalEnabled = false;
+        for (auto* mod : current) {
+            if (mod->enabled() && !mod->fileinfo().isSymLink() && mod->fileinfo().absoluteFilePath() == pair.first) {
+                originalEnabled = true;
+                break;
+            }
+        }
         const auto first = fileDigest(pair.first);
-        if (first.isEmpty() || first != fileDigest(pair.second) || QFileInfo::exists(pair.second + ".disabled"))
+        if (!originalEnabled || first.isEmpty() || first != fileDigest(pair.second) || QFileInfo::exists(pair.second + ".disabled"))
             continue;
         for (int row = 0; row < current.size(); ++row) {
             auto* mod = current.at(row);
@@ -381,7 +407,7 @@ void ModFolderPage::optimizeMods()
         return;
     }
     // Unknown local mods cannot be reliably checked for conflicts. Fail closed rather than guess.
-    if (!m_model->allMods().isEmpty()) {
+    if (hasModFolderContents(m_model)) {
         QMessageBox::information(this, tr("Optimization"),
                                  tr("Automatic selection is currently limited to an empty mods folder. "
                                     "Existing mods, including disabled ones, cannot yet be checked reliably for conflicts; nothing was installed."));
@@ -456,12 +482,13 @@ void ModFolderPage::optimizeMods()
                                 .arg(game, loader, pack->name, selected.version, selected.fileName);
     if (QMessageBox::question(this, tr("Confirm optimization"), message, QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
         return;
-    if (m_instance->isRunning() || !m_model->allMods().isEmpty() || QFileInfo::exists(m_model->dir().absoluteFilePath(selected.fileName)) ||
+    if (m_instance->isRunning() || hasModFolderContents(m_model) || QFileInfo::exists(m_model->dir().absoluteFilePath(selected.fileName)) ||
         !profile->getComponent("net.minecraft") || profile->getComponent("net.minecraft")->getVersion() != game || profile->getModLoaders() != loaders) {
         QMessageBox::warning(this, tr("Optimization"), tr("The instance changed during review. Nothing was installed; please check again."));
         return;
     }
-    auto task = makeShared<ResourceDownloadTask>(pack, selected, m_model, true, "optimization");
+    const bool isIndexed = !APPLICATION->settings()->get("ModMetadataDisabled").toBool();
+    auto task = makeShared<ResourceDownloadTask>(pack, selected, m_model, isIndexed, "optimization");
     ProgressDialog download(this);
     download.setSkipButton(true, tr("Abort"));
     if (download.execWithTask(task.get()) != QDialog::Accepted || !task->wasSuccessful())

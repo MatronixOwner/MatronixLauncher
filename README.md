@@ -32,6 +32,14 @@ In **Settings → Appearance**, choose a local video and apply the settings. Pre
 
 In **Settings → Appearance**, select a background image and choose its fit, opacity, and dimming. Clear the image to return to the cat background. When enabled, video is shown on top of the image. The clock and total-playtime widgets can be enabled independently; there is no greeting widget. Interface animations and Frost snowfall can also be turned off.
 
+### Mod checks, repair and optimization
+
+In **Edit Instance → Mods**, **Check Compatibility** reports potential Minecraft version, loader, duplicate ID and dependency issues using available local and indexed metadata. It cannot check all dependency version constraints or unindexed/embedded conflicts; missing information is not proof of compatibility.
+
+**Auto-fix** first shows compatibility findings, then looks for byte-identical enabled files. After a separate confirmation it disables the duplicates by renaming them; it never deletes them. Other problems require manual attention. Do not run it while the game is running.
+
+**Optimization** currently works only with an empty mods folder: it asks Modrinth for a compatible, self-contained Sodium (Fabric/Quilt) or Embeddium (Forge/NeoForge) version and shows the exact file before installing it. It does not install anything without confirmation. If existing files, unavailable metadata, required dependencies or an unsupported loader prevent a safe recommendation, it declines rather than guessing. These checks cannot guarantee that all incompatibilities have been found; back up your instance first.
+
 ## Downloads
 
 Get published builds from the [GitHub Releases page](https://github.com/MatronixOwner/MatronixLauncher/releases). Preview releases are produced by the [`matronix-preview-release` workflow](.github/workflows/matronix-preview-release.yml). Check each release's notes for available platforms and installation guidance.
