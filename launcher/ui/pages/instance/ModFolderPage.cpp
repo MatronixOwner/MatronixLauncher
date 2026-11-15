@@ -48,6 +48,7 @@
 #include <QKeyEvent>
 #include <QMenu>
 #include <QMessageBox>
+#include <QSet>
 #include <QSortFilterProxyModel>
 #include <algorithm>
 #include <memory>
@@ -76,6 +77,11 @@ ModFolderPage::ModFolderPage(BaseInstance* inst, ModFolderModel* model, QWidget*
     ui->actionsToolbar->insertActionBefore(ui->actionAddItem, ui->actionDownloadItem);
 
     connect(ui->actionDownloadItem, &QAction::triggered, this, &ModFolderPage::downloadMods);
+
+    auto* compatibility = new QAction(tr("Check Compatibility"), this);
+    compatibility->setToolTip(tr("Check enabled mods using locally available metadata; no files will be changed."));
+    ui->actionsToolbar->insertActionBefore(ui->actionAddItem, compatibility);
+    connect(compatibility, &QAction::triggered, this, &ModFolderPage::checkCompatibility);
 
     ui->actionUpdateItem->setToolTip(tr("Try to check or update all selected mods (all mods if none are selected)"));
     connect(ui->actionUpdateItem, &QAction::triggered, this, &ModFolderPage::updateMods);
@@ -158,6 +164,68 @@ void ModFolderPage::removeItems(const QItemSelection& selection)
         }
     }
     m_model->deleteResources(indexes);
+}
+
+void ModFolderPage::checkCompatibility()
+{
+    if (!m_instance || m_instance->typeName() != "Minecraft") {
+        QMessageBox::information(this, tr("Compatibility check"), tr("This check is only available for Minecraft instances."));
+        return;
+    }
+
+    auto* profile = static_cast<MinecraftInstance*>(m_instance)->getPackProfile();
+    auto minecraft = profile ? profile->getComponent("net.minecraft") : nullptr;
+    if (!minecraft) {
+        QMessageBox::warning(this, tr("Compatibility check"), tr("The Minecraft version could not be determined."));
+        return;
+    }
+
+    const auto gameVersion = minecraft->getVersion();
+    const auto supportedLoaders = profile->getSupportedModLoaders();
+    const auto mods = m_model->allMods();
+    QSet<QString> enabledIds;
+    for (auto* mod : mods) {
+        if (mod->enabled() && !mod->mod_id().isEmpty())
+            enabledIds.insert(mod->mod_id().toLower());
+    }
+
+    QStringList warnings;
+    int unknownVersions = 0;
+    int unknownLoaders = 0;
+    for (auto* mod : mods) {
+        if (!mod->enabled())
+            continue;
+        const auto versions = mod->mcVersions();
+        if (versions.isEmpty()) {
+            ++unknownVersions;
+        } else if (!versions.contains(gameVersion, Qt::CaseInsensitive)) {
+            warnings << tr("%1: Minecraft %2 is not listed in its metadata (listed: %3).")
+                            .arg(mod->name(), gameVersion, versions.join(", "));
+        }
+        const auto metadata = mod->metadata();
+        if (!metadata || metadata->loaders == ModPlatform::ModLoaderType::None) {
+            ++unknownLoaders;
+        } else if (!supportedLoaders || !(metadata->loaders & *supportedLoaders)) {
+            warnings << tr("%1: its listed loaders (%2) do not match this instance.").arg(mod->name(), mod->loaders());
+        }
+        for (const auto& dependency : mod->dependencies()) {
+            if (!dependency.isEmpty() && !enabledIds.contains(dependency.toLower())) {
+                warnings << tr("%1: required mod '%2' was not found among enabled mod IDs.").arg(mod->name(), dependency);
+            }
+        }
+    }
+
+    QMessageBox box(this);
+    box.setWindowTitle(tr("Compatibility check"));
+    box.setIcon(warnings.isEmpty() ? QMessageBox::Information : QMessageBox::Warning);
+    box.setText(warnings.isEmpty() ? tr("No problems were detected in the available metadata.")
+                                  : tr("Possible problems were found (%1). See details before making changes.").arg(warnings.size()));
+    warnings << tr("Minecraft version metadata unavailable for %1 enabled mods; loader metadata unavailable for %2.")
+                    .arg(unknownVersions).arg(unknownLoaders);
+    warnings << tr("This offline check is incomplete: metadata may be missing or outdated, embedded dependencies may not be detected, "
+                   "and dependency version constraints and conflicts are not checked. No files were changed.");
+    box.setDetailedText(warnings.join('\n'));
+    box.exec();
 }
 
 void ModFolderPage::downloadMods()

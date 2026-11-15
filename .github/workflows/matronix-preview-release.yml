@@ -2,11 +2,6 @@ name: Publish MatronixPrismLauncher preview builds
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - "arena/df25a442-matronixlauncher"
-    paths:
-      - ".release-preview"
 
 permissions: {}
 

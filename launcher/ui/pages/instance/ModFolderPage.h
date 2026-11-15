@@ -67,6 +67,7 @@ class ModFolderPage : public ExternalResourcesPage {
     void removeItems(const QItemSelection& selection) override;
 
     void downloadMods();
+    void checkCompatibility();
     void downloadDialogFinished(int result);
     void updateMods(bool includeDeps = false);
     void deleteModMetadata();
