@@ -2,6 +2,11 @@ name: Publish MatronixPrismLauncher preview builds
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - "arena/df25a442-matronixlauncher"
+    paths:
+      - ".release-preview"
 
 permissions: {}
 
@@ -24,29 +29,25 @@ jobs:
             exit 1
           fi
 
-  build_release:
-    needs: verify_release
-    name: Build Windows and Linux packages
-    uses: ./.github/workflows/build.yml
-    permissions:
-      contents: read
-      id-token: write
-      packages: write
-    with:
-      build-type: Release
-
   create_release:
-    needs: build_release
+    needs: verify_release
     permissions:
       contents: write
+      actions: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout release version
         uses: actions/checkout@v6
 
-      - name: Read release version
+      - name: Read release version and verify the tested build
         shell: bash
-        run: echo "VERSION=$(head -n 1 .release-preview)" >> "$GITHUB_ENV"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          echo "VERSION=$(head -n 1 .release-preview)" >> "$GITHUB_ENV"
+          gh api "repos/${{ github.repository }}/actions/runs/43688814014" | jq -e \
+            '.head_sha == "46eabadf494a626cf8e6810bfd6ecff37c81b699" and .status == "completed" and .conclusion == "success"'
 
       - name: Download Windows installer artifact
         uses: actions/download-artifact@v8
@@ -54,6 +55,8 @@ jobs:
           pattern: MatronixPrismLauncher-Windows-MSVC-Setup-*
           path: dist/windows
           merge-multiple: true
+          run-id: 43688814014
+          github-token: ${{ github.token }}
 
       - name: Download Linux AppImage artifact
         uses: actions/download-artifact@v8
@@ -61,6 +64,8 @@ jobs:
           pattern: MatronixPrismLauncher-Linux-*-Release-x86_64.AppImage
           path: dist/linux/appimage
           merge-multiple: true
+          run-id: 43688814014
+          github-token: ${{ github.token }}
 
       - name: Download Linux portable artifact
         uses: actions/download-artifact@v8
@@ -68,6 +73,8 @@ jobs:
           pattern: MatronixPrismLauncher-Linux-Qt6-Portable-*-Release
           path: dist/linux/portable
           merge-multiple: true
+          run-id: 43688814014
+          github-token: ${{ github.token }}
 
       - name: Prepare release assets
         shell: bash
@@ -83,7 +90,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.VERSION }}
-          target_commitish: ${{ github.sha }}
+          target_commitish: 46eabadf494a626cf8e6810bfd6ecff37c81b699
           name: MatronixPrismLauncher ${{ env.VERSION }}
           body: |
             Предварительная версия MatronixPrismLauncher.
@@ -92,6 +99,8 @@ jobs:
             - Локальный видеофон и картинка на фоне с настройками размера, прозрачности и затемнения.
             - Необязательные виджеты часов и общего времени игры; плавные анимации можно отключить.
             - Избранное, поиск и сортировка сборок; управление модами через Modrinth.
+            - Предупреждения о совместимости модов и автофикс побайтовых дубликатов с подтверждением.
+            - Подбор оптимизационного мода через Modrinth с проверкой доступных метаданных и подтверждением установки; неизвестные конфликты не гарантированно обнаруживаются.
             - Для Linux доступны AppImage и переносимый архив; интеграция AppImage использует XDG desktop portals.
             - Установщик Windows не подписан и может вызвать предупреждение SmartScreen.
           draft: false
