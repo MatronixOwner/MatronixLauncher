@@ -2,11 +2,35 @@ name: Publish MatronixPrismLauncher preview builds
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - "arena/df25a442-matronixlauncher"
+    paths:
+      - ".release-preview"
 
 permissions: {}
 
 jobs:
+  verify_release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - name: Verify the release tag is new
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(head -n 1 .release-preview)"
+          [[ "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-alpha\.[0-9]+$ ]]
+          existing="$(git ls-remote --tags origin "refs/tags/$version")"
+          if [[ -n "$existing" ]]; then
+            echo "::error::Release tag $version already exists; refusing to replace it."
+            exit 1
+          fi
+
   build_release:
+    needs: verify_release
     name: Build Windows and Linux packages
     uses: ./.github/workflows/build.yml
     permissions:
@@ -67,14 +91,14 @@ jobs:
           target_commitish: ${{ github.sha }}
           name: MatronixPrismLauncher ${{ env.VERSION }}
           body: |
-            Preview build of MatronixPrismLauncher.
+            Предварительная версия MatronixPrismLauncher.
 
-            - Choose the new Matronix Purple theme with a subtle violet gradient, alongside Matronix Black.
-            - Calm, short fades accompany theme changes and instance selection.
-            - Mark instances as favorites, search by name, ID, or group, and sort by name, recency, or playtime.
-            - Existing groups, instance copying, Modrinth-only mod management, and cat-background customization remain available.
-            - Linux builds are provided as an AppImage and a portable tarball; the AppImage uses XDG desktop portals for desktop integration, including KDE Plasma.
-            - The Windows installer is unsigned and may trigger a Windows SmartScreen warning.
+            - Тема Matronix Frost со снежинками и отдельным набором ледяных значков.
+            - Локальный видеофон и картинка на фоне с настройками размера, прозрачности и затемнения.
+            - Необязательные виджеты часов и общего времени игры; плавные анимации можно отключить.
+            - Избранное, поиск и сортировка сборок; управление модами через Modrinth.
+            - Для Linux доступны AppImage и переносимый архив; интеграция AppImage использует XDG desktop portals.
+            - Установщик Windows не подписан и может вызвать предупреждение SmartScreen.
           draft: false
           prerelease: true
           files: |
